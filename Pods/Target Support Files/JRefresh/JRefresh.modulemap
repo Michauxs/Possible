@@ -1,0 +1,6 @@
+framework module JRefresh {
+  umbrella header "JRefresh-umbrella.h"
+
+  export *
+  module * { export * }
+}

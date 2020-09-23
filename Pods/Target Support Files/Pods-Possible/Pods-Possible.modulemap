@@ -1,0 +1,6 @@
+framework module Pods_Possible {
+  umbrella header "Pods-Possible-umbrella.h"
+
+  export *
+  module * { export * }
+}

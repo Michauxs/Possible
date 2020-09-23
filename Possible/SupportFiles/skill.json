@@ -1,0 +1,11 @@
+{
+    "skill_000":["unknown",     "skill_000", 0, 0, "desc"],
+    "skill_001":["lock",        "skill_001", 1, 0, "desc"],
+    "skill_002":["blank",       "skill_002", 2, 0, "desc"],
+    
+    "skill_010":["RedA",        "skill_010", 10, 2, "desc"],
+    "skill_011":["XiaDan",      "skill_011", 11, 2, "desc"],
+    "skill_012":["Wolf St",     "skill_012", 12, 1, "desc"],
+    "skill_013":["Drink",       "skill_013", 13, 2, "desc"],
+    "skill_014":["AllOfMe",     "skill_014", 14, 2, "desc"],
+}
