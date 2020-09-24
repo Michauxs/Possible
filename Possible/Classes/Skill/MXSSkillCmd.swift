@@ -14,7 +14,7 @@ class MXSSkill {
     var power: SkillPower = .unKnown
     var state: SkillState = .unused {
         didSet {
-            
+            self.concreteBtn?.status = state
         }
     }
     var quality: Int?

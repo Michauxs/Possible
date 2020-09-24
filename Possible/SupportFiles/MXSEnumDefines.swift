@@ -20,6 +20,10 @@ let kHeroPhoto: String = "key_hero_photo"
 
 let SkillBlankPhoto: String = "skill_002"
 
+
+let FontKaiTiBold: String = "STKaitiSC-Bold"
+let FontKaiTiRegular: String = "STKaitiSC-Regular"
+
 let indexHeroName: Int = 0
 let indexHeroPhoto: Int = 1
 let indexHeroHP: Int = 2
@@ -52,11 +56,12 @@ enum PokerAction : Int {
     case attack = 1
     case defense
     case warFire
-    case rainArrow
+    case arrowes
     case duel
     case steal
     case destroy
     case detect
+    case recover
 }
 
 enum ActionReplyResult : Int {
@@ -91,7 +96,7 @@ enum SkillPower : Int {
 
 enum SkillState : Int {
     case unused = 0
-    /**被动 不可关闭*/
+    /**被动 不可操作*/
     case keepOn
     /**关闭*/
     case unable

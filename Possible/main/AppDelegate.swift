@@ -17,6 +17,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate, NetServiceDelegate, Strea
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         NSLog("%@", NSHomeDirectory())
+        for item in UIFont.familyNames {
+                
+            NSLog("\n%@", item)
+            if item == "KaiTi_GB2312" || item == "Kaiti SC" || item == "Kaiti TC" || item == "STKaiti" {
+                for child in UIFont.fontNames(forFamilyName: item) {
+                    NSLog("%@", child)
+                }
+            }
+        }
         
         /*----------------------*/
         let root_vc = MXSLobbyController()

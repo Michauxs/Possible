@@ -27,6 +27,7 @@ class MXSSkillBtn: UIButton {
         let name = skill.name
         self.init(name!, fontSize: 315, textColor: .white)
         self.belong = skill
+        skill.concreteBtn = self
         self.power = skill.power
         
         setup()
@@ -37,10 +38,23 @@ class MXSSkillBtn: UIButton {
         self.setTitleColor(.black, for: .disabled)
         self.setRaius(1, borderColor: .white, borderWitdh: 1)
         
-        if self.belong!.state == .keepOn {
-            self.isEnabled = false
-        }
+        self.status = self.belong!.state
                 
+    }
+    
+    var status: SkillState = .unused {
+        didSet {
+            if status == .keepOn {
+                self.isEnabled = false
+            }
+            else if status == .enable {
+                self.isSelected = true
+            }
+            else if status == .unable {
+                self.isSelected = false
+            }
+            else { self.isEnabled = false }
+        }
     }
     
 }

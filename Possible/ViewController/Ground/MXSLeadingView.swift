@@ -34,7 +34,7 @@ case unPick
 */
 
 class MXSLeadingView: MXSBaseView {
-    weak var belong:MXSGameController?
+    weak var belong:MXSGroundController?
     
     var cancelBtn: UIButton?
     var certainBtn: UIButton?

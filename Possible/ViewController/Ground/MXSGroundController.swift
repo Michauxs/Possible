@@ -9,7 +9,7 @@
 import UIKit
 
 
-class MXSGameController: MXSViewController {
+class MXSGroundController: MXSViewController {
     let PPedMargin: CGFloat = 5.0
     
     var player: MXSHero = MXSHeroCmd.shared.someoneFromName("hero_026")!
@@ -22,7 +22,6 @@ class MXSGameController: MXSViewController {
     var pokerScrollView: UIScrollView?
     var graspPokerViewes: Array<MXSPokerView> = Array<MXSPokerView>()
     var skillScrollView: UIScrollView?
-    var skillBtnArray:Array<MXSSkillBtn> = Array<MXSSkillBtn>()
     
     lazy var leadingView: MXSLeadingView = {
         let leader = MXSLeadingView.init()
@@ -88,18 +87,16 @@ class MXSGameController: MXSViewController {
         view.addSubview(skillScrollView!)
         
         let btn_height:CGFloat = 40.0
-        for index in 0..<player.skillSet.count {
-            let skill = player.skillSet[index]
-            if skill.power != .blank && skill.power != .unKnown && skill.power != .lock{
-                let btn = MXSSkillBtn.init(skill:skill)
-                btn.frame = CGRect(x: 5, y: (btn_height+3)*CGFloat(index) + 5, width: skillScrollView!.frame.width-10.0, height: btn_height)
-                skillScrollView?.addSubview(btn)
-                skillBtnArray.append(btn)
-                
-                btn.addTarget(self, action: #selector(didSkillBtnClick(btn:)), for: .touchUpInside)
-            }
+        var height_sum:CGFloat = 5.0
+        for skill in player.skillSet {
+            if skill.power == .blank || skill.power == .unKnown || skill.power == .lock { continue }
+            let btn = MXSSkillBtn.init(skill:skill)
+            btn.frame = CGRect(x: 5, y: height_sum, width: skillScrollView!.frame.width-10.0, height: btn_height)
+            skillScrollView?.addSubview(btn)
+            height_sum += btn_height+3
+            btn.addTarget(self, action: #selector(didSkillBtnClick(btn:)), for: .touchUpInside)
         }
-        skillScrollView?.contentSize = CGSize.init(width: 0, height: (btn_height+3)*CGFloat(skillBtnArray.count))
+        skillScrollView?.contentSize = CGSize.init(width: 0, height: height_sum)
         /*--------------------------------------------*/
         pokerScrollView = UIScrollView.init()
         pokerScrollView?.showsHorizontalScrollIndicator = false
@@ -190,13 +187,12 @@ class MXSGameController: MXSViewController {
     
     //MARK:- Skill
     @objc func didSkillBtnClick(btn:MXSSkillBtn) {
-        btn.isSelected = !btn.isSelected
+//        btn.isSelected = !btn.isSelected
         print(btn.power as Any)
         if btn.isSelected {
-            player.startingSkill(btn.belong!)
-        }
-        else {
             player.stopSkill(btn.belong!)
+        } else {
+            player.startingSkill(btn.belong!)
         }
         checkCanCertainAction()
     }
@@ -205,13 +201,11 @@ class MXSGameController: MXSViewController {
     public func certainForAttack() {
         if player.discard() {
             leadingView.isHidden = true
-            layoutPokersInBox(update: 1)
-            
             player.stopAllSkill(.enable)
-            for btn_skill in skillBtnArray { btn_skill.isSelected = false }
-            
-            cycleActive()
         }
+        player.aim = nil
+        layoutPokersInBox(update: 1)
+        cycleActive()
     }
     
     public func cancelPickes() {
@@ -223,7 +217,7 @@ class MXSGameController: MXSViewController {
     public func endActive() {
         leadingView.isHidden = true
         leadingView.state = .defenseUnPick
-
+        
         player.endActiveAndClearHistory()
         nextCount += 1
         passedView.fadeout()
@@ -244,7 +238,7 @@ class MXSGameController: MXSViewController {
         }
         
         let action = player.aimedBy?.actionFromPoker
-        if action == PokerAction.attack || action == PokerAction.warFire || action == PokerAction.rainArrow {
+        if action == PokerAction.attack || action == PokerAction.warFire || action == PokerAction.arrowes {
             player.minsHP()
         }
         if action == PokerAction.steal {
@@ -325,7 +319,7 @@ class MXSGameController: MXSViewController {
                         self.passedView.collectPoker(pokers: [poker])
                     }
                     else {
-                        hero.aim = nil
+                        
                         hero.endActiveAndClearHistory()
                         self.nextCount += 1
                         self.passedView.fadeout()

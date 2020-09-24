@@ -87,7 +87,7 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate,
     var collectData: Array<Dictionary<String,Any>>?
     
     @objc func didPVEBtnClick() {
-        let vc = MXSGameController.init()
+        let vc = MXSGroundController.init()
         vc.modalPresentationStyle = .overFullScreen
         self.present(vc, animated: true) {
             
@@ -97,16 +97,19 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate,
     override func viewDidLoad() {
         super.viewDidLoad()
         let width = MXSSize.Sw * 0.25
-        
+        let textSign = "情深不寿，慧极必伤"
+        //"sometimes ever，sometimes never."
 //        let text_center = CGPoint(x: width, y: MXSSize.Sh*0.5)
-        let textLabel = UILabel.init(text: "sometimes ever，sometimes never.", fontSize: 624, textColor: .darkText, align: .left)
+        let textLabel = UILabel.init(text: textSign, fontSize: 1034, textColor: .gray, align: .left)
         textLabel.sizeToFit()
         textLabel.frame = CGRect(x: 45, y: 90, width: textLabel.frame.width, height: textLabel.frame.height)
-        let textLabel2 = UILabel.init(text: "sometimes ever，sometimes never.", fontSize: 624, textColor: .gray, align: .left)
-        textLabel2.frame = CGRect(x: 46, y: 91, width: textLabel.frame.width, height: textLabel.frame.height)
-        view.addSubview(textLabel2)
         view.addSubview(textLabel)
         
+        let textLabel2 = UILabel.init(text: textSign, fontSize: 1034, textColor: .darkText, align: .left)
+        textLabel2.frame = CGRect(x: 46, y: 91, width: textLabel.frame.width, height: textLabel.frame.height)
+        view.addSubview(textLabel2)
+        
+        /*---------------------------------------------*/
         
         let label_height:CGFloat = 44.0
         let deviceLabel = UILabel.init(text: "Online Device", fontSize: 615, textColor: .lightGray, align: .left)

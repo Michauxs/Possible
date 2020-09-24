@@ -44,6 +44,7 @@ class MXSPassedView: MXSBaseView {
                 pok.concreteView = MXSPokerView.init()
             }
             pok.concreteView!.removeFromSuperview()
+            pok.concreteView!.frame = CGRect(x: self.frame.width-MXSSize.Pw, y: 0, width: MXSSize.Pw, height: MXSSize.Ph)
             self.addSubview(pok.concreteView!)
             pok.concreteView?.showWidth = MXSSize.Pw
             passPokeres.append(pok)
@@ -56,15 +57,18 @@ class MXSPassedView: MXSBaseView {
         
         for index in 0..<passPokeres.count {
             let pok = passPokeres[index]
-            pok.concreteView!.frame = CGRect.init(x: org_x + MXSSize.Pw * CGFloat(index), y: 0, width: MXSSize.Pw, height: MXSSize.Ph)
+            UIView.animate(withDuration: 0.15) {
+                pok.concreteView!.frame = CGRect.init(x: org_x + MXSSize.Pw * CGFloat(index), y: 0, width: MXSSize.Pw, height: MXSSize.Ph)
+            }
         }
         
     }
     
     public func fadeout () {
         for pok in passPokeres {
-            UIView.animate(withDuration: 0.1, animations: {
+            UIView.animate(withDuration: 0.5, animations: {
                 pok.concreteView!.alpha = 0
+                pok.concreteView!.frame = CGRect.init(x: -MXSSize.Pw, y: 0, width: MXSSize.Pw, height: MXSSize.Ph)
             }) { (success) in
                 pok.concreteView!.removeFromSuperview()
                 pok.concreteView = nil

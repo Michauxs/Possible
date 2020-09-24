@@ -14,8 +14,8 @@
             filePath = "Possible/ViewController/Lobby/MXSLobbyController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "229"
-            endingLineNumber = "229"
+            startingLineNumber = "232"
+            endingLineNumber = "232"
             landmarkName = "netServiceBrowser(_:didFind:moreComing:)"
             landmarkType = "7">
          </BreakpointContent>

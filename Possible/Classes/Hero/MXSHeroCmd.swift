@@ -39,7 +39,6 @@ class MXSHero {
     func stopAllSkill(_ state:SkillState) {
         for skill in skillSet.filter({$0.state == state}) {
             skill.state = .unable
-            skill.concreteBtn?.isSelected = false
         }
     }
     func startingSkill(_ skill:MXSSkill) {
@@ -77,13 +76,24 @@ class MXSHero {
     var attribute: Array<Any>?
     var desc: String?
     
+    var attackCount: Int = 0 {
+        didSet {
+            let arr = skillSet.filter { (item) -> Bool in item.power == SkillPower.WolfSt }
+            if arr.count > 0 {
+                attackCount = 0
+            }
+        }
+    }
     var actionFromPoker: PokerAction?
     var discards:Array<MXSPoker>?
     func endActiveAndClearHistory () {
+        stopAllSkill(.enable)
+        aim = nil
         isActive = false
         isHoldOn = false
         actionFromPoker = nil
         discards = nil
+        attackCount = 0
     }
     
     /**name photo hp skills desc*/
@@ -176,23 +186,27 @@ class MXSHero {
     }
     
     func canAttack() -> Bool {
-        if self.aim == nil || self.pickes.count == 0  { return false }
-        
+        if self.pickes.count == 0  { return false }
         let poker_0 = self.pickes.first!
         let action = poker_0.actionGuise
+        
+        if self.aim == nil && action == PokerAction.recover && HP < LP { return true }
+        if self.aim == nil  { return false }
         if action == PokerAction.unknown { return false }
+        
         if action == PokerAction.attack {
-            if actionFromPoker != nil {
-                if actionFromPoker! == .attack {
-                    return false
-                }
+            if attackCount == 0 {
+                return true
             }
-            return true
+            return false
         }
-        if action == PokerAction.warFire || action == PokerAction.rainArrow || action == PokerAction.duel {
+        if action == PokerAction.warFire || action == PokerAction.arrowes || action == PokerAction.duel {
             return true
         }
         if (action == PokerAction.steal || action == PokerAction.destroy) && self.aim?.pokers.count != 0 {
+            return true
+        }
+        if action == PokerAction.recover && aim!.HP < aim!.LP  {
             return true
         }
         
@@ -204,7 +218,7 @@ class MXSHero {
         let action_pick = self.pickes.first!.actionGuise!
         let action_attck:PokerAction = self.aimedBy!.actionFromPoker!
         var action_reply: PokerAction?
-        if action_attck == .attack || action_attck == .rainArrow {
+        if action_attck == .attack || action_attck == .arrowes {
             action_reply = .defense
         }
         else if action_attck == .steal || action_attck == .destroy {
@@ -255,7 +269,7 @@ class MXSHero {
             return minsHPOrDefenseWithAction(.defense)
         case .warFire:
             return minsHPOrDefenseWithAction(.attack)
-        case .rainArrow:
+        case .arrowes:
             return minsHPOrDefenseWithAction(.defense)
         case .destroy:
             return distributeWithState(.pass)
@@ -297,6 +311,9 @@ class MXSHero {
     public func popCard(_ poker:MXSPoker) {
         self.pokers.removeAll(where: {$0 === poker})
         poker.state = .pass
+        if poker.actionGuise == PokerAction.attack {
+            attackCount += 1
+        }
         
         self.actionFromPoker = poker.actionGuise
         self.discards = [poker]
@@ -316,6 +333,8 @@ class MXSHero {
         for action in MXSPokerCmd.shared.priority {
             if let index = self.pokers.firstIndex(where: { (item) -> Bool in item.actionGuise == action }) {
                 let poker = self.pokers[index]
+                /**attack yet , check next action*/
+                if (action == PokerAction.attack ) && self.attackCount != 0 { continue }
                 /**aim no anyone poker , check next action*/
                 if (action == PokerAction.steal || action == PokerAction.destroy) && aim!.pokers.count == 0 { continue }
                 return poker

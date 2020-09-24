@@ -59,13 +59,13 @@ class MXSPokerCmd {
     static let shared : MXSPokerCmd = {
         let single = MXSPokerCmd.init()
         let color:Array<PokerColor> = [.heart, .spade, .club, .diamond]
-        let action:Array<PokerAction> = [.duel, .attack, .attack, .attack, .attack, .defense, .defense, .defense, .steal, .steal, .destroy, .destroy, .detect,
-                                         .warFire, .warFire, .rainArrow, .rainArrow, .duel, .attack, .attack, .defense, .steal, .steal, .destroy, .destroy, .detect]
+        let action:Array<PokerAction> = [.duel, .recover, .attack, .attack, .attack, .defense, .defense, .defense, .steal, .steal, .destroy, .recover, .detect,
+                                         .duel, .warFire, .warFire, .arrowes, .arrowes, .attack, .attack, .defense, .steal, .steal, .destroy, .recover, .detect]
         
         for index in 0..<13*2 {
             let index_trans = index%13
             for type in color {
-                let pok = MXSPoker.init([PokerState.pass, index_trans+1, type, action[index_trans]])
+                let pok = MXSPoker.init([PokerState.pass, index_trans+1, type, action[index]])
                 single.pokers.append(pok)
             }
         }

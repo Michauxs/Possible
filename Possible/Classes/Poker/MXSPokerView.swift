@@ -15,8 +15,9 @@ class MXSPokerView: MXSBaseView {
                                                       .steal:"偷窃",
                                                       .destroy:"破坏",
                                                       .warFire:"战火",
-                                                      .rainArrow:"箭雨",
-                                                      .duel:"决斗",
+                                                      .arrowes:"箭雨",
+                                                      .duel:"暗器",
+                                                      .recover:"恢复",
                                                       .detect:"侦察"]
     
     var contentView: UIView = UIView()
@@ -51,7 +52,12 @@ class MXSPokerView: MXSBaseView {
         didSet {
             var font_size = showWidth*0.5
             if font_size > 18 { font_size = 18 }
-            actionLabel.font = UIFont.systemFont(ofSize: font_size, weight: .bold)
+//            actionLabel.font = UIFont.systemFont(ofSize: font_size, weight: .bold)
+            //actionLabel.font = UIFont.init(name: "楷体_GB2312 Regular", size: font_size)
+//            actionLabel.font = UIFont.init(name: "KaiTi_GB2312", size: font_size)
+            let index = Int(arc4random_uniform(UInt32(2)))
+            if index == 0 { actionLabel.font = UIFont.init(name: "STKaitiTC-Bold", size: font_size)}
+            else { actionLabel.font = UIFont.init(name: "STKaitiSC-Bold", size: font_size)}
             contentView.snp.updateConstraints({ (m) in
                 m.width.equalTo(showWidth)
             })
