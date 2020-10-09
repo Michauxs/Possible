@@ -52,12 +52,8 @@ class MXSPokerView: MXSBaseView {
         didSet {
             var font_size = showWidth*0.5
             if font_size > 18 { font_size = 18 }
-//            actionLabel.font = UIFont.systemFont(ofSize: font_size, weight: .bold)
-            //actionLabel.font = UIFont.init(name: "楷体_GB2312 Regular", size: font_size)
-//            actionLabel.font = UIFont.init(name: "KaiTi_GB2312", size: font_size)
-            let index = Int(arc4random_uniform(UInt32(2)))
-            if index == 0 { actionLabel.font = UIFont.init(name: "STKaitiTC-Bold", size: font_size)}
-            else { actionLabel.font = UIFont.init(name: "STKaitiSC-Bold", size: font_size)}
+            //actionLabel.font = UIFont.systemFont(ofSize: font_size, weight: .bold)
+            actionLabel.font = UIFont.init(name: FontXingKai, size: font_size)
             contentView.snp.updateConstraints({ (m) in
                 m.width.equalTo(showWidth)
             })
@@ -72,8 +68,8 @@ class MXSPokerView: MXSBaseView {
         }
     }
     @objc func didTapedSelf() {
-        print("didTapedSelf")
-        self.controller?.perform(Selector(("someonePokerTaped:")), with: self)
+        print("poker did taped")
+        self.controller?.perform(#selector(MXSGroundController.someonePokerTaped(_:)), with: self)
 //        self.controller?.perform(#selector(someonePokerTapedWithPokerView:), with: self)
 //        let _ = self.controller?.perform(Selector(("someonePokerTaped:")), with: self)?.takeUnretainedValue()
 //        self.controller?.someonePokerTaped(self)

@@ -21,8 +21,9 @@ let kHeroPhoto: String = "key_hero_photo"
 let SkillBlankPhoto: String = "skill_002"
 
 
-let FontKaiTiBold: String = "STKaitiSC-Bold"
-let FontKaiTiRegular: String = "STKaitiSC-Regular"
+let FontKaiTiBold: String = "Kaiti SC"
+let FontKaiTiRegular: String = "KaiTi_GB2312"
+let FontXingKai: String = "FZXingKai-S04S"
 
 let indexHeroName: Int = 0
 let indexHeroPhoto: Int = 1

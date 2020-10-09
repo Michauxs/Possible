@@ -79,7 +79,6 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate,
     }()
     
     var services: Array<NetService> = Array<NetService>.init()
-    var localServ: NetService = MXSNetServ.shared
     var mainTable: MXSTableView?
     
     let closeBtn = UIButton.init(frame: CGRect.init(x: MXSSize.Sw*0.5, y: 0, width: 60, height: 40))
@@ -102,11 +101,11 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate,
 //        let text_center = CGPoint(x: width, y: MXSSize.Sh*0.5)
         let textLabel = UILabel.init(text: textSign, fontSize: 1034, textColor: .gray, align: .left)
         textLabel.sizeToFit()
-        textLabel.frame = CGRect(x: 45, y: 90, width: textLabel.frame.width, height: textLabel.frame.height)
         view.addSubview(textLabel)
         
         let textLabel2 = UILabel.init(text: textSign, fontSize: 1034, textColor: .darkText, align: .left)
-        textLabel2.frame = CGRect(x: 46, y: 91, width: textLabel.frame.width, height: textLabel.frame.height)
+        textLabel.frame = CGRect(x: 45.5, y: 90.5, width: textLabel.frame.width, height: textLabel.frame.height)
+        textLabel2.frame = CGRect(x: 45, y: 90, width: textLabel.frame.width, height: textLabel.frame.height)
         view.addSubview(textLabel2)
         
         /*---------------------------------------------*/
@@ -223,7 +222,7 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate,
     
     func netServiceBrowser(_ browser: NetServiceBrowser, didFind service: NetService, moreComing: Bool) {
         print("didFind")
-        if !(localServ.isEqual(service))  {
+        if !(MXSNetServ.shared.isEqual(service))  {
             services.append(service)
             print("service +1 \n")
         }
@@ -234,7 +233,7 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate,
     }
     func netServiceBrowser(_ browser: NetServiceBrowser, didRemove service: NetService, moreComing: Bool) {
         print("didRemove")
-        if !(localServ.isEqual(service))  {
+        if !(MXSNetServ.shared.isEqual(service))  {
             services.removeAll { (item) -> Bool in item.isEqual(service) }
         }
         if !moreComing {

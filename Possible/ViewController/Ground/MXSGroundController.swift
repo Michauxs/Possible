@@ -1,5 +1,5 @@
 //
-//  MXSGameController.swift
+//  MXSGroundController.swift
 //  HaiOn
 //
 //  Created by Sunfei on 2020/8/12.
@@ -12,20 +12,16 @@ import UIKit
 class MXSGroundController: MXSViewController {
     let PPedMargin: CGFloat = 5.0
     
-    var player: MXSHero = MXSHeroCmd.shared.someoneFromName("hero_026")!
-    lazy var opponter: MXSHero = {
-        return MXSHeroCmd.shared.random()
-    }()
-    var joinedHeroes: Array<MXSHero> = Array<MXSHero>()
-    var nextCount: Int = 0
+    var player: MXSHero = MXSHeroCmd.shared.getUnknownHero()
+    var opponter: MXSHero = MXSHeroCmd.shared.getUnknownHero()
     
-    var pokerScrollView: UIScrollView?
+    var pokerScrollView: UIScrollView = UIScrollView.init()
     var graspPokerViewes: Array<MXSPokerView> = Array<MXSPokerView>()
-    var skillScrollView: UIScrollView?
+    var skillScrollView: UIScrollView = UIScrollView.init()
     
     lazy var leadingView: MXSLeadingView = {
         let leader = MXSLeadingView.init()
-        let pokerViewFrame = pokerScrollView!.frame
+        let pokerViewFrame = pokerScrollView.frame
         leader.frame = CGRect(x: pokerViewFrame.minX, y: pokerViewFrame.minY - 44, width: pokerViewFrame.width, height: 44)
         view.addSubview(leader)
         leader.belong = self
@@ -53,11 +49,44 @@ class MXSGroundController: MXSViewController {
     
     @objc func didCloseGameBtnClick() {
         self.dismiss(animated: true) {
-            for hero in self.joinedHeroes {
-                hero.pokers.removeAll()
-            }
             MXSPokerCmd.shared.packagePoker()
         }
+    }
+    
+    let playerView = MXSHeroView.init()
+    let oppontView = MXSHeroView.init()
+    public func pickHero(_ hero:MXSHero) {
+        player = hero
+        player.isAxle = true
+        player.concreteView = playerView
+        
+        player.joingame()
+    }
+    public func autoPickHero(_ hero:MXSHero) {
+        opponter = hero
+        opponter.concreteView = oppontView
+        
+        if MXSPokerCmd.shared.shuffle() {
+            player.pokers.append(contentsOf: MXSPokerCmd.shared.push(6))
+            layoutPokersInBox(update: 0)
+            opponter.pokers.append(contentsOf: MXSPokerCmd.shared.push(6))
+        }
+        opponter.joingame()
+        /*--------------------------------------------*/
+        
+        let btn_height:CGFloat = 40.0
+        var height_sum:CGFloat = 5.0
+        for skill in player.skillSet {
+            if skill.power == .blank || skill.power == .unKnown || skill.power == .lock { continue }
+            let btn = MXSSkillBtn.init(skill:skill)
+            btn.frame = CGRect(x: 5, y: height_sum, width: skillScrollView.frame.width-10.0, height: btn_height)
+            skillScrollView.addSubview(btn)
+            height_sum += btn_height+3
+            btn.addTarget(self, action: #selector(didSkillBtnClick(btn:)), for: .touchUpInside)
+        }
+        skillScrollView.contentSize = CGSize.init(width: 0, height: height_sum)
+        
+        cycleActive()
     }
     
     override func viewDidLoad() {
@@ -75,52 +104,39 @@ class MXSGroundController: MXSViewController {
         actionBg.frame = CGRect.init(x: 0, y: MXSSize.Sh - MXSSize.Hh + 15, width: MXSSize.Sw, height: MXSSize.Hh-15)
         self.view.addSubview(actionBg)
         
-        let playerView = MXSHeroView.init()
+        /*--------------------------------------------*/
         self.view.addSubview(playerView)
         playerView.frame = CGRect.init(x: 10, y: MXSSize.Sh - MXSSize.Hh, width: MXSSize.Hw, height: MXSSize.Hh)
-        player.concreteView = playerView
-        player.isAxle = true
-        /*--------------------------------------------*/
-        skillScrollView = UIScrollView.init()
-        skillScrollView?.backgroundColor = .brown
-        skillScrollView?.frame = CGRect.init(x: MXSSize.Sw-MXSSize.Hw, y: actionBg.frame.minY, width: MXSSize.Hw, height: actionBg.frame.height)
-        view.addSubview(skillScrollView!)
         
-        let btn_height:CGFloat = 40.0
-        var height_sum:CGFloat = 5.0
-        for skill in player.skillSet {
-            if skill.power == .blank || skill.power == .unKnown || skill.power == .lock { continue }
-            let btn = MXSSkillBtn.init(skill:skill)
-            btn.frame = CGRect(x: 5, y: height_sum, width: skillScrollView!.frame.width-10.0, height: btn_height)
-            skillScrollView?.addSubview(btn)
-            height_sum += btn_height+3
-            btn.addTarget(self, action: #selector(didSkillBtnClick(btn:)), for: .touchUpInside)
-        }
-        skillScrollView?.contentSize = CGSize.init(width: 0, height: height_sum)
-        /*--------------------------------------------*/
-        pokerScrollView = UIScrollView.init()
-        pokerScrollView?.showsHorizontalScrollIndicator = false
-        view.addSubview(pokerScrollView!)
-        pokerScrollView?.frame = CGRect.init(x: playerView.frame.maxX+10, y: MXSSize.Sh - (MXSSize.Ph + PPedMargin),
-                                             width: MXSSize.Sw - 10 - MXSSize.Hw - 10 - 10 - MXSSize.Hw, height: MXSSize.Ph + PPedMargin)
-        /*--------------------------------------------*/
-        let oppontView = MXSHeroView.init()
         self.view.addSubview(oppontView)
         oppontView.frame = CGRect(x: (MXSSize.Sw - MXSSize.Hw)*0.5, y: 0, width: MXSSize.Hw, height: MXSSize.Hh)
         oppontView.controller = self
-        opponter.concreteView = oppontView
         /*--------------------------------------------*/
-        if MXSPokerCmd.shared.shuffle() {
-            player.pokers.append(contentsOf: MXSPokerCmd.shared.push(6))
-            layoutPokersInBox(update: 0)
-            opponter.pokers.append(contentsOf: MXSPokerCmd.shared.push(6))
-        }
+        skillScrollView.backgroundColor = .brown
+        skillScrollView.frame = CGRect.init(x: MXSSize.Sw-MXSSize.Hw, y: actionBg.frame.minY, width: MXSSize.Hw, height: actionBg.frame.height)
+        view.addSubview(skillScrollView)
         
-        joinedHeroes.append(player)
-        joinedHeroes.append(opponter)
         /*--------------------------------------------*/
-        cycleActive()
+        pokerScrollView.showsHorizontalScrollIndicator = false
+        view.addSubview(pokerScrollView)
+        pokerScrollView.frame = CGRect.init(x: playerView.frame.maxX+10, y: MXSSize.Sh - (MXSSize.Ph + PPedMargin),
+                                             width: MXSSize.Sw - 10 - MXSSize.Hw - 10 - 10 - MXSSize.Hw, height: MXSSize.Ph + PPedMargin)
+        /*--------------------------------------------*/
         
+//        if MXSPokerCmd.shared.shuffle() {
+//            player.pokers.append(contentsOf: MXSPokerCmd.shared.push(6))
+//            layoutPokersInBox(update: 0)
+//            opponter.pokers.append(contentsOf: MXSPokerCmd.shared.push(6))
+//        }
+//
+//        joinedHeroes.append(player)
+//        joinedHeroes.append(opponter)
+//        /*--------------------------------------------*/
+//        //cycleActive()
+        
+        let pickHeroView = MXSPickHeroView(frame: self.view.bounds)
+        view.addSubview(pickHeroView)
+        pickHeroView.belong = self
     }
     
     func layoutPokersInBox(update: Int) {
@@ -136,14 +152,14 @@ class MXSGroundController: MXSViewController {
         }
         //如果折叠后每张所得显示区域太小，则强制重置展示宽度，并开启滚动
         if margin_count < MXSSize.PTextVerLimit { margin_count = MXSSize.PTextVerLimit }
-        pokerScrollView?.contentSize = CGSize.init(width: margin_count*CGFloat(count-1)+MXSSize.Pw, height: 0)
+        pokerScrollView.contentSize = CGSize.init(width: margin_count*CGFloat(count-1)+MXSSize.Pw, height: 0)
         /*--------------------------*/
         if update == 0 {
             var index = 0
             while index < pokers.count {
                 let pok = pokers[index]
                 let pokerView = MXSPokerView.init()
-                pokerScrollView?.addSubview(pokerView)
+                pokerScrollView.addSubview(pokerView)
                 pokerView.frame = CGRect.init(x: margin_count * CGFloat(index), y: PPedMargin, width: MXSSize.Pw, height: MXSSize.Ph)
                 pokerView.controller = self
                 pok.concreteView = pokerView
@@ -176,8 +192,8 @@ class MXSGroundController: MXSViewController {
             }
             graspPokerViewes.last?.showWidth = MXSSize.Pw
             
-            if (pokerScrollView?.contentSize.width)! > box_width && player.adjustGrasp {
-                pokerScrollView?.setContentOffset(CGPoint(x: (pokerScrollView?.contentSize.width)! - box_width, y: 0), animated: true)
+            if pokerScrollView.contentSize.width > box_width && player.adjustGrasp {
+                pokerScrollView.setContentOffset(CGPoint(x: pokerScrollView.contentSize.width - box_width, y: 0), animated: true)
                 player.adjustGrasp = false
             }
             
@@ -199,33 +215,84 @@ class MXSGroundController: MXSViewController {
     
     //MARK:- leadingView
     public func certainForAttack() {
-        if player.discard() {
-            leadingView.isHidden = true
-            player.stopAllSkill(.enable)
+        let poker = player.pickes.first!
+        player.pokers.removeAll(where: {$0 === poker})
+        poker.state = .pass
+        
+        leadingView.isHidden = true
+        
+        if poker.actionGuise == PokerAction.attack {
+            player.attackCount += 1
         }
-        player.aim = nil
+        else if poker.actionGuise == PokerAction.duel {
+            MXSJudge.cmd.passive.first?.minsHP()
+            MXSJudge.cmd.clearPassive()
+
+            leadingView.isHidden = false
+            leadingView.state = .attackUnPick
+            
+            player.stopAllSkill(.enable)
+            layoutPokersInBox(update: 1)
+            cycleActive()
+            return
+        }
+        else if poker.actionGuise == PokerAction.recover {
+            if let aimed = MXSJudge.cmd.passive.first { //has aim
+                aimed.plusHP()
+            }
+            else {
+                player.plusHP()
+            }
+        }
+        else if player.actionFromPoker == PokerAction.warFire || player.actionFromPoker == PokerAction.arrowes {
+            
+        }
+        
+        player.actionFromPoker = poker.actionGuise
+        player.discards = [poker]
+        
+        player.isActive = false
+        
+        player.stopAllSkill(.enable)
         layoutPokersInBox(update: 1)
         cycleActive()
     }
+        
+    //            let group = DispatchGroup()
+    //            for hero in joinedHeroes {
+    //                if hero === player { continue }
+    //                    hero.isBeAimed = true
+    ////                hero.isActive = true
+    //                group.enter()
+    //                DispatchQueue.main.asyncAfter(deadline: .now()+1) {
+    //                    if let poker_return = hero.replyAttack() {
+    //                        self.passedView.collectPoker(pokers: [poker_return])
+    //                    }
+    //                    hero.isBeAimed = false
+    //                    group.leave()
+    //                }
+    //            }
+    //            group.notify(queue: DispatchQueue.main) {
+    //                self.leadingView.isHidden = true
+    //            }
     
     public func cancelPickes() {
         for poker in player.pickes { poker.concreteView?.isUp = false }
         player.pickes.removeAll()
-        player.aim = nil
+        MXSJudge.cmd.clearPassive()
     }
         
     public func endActive() {
         leadingView.isHidden = true
         leadingView.state = .defenseUnPick
         
-        player.endActiveAndClearHistory()
-        nextCount += 1
+        MXSJudge.cmd.next()
         passedView.fadeout()
         cycleActive()
     }
     
     public func certainForDefense() {
-        player.freeAimAndBackActive()
+        MXSJudge.cmd.leaderReactive()
         leadingView.isHidden = true
         layoutPokersInBox(update: 1)
         
@@ -237,7 +304,7 @@ class MXSGroundController: MXSViewController {
             player.pickes.removeAll()
         }
         
-        let action = player.aimedBy?.actionFromPoker
+        let action = MXSJudge.cmd.leader?.actionFromPoker
         if action == PokerAction.attack || action == PokerAction.warFire || action == PokerAction.arrowes {
             player.minsHP()
         }
@@ -258,7 +325,7 @@ class MXSGroundController: MXSViewController {
             layoutPokersInBox(update: 1)
         }
         
-        player.freeAimAndBackActive()
+        MXSJudge.cmd.leaderReactive()
         leadingView.isHidden = true
         
         cycleActive()
@@ -266,14 +333,10 @@ class MXSGroundController: MXSViewController {
     
     //MARK:- cycle active exchange
     func cycleActive() {
-        if let index = self.joinedHeroes.firstIndex(where: { (item) -> Bool in item.isActive == true }) {
-            let hero = self.joinedHeroes[index]
+        if let hero = MXSJudge.cmd.active {
             if hero.isAxle {
                 leadingView.isHidden = false
-                if hero.aimedBy != nil {//被动活跃
-                    leadingView.state = .defenseUnPick
-                }
-                else {//轮转活跃 + 回合
+                if hero === MXSJudge.cmd.leader { //leader
                     leadingView.state = .attackUnPick
                     if !hero.isHoldOn { //第一圈开始
                         hero.isHoldOn = true
@@ -284,57 +347,54 @@ class MXSGroundController: MXSViewController {
                         layoutPokersInBox(update: 1)
                     }
                 }
-                return
+                else {//passive
+                    leadingView.state = .defenseUnPick }
             }
-            
-            if hero.aimedBy != nil {   //hero 被动活跃
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                    if let poker_return = hero.replyAttack() {
-                        if poker_return.state == PokerState.transferring {// steal
-                            self.playerCollectPoker(poker_return)
-                            self.layoutPokersInBox(update: 1)
+            else { //AI /oppot
+                if hero === MXSJudge.cmd.leader { //leader
+                    if !hero.isHoldOn { //first
+                        hero.pokers.append(contentsOf: MXSPokerCmd.shared.push(2))
+                        hero.isHoldOn = true
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                        MXSJudge.cmd.appendOrRemovePassive(self.player)
+                        if let poker = hero.hasPokerDoAttack() {
+                            hero.pickes.append(poker)
+                            if hero.discard() {
+                            }
+                            hero.pickes.removeAll()
+                            self.passedView.collectPoker(pokers: [poker])
                         }
-                        else {//destroy / defense
-                            self.passedView.collectPoker(pokers: [poker_return])
+                        else {
+                            
+                            MXSJudge.cmd.next()
+                            self.passedView.fadeout()
                         }
+                        self.cycleActive()
                     }
                     
-                    hero.freeAimAndBackActive()
-                    self.cycleActive()
                 }
-            }
-            else { //do
-                if !hero.isHoldOn { //first
-                    hero.pokers.append(contentsOf: MXSPokerCmd.shared.push(2))
-                    hero.isHoldOn = true
-                }
-                
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                    hero.aim = self.player
-                    if let poker = hero.hasPokerDoAttack() {
-                        hero.pickes.append(poker)
-                        if hero.discard() {
+                else {//passive
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                        if let poker_return = hero.replyAttack() {
+                            if poker_return.state == PokerState.transferring {// steal
+                                self.playerCollectPoker(poker_return)
+                                self.layoutPokersInBox(update: 1)
+                            }
+                            else {//destroy / defense
+                                self.passedView.collectPoker(pokers: [poker_return])
+                            }
                         }
-                        hero.pickes.removeAll()
-                        self.passedView.collectPoker(pokers: [poker])
-                    }
-                    else {
                         
-                        hero.endActiveAndClearHistory()
-                        self.nextCount += 1
-                        self.passedView.fadeout()
+                        MXSJudge.cmd.leaderReactive()
+                        self.cycleActive()
                     }
-                    self.cycleActive()
-                    
                 }
             }
-        }
-        else {
-            let hero = joinedHeroes[(nextCount%joinedHeroes.count)]
-            hero.isActive = true
-            cycleActive()
+        
         }
     }
+        
     override func playerCollectPoker(_ poker: MXSPoker) {
         player.pokers.append(poker)
         poker.state = .handOn
@@ -345,7 +405,7 @@ class MXSGroundController: MXSViewController {
         let view_last = graspPokerViewes.last
         for poker in pokers {
             let pokerView = MXSPokerView.init()
-            pokerScrollView?.addSubview(pokerView)
+            pokerScrollView.addSubview(pokerView)
             pokerView.frame = CGRect.init(x: view_last?.frame.origin.x ?? 0.0, y: PPedMargin, width: MXSSize.Pw, height: MXSSize.Ph)
             pokerView.controller = self
             poker.concreteView = pokerView
@@ -375,17 +435,17 @@ class MXSGroundController: MXSViewController {
         /**被动响应 无需选择*/
         if leadingView.state == LeadingState.defenseUnPick { return }
         
-        if player.aim != nil {
-            if player.aim === heroView.belong {
-                player.aim = nil
-            }
-            else {
-                player.aim = heroView.belong
-            }
-        } else {
-            player.aim = heroView.belong
-        }
-        
+//        if player.aim != nil {
+//            if player.aim === heroView.belong {
+//                player.aim = nil
+//            }
+//            else {
+//                player.aim = heroView.belong
+//            }
+//        } else {
+//            player.aim = heroView.belong
+//        }
+        MXSJudge.cmd.appendOrRemovePassive(heroView.belong!)
         checkCanCertainAction()
     }
     

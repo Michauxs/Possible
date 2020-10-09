@@ -1,5 +1,5 @@
 [
-    ["Mr. Back",    "hero_000", 4, ["skill_010"], "backface"],
+    ["Unknown",    "hero_000", 4, ["skill_010"], "unknown"],
     ["Gen. Yang",   "hero_026", 4, ["skill_012"], "desc"],
     ["Xia Ren",     "hero_034", 4, ["skill_011"], "desc"],
     ["Moster Dian", "hero_016", 4, ["skill_010"], "default"],

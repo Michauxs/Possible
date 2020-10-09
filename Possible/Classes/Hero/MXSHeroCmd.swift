@@ -88,7 +88,6 @@ class MXSHero {
     var discards:Array<MXSPoker>?
     func endActiveAndClearHistory () {
         stopAllSkill(.enable)
-        aim = nil
         isActive = false
         isHoldOn = false
         actionFromPoker = nil
@@ -168,17 +167,6 @@ class MXSHero {
     }
     
     var isActive: Bool = false
-    weak var aim: MXSHero? {
-        willSet {
-            aim?.isBeAimed = false
-        }
-        didSet {
-            if aim != nil {
-                aim?.isBeAimed = true
-            }
-        }
-    }
-    weak var aimedBy: MXSHero?
     
     //MARK:- other hero
     public func collectCard () {
@@ -188,25 +176,25 @@ class MXSHero {
     func canAttack() -> Bool {
         if self.pickes.count == 0  { return false }
         let poker_0 = self.pickes.first!
-        let action = poker_0.actionGuise
+        let action:PokerAction? = poker_0.actionGuise
         
-        if self.aim == nil && action == PokerAction.recover && HP < LP { return true }
-        if self.aim == nil  { return false }
-        if action == PokerAction.unknown { return false }
+        let passive = MXSJudge.cmd.passive
+        if passive.count == 0 && action == .recover && HP < LP { return true }
+        if passive.count == 0 && (action == .warFire || action == .arrowes) { return true }
+        if passive.count == 0  { return false }
         
-        if action == PokerAction.attack {
-            if attackCount == 0 {
-                return true
-            }
-            return false
+        if action == .unknown { return false }
+        
+        if action == .attack {
+            return attackCount == 0
         }
-        if action == PokerAction.warFire || action == PokerAction.arrowes || action == PokerAction.duel {
+        if action == .duel {
             return true
         }
-        if (action == PokerAction.steal || action == PokerAction.destroy) && self.aim?.pokers.count != 0 {
+        if (action == .steal || action == .destroy) && passive.first!.pokers.count != 0 {
             return true
         }
-        if action == PokerAction.recover && aim!.HP < aim!.LP  {
+        if action == .recover && passive.first!.HP < passive.first!.LP  {
             return true
         }
         
@@ -216,7 +204,7 @@ class MXSHero {
         if self.pickes.count == 0 { return false }
         
         let action_pick = self.pickes.first!.actionGuise!
-        let action_attck:PokerAction = self.aimedBy!.actionFromPoker!
+        let action_attck:PokerAction = MXSJudge.cmd.leader!.actionFromPoker!
         var action_reply: PokerAction?
         if action_attck == .attack || action_attck == .arrowes {
             action_reply = .defense
@@ -235,26 +223,24 @@ class MXSHero {
     }
     
     /**return - need cycle
-     * true: other
-     * false: oneself
+     * true: 1 vs 1
+     * false: 1 vs 0 / 1 vs N
      */
     func discard() -> Bool {
         let poker = self.pickes.first!
-        if let aimed = self.aim {
+        
+        if let aimed = MXSJudge.cmd.passive.first {
             self.popCard(poker)
             if poker.actionGuise == PokerAction.duel {
                 aimed.minsHP()
+                MXSJudge.cmd.appendOrRemovePassive(aimed)
                 return false
             }
             
             self.isActive = false
-            
-            aimed.aimedBy = self
-            aimed.isActive = true
             return true
         }
-        else { //oneself
-            plusHP()
+        else { // oneself \ group
             return false
         }
     }
@@ -263,7 +249,7 @@ class MXSHero {
     func replyAttack() -> MXSPoker? {
         if isAxle { return nil }
         
-        let action_attck = self.aimedBy?.actionFromPoker
+        let action_attck = MXSJudge.cmd.leader?.actionFromPoker
         switch action_attck {
         case .attack:
             return minsHPOrDefenseWithAction(.defense)
@@ -319,16 +305,9 @@ class MXSHero {
         self.discards = [poker]
     }
     
-    public func freeAimAndBackActive() {
-        self.isActive = false
-        
-        self.aimedBy?.aim = nil
-        self.aimedBy?.isActive = true
-        self.aimedBy = nil
-    }
     /*--------------------------------------------*/
     public func hasPokerDoAttack() -> MXSPoker? {
-        if aim == nil || self.pokers.count == 0 { return nil }
+        if MXSJudge.cmd.passive.count == 0 || self.pokers.count == 0 { return nil }
         
         for action in MXSPokerCmd.shared.priority {
             if let index = self.pokers.firstIndex(where: { (item) -> Bool in item.actionGuise == action }) {
@@ -336,7 +315,7 @@ class MXSHero {
                 /**attack yet , check next action*/
                 if (action == PokerAction.attack ) && self.attackCount != 0 { continue }
                 /**aim no anyone poker , check next action*/
-                if (action == PokerAction.steal || action == PokerAction.destroy) && aim!.pokers.count == 0 { continue }
+                if (action == PokerAction.steal || action == PokerAction.destroy) && MXSJudge.cmd.passive.first!.pokers.count == 0 { continue }
                 return poker
             }
         }
@@ -344,6 +323,9 @@ class MXSHero {
     }
     /*--------------------------------------------*/
     
+    func joingame(){
+        MXSJudge.cmd.subject.append(self)
+    }
 }
 
 class MXSHeroCmd {
@@ -385,6 +367,11 @@ class MXSHeroCmd {
             return hero
         }
         return nil
+    }
+    func getUnknownHero() -> MXSHero {
+        let attr = heroData[0]
+        let hero = MXSHero.init(attr)
+        return hero
     }
     
     func allHeroModel() -> Array<MXSHero> {

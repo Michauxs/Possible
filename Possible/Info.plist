@@ -4,7 +4,8 @@
 <dict>
 	<key>UIAppFonts</key>
 	<array>
-		<string>Kaiti.ttc</string>
+		<string>XK.ttf</string>
+		<string>KT_GB2312 Bold.ttf</string>
 		<string>KT_GB2312.ttf</string>
 	</array>
 	<key>CFBundleDevelopmentRegion</key>

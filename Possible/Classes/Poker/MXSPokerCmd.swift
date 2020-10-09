@@ -53,7 +53,7 @@ class MXSPokerCmd {
     var pokers: Array<MXSPoker> = Array<MXSPoker>()
     var pokers_ready: Array<MXSPoker>?
     
-    var priority: Array<PokerAction> = [.steal, .destroy, .warFire, .warFire, .duel, .attack]
+    var priority: Array<PokerAction> = [.steal, .destroy, .warFire, .arrowes, .duel, .attack]
     
     
     static let shared : MXSPokerCmd = {
