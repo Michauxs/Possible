@@ -91,15 +91,19 @@ class MXSPokerView: MXSBaseView {
             case .heart:
                 colorSign.image = UIImage.init(named: "heart")
                 numberLabel.textColor = .red
+                actionLabel.textColor = .red
             case .club:
                 colorSign.image = UIImage.init(named: "club")
                 numberLabel.textColor = .black
+                actionLabel.textColor = .black
             case .spade:
                 colorSign.image = UIImage.init(named: "spade")
                 numberLabel.textColor = .black
+                actionLabel.textColor = .black
             case .diamond:
                 colorSign.image = UIImage.init(named: "diamond")
                 numberLabel.textColor = .red
+                actionLabel.textColor = .red
             default:
                 break
             }
@@ -149,8 +153,6 @@ class MXSPokerView: MXSBaseView {
             m.size.equalTo(CGSize.init(width: sign_width, height: sign_width))
         })
         
-//        actionLabel.minimumScaleFactor = 0.5
-//        actionLabel.adjustsFontSizeToFitWidth = true
         actionLabel.numberOfLines = 0
         contentView.addSubview(actionLabel)
         actionLabel.snp.makeConstraints({ (m) in

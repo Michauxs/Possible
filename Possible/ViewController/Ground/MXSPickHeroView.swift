@@ -116,10 +116,12 @@ class MXSPickHeroView: MXSBaseView {
             if index == view.tag { index += 1 }
             self.conctectViewes[index].isSelect = true
             
-            self.belong?.autoPickHero(self.heroData[index])
-            
-            self.isHidden = true
+            DispatchQueue.main.asyncAfter(deadline: .now()+1) {
+                self.belong?.autoPickHero(self.heroData[index])
+                self.isHidden = true
+            }
         }
+        
     }
     
     

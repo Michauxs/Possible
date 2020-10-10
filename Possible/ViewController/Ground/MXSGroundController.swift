@@ -435,16 +435,6 @@ class MXSGroundController: MXSViewController {
         /**被动响应 无需选择*/
         if leadingView.state == LeadingState.defenseUnPick { return }
         
-//        if player.aim != nil {
-//            if player.aim === heroView.belong {
-//                player.aim = nil
-//            }
-//            else {
-//                player.aim = heroView.belong
-//            }
-//        } else {
-//            player.aim = heroView.belong
-//        }
         MXSJudge.cmd.appendOrRemovePassive(heroView.belong!)
         checkCanCertainAction()
     }
