@@ -30,9 +30,9 @@ class MXSHeroShowView: MXSBaseView {
         }
     }
     
-    
     override func setupSubviews() {
-        
+        photoView.contentMode = .scaleAspectFill
+        photoView.clipsToBounds = true
         addSubview(photoView)
         photoView.snp.makeConstraints { (m) in
             m.edges.equalTo(self)
@@ -56,6 +56,10 @@ class MXSHeroShowView: MXSBaseView {
         }
         selectSign.setRaius(wh*0.5, borderColor: .orange, borderWitdh: 1.0)
         selectSign.isHidden = true
+        
+        self.layer.cornerRadius = 2.0
+        self.layer.borderColor = UIColor.orange.cgColor
+        self.layer.borderWidth = 1.0
     }
 }
 
@@ -77,7 +81,6 @@ class MXSPickHeroView: MXSBaseView {
         let numb_col = 4
         let content_height:CGFloat = hero_height * 2 + between
         let content_width:CGFloat = hero_width * CGFloat(numb_col) + between * CGFloat(numb_col-1)
-        
         
         let padding:CGFloat = (self.frame.height - content_height) * 0.5
         let contentView = UIView()
@@ -116,10 +119,8 @@ class MXSPickHeroView: MXSBaseView {
             if index == view.tag { index += 1 }
             self.conctectViewes[index].isSelect = true
             
-            DispatchQueue.main.asyncAfter(deadline: .now()+1) {
-                self.belong?.autoPickHero(self.heroData[index])
-                self.isHidden = true
-            }
+            self.belong?.autoPickHero(self.heroData[index])
+            self.isHidden = true
         }
         
     }

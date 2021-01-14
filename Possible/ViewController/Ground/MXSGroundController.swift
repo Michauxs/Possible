@@ -244,13 +244,6 @@ class MXSGroundController: MXSViewController {
                 player.plusHP()
             }
         }
-        else if player.actionFromPoker == PokerAction.warFire || player.actionFromPoker == PokerAction.arrowes {
-            
-        }
-        
-        player.actionFromPoker = poker.actionGuise
-        player.discards = [poker]
-        
         player.isActive = false
         
         player.stopAllSkill(.enable)
@@ -304,7 +297,7 @@ class MXSGroundController: MXSViewController {
             player.pickes.removeAll()
         }
         
-        let action = MXSJudge.cmd.leader?.actionFromPoker
+        let action = MXSJudge.cmd.leaderActiveAction
         if action == PokerAction.attack || action == PokerAction.warFire || action == PokerAction.arrowes {
             player.minsHP()
         }
@@ -348,7 +341,9 @@ class MXSGroundController: MXSViewController {
                     }
                 }
                 else {//passive
-                    leadingView.state = .defenseUnPick }
+                    leadingView.state = .defenseUnPick
+                    
+                }
             }
             else { //AI /oppot
                 if hero === MXSJudge.cmd.leader { //leader

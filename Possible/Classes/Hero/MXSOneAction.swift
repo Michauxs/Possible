@@ -12,6 +12,12 @@ enum CycleType : String{
     case start = "start"
     case end = "end"
 }
+enum OneStepType {
+    case unknown
+    case seplier
+    case aimOther
+    case oneself
+}
 
 class MXSOneAction {
     

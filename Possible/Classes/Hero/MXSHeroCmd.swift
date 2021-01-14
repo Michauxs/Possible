@@ -84,14 +84,12 @@ class MXSHero {
             }
         }
     }
-    var actionFromPoker: PokerAction?
-    var discards:Array<MXSPoker>?
+    var lastStep:MXSOneAction?
     func endActiveAndClearHistory () {
         stopAllSkill(.enable)
         isActive = false
         isHoldOn = false
-        actionFromPoker = nil
-        discards = nil
+        lastStep = nil
         attackCount = 0
     }
     
@@ -204,7 +202,7 @@ class MXSHero {
         if self.pickes.count == 0 { return false }
         
         let action_pick = self.pickes.first!.actionGuise!
-        let action_attck:PokerAction = MXSJudge.cmd.leader!.actionFromPoker!
+        let action_attck:PokerAction = MXSJudge.cmd.leaderActiveAction!
         var action_reply: PokerAction?
         if action_attck == .attack || action_attck == .arrowes {
             action_reply = .defense
@@ -249,7 +247,7 @@ class MXSHero {
     func replyAttack() -> MXSPoker? {
         if isAxle { return nil }
         
-        let action_attck = MXSJudge.cmd.leader?.actionFromPoker
+        let action_attck = MXSJudge.cmd.leaderActiveAction
         switch action_attck {
         case .attack:
             return minsHPOrDefenseWithAction(.defense)
@@ -300,9 +298,6 @@ class MXSHero {
         if poker.actionGuise == PokerAction.attack {
             attackCount += 1
         }
-        
-        self.actionFromPoker = poker.actionGuise
-        self.discards = [poker]
     }
     
     /*--------------------------------------------*/

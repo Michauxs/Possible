@@ -15,7 +15,6 @@ class MXSJudge {
      * |  leader <- active -> _passive_ |
      * |
      * |      <-------cycle-------      |
-     *
      */
     
     static let cmd : MXSJudge = {
@@ -28,6 +27,8 @@ class MXSJudge {
     var diary:Array<MXSOneAction> = Array<MXSOneAction>()
     
     //MARK: - leader
+    var leaderActiveAction:PokerAction?
+    var leaderActiveDiscard:Array<MXSPoker>?
     var leader:MXSHero? {
         willSet {
             passive.removeAll()
@@ -43,6 +44,24 @@ class MXSJudge {
         passive.removeAll()
         leader?.isActive = true
     }
+    
+    func leaderDiscard(poker:Array<MXSPoker>, action:PokerAction) {
+        let one = MXSOneAction(someone: leader!, act: action, pok: poker, to: passive)
+        diary.append(one)
+    }
+    
+    func findHistoryPoker() -> Array<MXSPoker> {
+        for index in 0...diary.count {
+            let last = diary[diary.count - index]
+            if last.hero === leader {
+                return last.pokers
+            }
+        }
+        return Array<MXSPoker>()
+    }
+//    func oppoentDiscard(poker:Array<MXSPoker>, action:PokerAction) {
+//
+//    }
     
     //MARK: - active
     var active:MXSHero?
