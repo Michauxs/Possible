@@ -36,6 +36,7 @@
 		765824DE250A08E300EB55E5 /* hero.json in Resources */ = {isa = PBXBuildFile; fileRef = 765824DC250A08E300EB55E5 /* hero.json */; };
 		765824DF250A08E300EB55E5 /* skill.json in Resources */ = {isa = PBXBuildFile; fileRef = 765824DD250A08E300EB55E5 /* skill.json */; };
 		765824E6250B51A500EB55E5 /* MXSAssemSkillItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 765824E5250B51A500EB55E5 /* MXSAssemSkillItem.swift */; };
+		7669BEE825C8EC660093ECFF /* MXSTIPMask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7669BEE725C8EC660093ECFF /* MXSTIPMask.swift */; };
 		766C3F3925243814002819E6 /* MXSJudge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 766C3F3825243814002819E6 /* MXSJudge.swift */; };
 		766C3F3B25245235002819E6 /* MXSOneAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 766C3F3A25245235002819E6 /* MXSOneAction.swift */; };
 		76963DC524FC922200007D9F /* MXSLeadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76963DC424FC922200007D9F /* MXSLeadingView.swift */; };
@@ -111,6 +112,7 @@
 		765824DC250A08E300EB55E5 /* hero.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = hero.json; sourceTree = "<group>"; };
 		765824DD250A08E300EB55E5 /* skill.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = skill.json; sourceTree = "<group>"; };
 		765824E5250B51A500EB55E5 /* MXSAssemSkillItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSAssemSkillItem.swift; sourceTree = "<group>"; };
+		7669BEE725C8EC660093ECFF /* MXSTIPMask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSTIPMask.swift; sourceTree = "<group>"; };
 		766C3F3825243814002819E6 /* MXSJudge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSJudge.swift; sourceTree = "<group>"; };
 		766C3F3A25245235002819E6 /* MXSOneAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSOneAction.swift; sourceTree = "<group>"; };
 		76963DC424FC922200007D9F /* MXSLeadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSLeadingView.swift; sourceTree = "<group>"; };
@@ -389,6 +391,7 @@
 				764DE64A25020B1A00409586 /* Extension */,
 				76F92F4B24F788990039478D /* MXSCodeNote.swift */,
 				76963DC824FE3B5100007D9F /* MXSNetServCmd.swift */,
+				7669BEE725C8EC660093ECFF /* MXSTIPMask.swift */,
 			);
 			path = Other;
 			sourceTree = "<group>";
@@ -606,6 +609,7 @@
 				76963DCB24FF388900007D9F /* MXSLobbyController.swift in Sources */,
 				765824D52509D64A00EB55E5 /* MXSCollectionCell.swift in Sources */,
 				765824E6250B51A500EB55E5 /* MXSAssemSkillItem.swift in Sources */,
+				7669BEE825C8EC660093ECFF /* MXSTIPMask.swift in Sources */,
 				765824D92509F63100EB55E5 /* MXSAssemHeroCell.swift in Sources */,
 				76F92F4A24F4A5D20039478D /* MXSColor.swift in Sources */,
 				765824D22509D64A00EB55E5 /* MXSTableView.swift in Sources */,

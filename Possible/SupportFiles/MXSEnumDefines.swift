@@ -8,6 +8,11 @@
 
 import UIKit
 
+
+let kMessageType: String = "develop_message_type"
+let kMessageValue: String = "develop_message_value"
+
+
 let kSkill: String = "key_skill"
 let kSkillPhoto: String = "key_skill_photo"
 let kSkillName: String = "key_skill_name"

@@ -8,6 +8,15 @@
 
 import UIKit
 
+enum MessageStatus : Int {
+    case request
+    case invite
+    case replyRequest
+    case replyInvite
+    case joined
+    case discard
+}
+
 class MXSNetServ: NetService, NetServiceDelegate, StreamDelegate {
     weak var belong: MXSLobbyController?
     
@@ -99,7 +108,8 @@ class MXSNetServ: NetService, NetServiceDelegate, StreamDelegate {
          */
         /**
         let data = message.data(using: .utf8)!
-        _ = data.withUnsafeBytes { MXSNetServ.shared.outputStream?.write($0, maxLength: data.count) }        */
+        _ = data.withUnsafeBytes { MXSNetServ.shared.outputStream?.write($0, maxLength: data.count) }
+         */
         /**
          let value = Int(bigEndian: data.subdata(in: 0..<4).withUnsafeBytes { $0.pointee })
          let value = Int(bigEndian: data.subdata(in: 0..<4).withUnsafeBytes { $0.baseAddress!.bindMemory(to: Int.self, capacity: 4).pointee })
@@ -130,19 +140,21 @@ class MXSNetServ: NetService, NetServiceDelegate, StreamDelegate {
         print("\n=== aStream ===")
         switch eventCode {
         case .openCompleted:
-            print("openCompleted +")
-            currentConnectCount += 1
-            /**完成链接 停止browser监测、当前service，输入、输出流不会停*/
-            if currentConnectCount == expectConnectCount {
-                print("openCompleted done")
-                self.belong?.stopBrowser()
-                stopService()
-                belong?.setupForConnected()
-            }
+            openCompleted()
         case .hasSpaceAvailable:
             print("can write")
         case .hasBytesAvailable:
             print("has bytes waiting")
+            let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: 4096)
+            let in_stream = aStream as! InputStream
+            let numberOfBytesRead = in_stream.read(buffer, maxLength: 4096)
+            if numberOfBytesRead > 0 {
+                let data1 = Data.init(bytesNoCopy: buffer, count: numberOfBytesRead, deallocator: .free)
+                let dict1 = try? JSONSerialization.jsonObject(with: data1, options: .mutableContainers)
+                if (dict1 != nil) {
+                    receiveMessage(dict1 as! Dictionary<String, Any>)
+                }
+            }
             
             /**var buf: UInt8 = UInt8.init()
             let len = MXSNetServ.shared.inputStream?.read(&buf, maxLength: Int(UInt8.max))
@@ -150,33 +162,7 @@ class MXSNetServ: NetService, NetServiceDelegate, StreamDelegate {
                 let s = String.init(buf)
                 self.belong!.receiveMsg(s)
             }*/
-             
-            /**
-             let in_stream = aStream as! InputStream
-             let dict = try? JSONSerialization.jsonObject(with: in_stream, options: .mutableContainers)
-             if (dict != nil) {
-             self.belong!.receiveMsg(dict as! Dictionary<String, Any>)
-             }
-             */
             
-            let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: 4096)
-            let in_stream = aStream as! InputStream
-            let numberOfBytesRead = in_stream.read(buffer, maxLength: 4096)
-            if numberOfBytesRead > 0 {
-//                let data = Data.init(bytes: buffer, count: 4096)
-//                let dict = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers)
-//                if (dict != nil) {
-//                    self.belong!.receiveMsg(dict as! Dictionary<String, Any>)
-//                }
-                let data1 = Data.init(bytesNoCopy: buffer, count: numberOfBytesRead, deallocator: .free)
-                let dict1 = try? JSONSerialization.jsonObject(with: data1, options: .mutableContainers)
-                if (dict1 != nil) {
-                    self.belong!.receiveMsg(dict1 as! Dictionary<String, Any>)
-                }
-            }
-//                if let message = String(bytesNoCopy: buffer, length: numberOfBytesRead, encoding: .utf8, freeWhenDone: true) {
-//                    self.belong!.receiveMsg(["s":message])
-//                }
             /**
              while in_stream.hasBytesAvailable {
              }
@@ -184,24 +170,45 @@ class MXSNetServ: NetService, NetServiceDelegate, StreamDelegate {
              break
              }
              */
+            /*
+             var b: UInt8 = 0
+             let byteR = MXSNetServ.shared.inputStream?.read(&b, maxLength: Int(UInt8.max))
+             if byteR ?? 0 > 0 {
+                 self.belong!.receiveMsg(b)
+             }
+             */
             
-//            var b: UInt8 = 0
-//            let byteR = MXSNetServ.shared.inputStream?.read(&b, maxLength: Int(UInt8.max))
-//            if byteR ?? 0 > 0 {
-//                self.belong!.receiveMsg(b)
-//            }
         case .errorOccurred:
             print("errorOccurred")
         case .endEncountered:
-            print("endEncountered")
-            MXSNetServ.shared.publishOrRestart()
-            belong?.startBrowser()
-            belong?.setupForNewGame()
+            endEncountered()
         default:
             print("nothing")
         }
     }
     
+    
+    //MARK:notifies
+    func openCompleted() {
+        print("openCompleted +")
+        currentConnectCount += 1
+        /**完成链接 停止browser监测、当前service，输入、输出流不会停*/
+        if currentConnectCount == expectConnectCount {
+            print("openCompleted done")
+            self.belong?.stopBrowser()
+            stopService()
+            belong?.setupForConnected()
+        }
+    }
+    func receiveMessage(_ msg:Dictionary<String, Any>) {
+        self.belong!.havesomeMessage(msg)
+    }
+    func endEncountered() {
+        print("endEncountered")
+        MXSNetServ.shared.publishOrRestart()
+        belong?.startBrowser()
+        belong?.setupForNewGame()
+    }
     
     //MARK:serv delegate
     func netServiceDidPublish(_ sender: NetService) {

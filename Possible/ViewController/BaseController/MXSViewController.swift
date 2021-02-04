@@ -10,6 +10,10 @@ import UIKit
 
 class MXSViewController: UIViewController {
 
+    lazy var maskTipView:MXSTIPMask = {
+        return MXSTIPMask.init()
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = UIColor.init(100, 100, 120)
@@ -36,13 +40,10 @@ class MXSViewController: UIViewController {
         
     }
     
-    /*
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    /***/
+    func havesomeMessage(_ dict:Dictionary<String, Any>) {
+        
     }
-    */
+    
 
 }

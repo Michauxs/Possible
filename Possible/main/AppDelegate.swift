@@ -18,18 +18,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate, NetServiceDelegate, Strea
         // Override point for customization after application launch.
         NSLog("%@", NSHomeDirectory())
         
-        NSLog("----------------")
-        for item in UIFont.familyNames {
-                
-            NSLog("%@", item)
-            if item == "KaiTi_GB2312" || item == "Kaiti SC" || item == "Kaiti TC" || item == "STKaiti" {
-                for child in UIFont.fontNames(forFamilyName: item) {
-                    NSLog("- %@", child)
-                }
-                NSLog("\n")
-            }
-            NSLog("----------------")
-        }
+//        NSLog("----------------")
+//        for item in UIFont.familyNames {
+//
+//            NSLog("%@", item)
+//            if item == "KaiTi_GB2312" || item == "Kaiti SC" || item == "Kaiti TC" || item == "STKaiti" {
+//                for child in UIFont.fontNames(forFamilyName: item) {
+//                    NSLog("- %@", child)
+//                }
+//                NSLog("\n")
+//            }
+//            NSLog("----------------")
+//        }
         
         /*----------------------*/
         let root_vc = MXSLobbyController()
@@ -57,11 +57,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, NetServiceDelegate, Strea
     
     func applicationDidEnterBackground(_ application: UIApplication) {
         print("applicationDidEnterBackground")
-        MXSNetServ.shared.belong?.deviceOffLine()
+//        MXSNetServ.shared.belong?.deviceOffLine()
     }
     
     func applicationWillEnterForeground(_ application: UIApplication) {
-        MXSNetServ.shared.belong?.startBrowser()
+//        MXSNetServ.shared.belong?.startBrowser()
     }
     
     func applicationWillTerminate(_ application: UIApplication) {

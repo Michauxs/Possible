@@ -8,66 +8,50 @@
 
 import UIKit
 
-class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate,
-    UICollectionViewDelegate,
-    UICollectionViewDataSource
+class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate
 {
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        collectData!.count
-    }
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell_c", for: indexPath)
-        let select = collectData![indexPath.row]["select"] as! Int
-        if select == 1 { cell.backgroundColor = .gray }
-        else { cell.backgroundColor = .random }
-        return cell
-    }
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        var item = collectData![indexPath.row]
-        let select = item["select"] as! Int
-        if select == 1 { item["select"] = 2 }
-        else { item["select"] = 1 }
-
-        swap(&item, &collectData![indexPath.row])
-        
-        let dict = ["selected":indexPath.row]
-        MXSNetServ.shared.send(dict)
-        mainCollect?.reloadData()
-    }
     
     /*---------------------------------------------*/
     @objc func tableDidSelectedRow(args:Array<Any>) {
         let ip:IndexPath = args[1] as! IndexPath
         let server = services[ip.row]
-        let success = MXSNetServ.shared.connectToService(server)
-        if success {
+        if MXSNetServ.shared.connectToService(server) {
             stopBrowser()
-            mainCollect?.isHidden = false
-            closeBtn.isHidden = false
-            MXSNetServ.shared.send(["open":1])
+            
+            MXSNetServ.shared.send([kMessageType:MessageStatus.request.rawValue, kMessageValue:"Mymy"])
+            MXSTIPMaskCmd.shared.showMaskWithTip("Waiting...", auto: false)
         }
     }
     
-    func receiveMsg(_ dict:Dictionary<String, Any>) {
+    override func havesomeMessage(_ dict:Dictionary<String, Any>) {
         print(dict)
         
-        if (dict["open"] != nil) {
-            if dict["open"] as! Int == 1 {
-                mainCollect?.isHidden = false
-                closeBtn.isHidden = false
+        let type:MessageStatus = MessageStatus.init(rawValue: dict[kMessageType] as! Int)!
+        switch type {
+        case .request:
+            let name = dict[kMessageValue] as! String
+            let alert = UIAlertController.init(title: "接连请求", message: name, preferredStyle: .alert)
+            alert.addAction(UIAlertAction.init(title: "N", style: .cancel, handler: { (act) in
+                MXSNetServ.shared.send([kMessageType:MessageStatus.replyRequest.rawValue, kMessageValue:0])
+            }))
+            alert.addAction(UIAlertAction.init(title: "Y", style: .default, handler: { (act) in
+                MXSNetServ.shared.send([kMessageType:MessageStatus.replyRequest.rawValue, kMessageValue:1])
+            }))
+            self.present(alert, animated: true, completion: nil)
+        case .replyRequest:
+            MXSTIPMaskCmd.shared.dispearMaskTip()
+            let value = dict[kMessageValue] as! Int
+            if value == 0 { 
+                MXSTIPMaskCmd.shared.showMaskWithTip("connect be refused", auto:true)
+                MXSNetServ.shared.closeStreams()
+//                startBrowser()
             }
-        }
-        
-        if (dict["selected"] != nil) {
-            let selected_row = dict["selected"] as! Int
-            var item = collectData![selected_row]
-            let select = item["select"] as! Int
-            if select == 1 { item["select"] = 2 }
-            else { item["select"] = 1 }
+            else {
+                MXSTIPMaskCmd.shared.showMaskWithTip("connected success", auto:true)
+            }
             
-            swap(&item, &collectData![selected_row])
+        default: break
             
-            mainCollect?.reloadData()
         }
     }
     
@@ -82,8 +66,6 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate,
     var mainTable: MXSTableView?
     
     let closeBtn = UIButton.init(frame: CGRect.init(x: MXSSize.Sw*0.5, y: 0, width: 60, height: 40))
-    var mainCollect: UICollectionView?
-    var collectData: Array<Dictionary<String,Any>>?
     
     @objc func didPVEBtnClick() {
         let vc = MXSGroundController.init()
@@ -96,7 +78,8 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate,
     override func viewDidLoad() {
         super.viewDidLoad()
         let width = MXSSize.Sw * 0.25
-        let textSign = "情深不寿，慧极必伤"
+//        let textSign = "情深不寿，慧极必伤"
+        let textSign = "sometimes ever，sometimes never."
         //"sometimes ever，sometimes never."
 //        let text_center = CGPoint(x: width, y: MXSSize.Sh*0.5)
         let textLabel = UILabel.init(text: textSign, fontSize: 1034, textColor: .gray, align: .left)
@@ -127,19 +110,6 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate,
         pveBtn.addTarget(self, action: #selector(didPVEBtnClick), for: .touchUpInside)
         
         /*---------------------------------------------*/
-        let layout = UICollectionViewFlowLayout.init()
-        layout.minimumLineSpacing = 1
-        layout.minimumInteritemSpacing = 1
-        layout.itemSize = CGSize.init(width: width*0.5-1, height: width*0.5-1)
-        
-        mainCollect = UICollectionView.init(frame: CGRect.init(x: 0, y: 0, width: width*2, height: MXSSize.Sh-44), collectionViewLayout: layout)
-        view.addSubview(mainCollect!)
-        mainCollect?.delegate = self
-        mainCollect?.dataSource = self
-        mainCollect?.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "cell_c")
-        
-        collectData = [["select":1],["select":1],["select":1],["select":1],
-                       ["select":1],["select":1],["select":1],["select":1],]
         
         closeBtn.setTitle("Close", for: .normal)
         view.addSubview(closeBtn)
@@ -198,6 +168,7 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate,
         print("stopBrowser")
         servBrowser.stop()
         services.removeAll()
+        mainTable?.dlg?.dlgData = services
         mainTable?.reloadData()
         
         startedBrowser = false
@@ -205,7 +176,7 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate,
         
     
     public func setupForNewGame() {
-        mainCollect?.isHidden = true
+        
         closeBtn.isHidden = true
     }
     public func setupForConnected() {
