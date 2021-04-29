@@ -39,12 +39,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, NetServiceDelegate, Strea
         
         MXSNetServ.shared.belong = root_vc
         /*----------------------*/
-        let str = "https://www.baidu.com"
-        let request = URLRequest(url: NSURL(string: str)! as URL, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 30)
-        let dataTask = URLSession.shared.dataTask(with: request) { (data, respons, error) in
-            
-        }
-        dataTask.resume()
+//        let str = "https://www.baidu.com"
+//        let request = URLRequest(url: NSURL(string: str)! as URL, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 30)
+//        let dataTask = URLSession.shared.dataTask(with: request) { (data, respons, error) in
+//
+//        }
+//        dataTask.resume()
         
         //屏幕常亮
         application.isIdleTimerDisabled = true

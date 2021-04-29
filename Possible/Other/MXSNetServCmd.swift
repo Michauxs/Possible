@@ -215,6 +215,12 @@ class MXSNetServ: NetService, NetServiceDelegate, StreamDelegate {
         print("netServiceDidPublish")
         published = true
     }
+    func netServiceDidStop(_ sender: NetService) {
+        print("netServiceDidStop")
+    }
+    func netService(_ sender: NetService, didNotPublish errorDict: [String : NSNumber]) {
+        print("didNotPublish")
+    }
     
     func netService(_ sender: NetService, didAcceptConnectionWith inputStream: InputStream, outputStream: OutputStream) {
 //        print(inputStream.)

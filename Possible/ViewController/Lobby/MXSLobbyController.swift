@@ -190,9 +190,11 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate
             MXSNetServ.shared.publishOrRestart()
         }
     }
-    
+    func netServiceBrowserDidStopSearch(_ browser: NetServiceBrowser) {
+        
+    }
     func netServiceBrowser(_ browser: NetServiceBrowser, didFind service: NetService, moreComing: Bool) {
-        print("didFind")
+        print("- didFind")
         if !(MXSNetServ.shared.isEqual(service))  {
             services.append(service)
             print("service +1 \n")
@@ -203,7 +205,7 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate
         }
     }
     func netServiceBrowser(_ browser: NetServiceBrowser, didRemove service: NetService, moreComing: Bool) {
-        print("didRemove")
+        print("- didRemove")
         if !(MXSNetServ.shared.isEqual(service))  {
             services.removeAll { (item) -> Bool in item.isEqual(service) }
         }

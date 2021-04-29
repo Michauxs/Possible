@@ -328,6 +328,7 @@
 		76AC2AF52514B34F005884CF /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				76AFA909263A949F00D958F2 /* Judge */,
 				76AC2AF82514B34F005884CF /* Hero */,
 				76AC2AF72514B34F005884CF /* Poker */,
 				76AC2AF62514B34F005884CF /* Skill */,
@@ -359,8 +360,6 @@
 			children = (
 				76F92F4424F3D8850039478D /* MXSHeroCmd.swift */,
 				76053E2224E68722001860E7 /* MXSHeroView.swift */,
-				766C3F3825243814002819E6 /* MXSJudge.swift */,
-				766C3F3A25245235002819E6 /* MXSOneAction.swift */,
 			);
 			path = Hero;
 			sourceTree = "<group>";
@@ -383,6 +382,15 @@
 				7654CDD1251AF0EF0053B4F3 /* MXSDeviceCell.swift */,
 			);
 			path = Lobby;
+			sourceTree = "<group>";
+		};
+		76AFA909263A949F00D958F2 /* Judge */ = {
+			isa = PBXGroup;
+			children = (
+				766C3F3825243814002819E6 /* MXSJudge.swift */,
+				766C3F3A25245235002819E6 /* MXSOneAction.swift */,
+			);
+			path = Judge;
 			sourceTree = "<group>";
 		};
 		76F92F4824F4A5970039478D /* Other */ = {

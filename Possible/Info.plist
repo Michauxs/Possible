@@ -2,6 +2,13 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>使用本地网络连接本地设备</string>
+    <key>NSBonjourServices</key>
+    <array>
+        <string>_mxs._tcp</string>
+        <string>_mxs._udp</string>
+    </array>
 	<key>UIAppFonts</key>
 	<array>
 		<string>XK.ttf</string>
