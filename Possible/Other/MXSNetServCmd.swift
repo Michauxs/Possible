@@ -10,15 +10,17 @@ import UIKit
 
 enum MessageStatus : Int {
     case request
-    case invite
+    case cancelRquest
     case replyRequest
+    case invite
+    case cancelInvite
     case replyInvite
     case joined
     case discard
 }
 
 class MXSNetServ: NetService, NetServiceDelegate, StreamDelegate {
-    weak var belong: MXSLobbyController?
+    weak var belong: MXSViewController?
     
     var inputStream: InputStream?
     var outputStream: OutputStream?

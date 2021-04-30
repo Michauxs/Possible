@@ -156,7 +156,7 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate
         startBrowser()
     }
         
-    public func startBrowser() {
+    override public func startBrowser() {
         if startedBrowser { return }
         
         print("startBrowser")
@@ -164,7 +164,7 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate
         servBrowser.searchForServices(ofType: "_mxs._tcp", inDomain: "local")
         startedBrowser = true
     }
-    public func stopBrowser() {
+    override public func stopBrowser() {
         print("stopBrowser")
         servBrowser.stop()
         services.removeAll()
@@ -175,11 +175,11 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate
     }
         
     
-    public func setupForNewGame() {
+    override public func setupForNewGame() {
         
         closeBtn.isHidden = true
     }
-    public func setupForConnected() {
+    override public func setupForConnected() {
         
     }
     

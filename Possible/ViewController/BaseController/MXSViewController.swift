@@ -40,10 +40,14 @@ class MXSViewController: UIViewController {
         
     }
     
+    
+    // MARK: - NetServ
     /***/
     func havesomeMessage(_ dict:Dictionary<String, Any>) {
         
     }
-    
-
+    public func startBrowser() { }
+    public func stopBrowser() { }
+    public func setupForNewGame() { }
+    public func setupForConnected() { }
 }
