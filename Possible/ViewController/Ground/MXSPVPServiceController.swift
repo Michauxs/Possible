@@ -30,7 +30,7 @@ class MXSPVPServiceController: MXSGroundController {
         
         player.joingame()
         pickHeroView.isHidden = true
-        MXSNetServ.shared.send([kMessageType:MessageType.pickHero.rawValue, kMessageValue:hero])
+        MXSNetServ.shared.send([kMessageType:MessageType.pickHero.rawValue, kMessageValue:hero.photo])
     }
     
     override func havesomeMessage(_ dict: Dictionary<String, Any>) {
@@ -43,7 +43,8 @@ class MXSPVPServiceController: MXSGroundController {
             MXSNetServ.shared.send([kMessageType:MessageType.showHero.rawValue, kMessageValue:pickHeroView.heroData])
             
         case .pickHero:
-            let hero = dict[kMessageValue] as! MXSHero
+            let hero_photo = dict[kMessageValue] as! String
+            let hero = MXSHeroCmd.shared.someoneFromName(hero_photo)
             opponter = hero
             opponter.concreteView = oppontView
             opponter.joingame()

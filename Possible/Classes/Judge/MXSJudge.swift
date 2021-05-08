@@ -17,6 +17,13 @@ class MXSJudge {
      * |      <-------cycle-------      |
      */
     
+    static func translateHeroModel(_ model:MXSHero) -> Dictionary {
+        return ["name":""]
+    }
+    static func translateHeroModelArray(_ model:Array<MXSHero>) -> Array<Dictionary<String, Any>> {
+        
+    }
+    
     static let cmd : MXSJudge = {
         let single = MXSJudge.init()
         return single
