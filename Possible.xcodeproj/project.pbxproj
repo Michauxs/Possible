@@ -52,6 +52,10 @@
 		76B4E9522506269000AD5CA3 /* MXSPassedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76B4E9512506269000AD5CA3 /* MXSPassedView.swift */; };
 		76B4E9542507769000AD5CA3 /* MXSView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76B4E9532507769000AD5CA3 /* MXSView.swift */; };
 		76DEB05825303E5300D954FC /* XK.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 76DEB05725303E5300D954FC /* XK.ttf */; };
+		76E9D0E526453DA800D6E5C4 /* MXSPVPSoloController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76E9D0E426453DA800D6E5C4 /* MXSPVPSoloController.swift */; };
+		76E9D0EA26453EF400D6E5C4 /* MXSPVESoloController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76E9D0E926453EF400D6E5C4 /* MXSPVESoloController.swift */; };
+		76E9D0EF26463FF700D6E5C4 /* MXSPVPServiceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76E9D0EE26463FF700D6E5C4 /* MXSPVPServiceController.swift */; };
+		76E9D0F42646401400D6E5C4 /* MXSPVPCustomerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76E9D0F32646401400D6E5C4 /* MXSPVPCustomerController.swift */; };
 		76F92F4324F397C50039478D /* LaunchImage-Landscape-667h~iPhone.png in Resources */ = {isa = PBXBuildFile; fileRef = 76F92F4224F397C50039478D /* LaunchImage-Landscape-667h~iPhone.png */; };
 		76F92F4524F3D8860039478D /* MXSHeroCmd.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76F92F4424F3D8850039478D /* MXSHeroCmd.swift */; };
 		76F92F4724F3D8E80039478D /* MXSSkillCmd.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76F92F4624F3D8E80039478D /* MXSSkillCmd.swift */; };
@@ -128,6 +132,10 @@
 		76B4E9512506269000AD5CA3 /* MXSPassedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSPassedView.swift; sourceTree = "<group>"; };
 		76B4E9532507769000AD5CA3 /* MXSView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSView.swift; sourceTree = "<group>"; };
 		76DEB05725303E5300D954FC /* XK.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = XK.ttf; sourceTree = "<group>"; };
+		76E9D0E426453DA800D6E5C4 /* MXSPVPSoloController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSPVPSoloController.swift; sourceTree = "<group>"; };
+		76E9D0E926453EF400D6E5C4 /* MXSPVESoloController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSPVESoloController.swift; sourceTree = "<group>"; };
+		76E9D0EE26463FF700D6E5C4 /* MXSPVPServiceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSPVPServiceController.swift; sourceTree = "<group>"; };
+		76E9D0F32646401400D6E5C4 /* MXSPVPCustomerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSPVPCustomerController.swift; sourceTree = "<group>"; };
 		76F92F4224F397C50039478D /* LaunchImage-Landscape-667h~iPhone.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "LaunchImage-Landscape-667h~iPhone.png"; sourceTree = "<group>"; };
 		76F92F4424F3D8850039478D /* MXSHeroCmd.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSHeroCmd.swift; sourceTree = "<group>"; };
 		76F92F4624F3D8E80039478D /* MXSSkillCmd.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSSkillCmd.swift; sourceTree = "<group>"; };
@@ -371,6 +379,10 @@
 				76B4E9512506269000AD5CA3 /* MXSPassedView.swift */,
 				76963DC424FC922200007D9F /* MXSLeadingView.swift */,
 				76053DDB24E39C90001860E7 /* MXSGroundController.swift */,
+				76E9D0E426453DA800D6E5C4 /* MXSPVPSoloController.swift */,
+				76E9D0E926453EF400D6E5C4 /* MXSPVESoloController.swift */,
+				76E9D0EE26463FF700D6E5C4 /* MXSPVPServiceController.swift */,
+				76E9D0F32646401400D6E5C4 /* MXSPVPCustomerController.swift */,
 			);
 			path = Ground;
 			sourceTree = "<group>";
@@ -593,8 +605,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				76E9D0E526453DA800D6E5C4 /* MXSPVPSoloController.swift in Sources */,
 				76053DDD24E39C90001860E7 /* MXSGroundController.swift in Sources */,
 				7654CDDA251C98D90053B4F3 /* MXSPickHeroView.swift in Sources */,
+				76E9D0EF26463FF700D6E5C4 /* MXSPVPServiceController.swift in Sources */,
 				765824D32509D64A00EB55E5 /* MXSCollectionDlg.swift in Sources */,
 				76963DC924FE3B5100007D9F /* MXSNetServCmd.swift in Sources */,
 				76F92F4724F3D8E80039478D /* MXSSkillCmd.swift in Sources */,
@@ -610,6 +624,7 @@
 				7697A5C624ECBC1E00FB93A6 /* MXSPokerView.swift in Sources */,
 				76053DDC24E39C90001860E7 /* MXSViewController.swift in Sources */,
 				76963DC524FC922200007D9F /* MXSLeadingView.swift in Sources */,
+				76E9D0F42646401400D6E5C4 /* MXSPVPCustomerController.swift in Sources */,
 				765824D02509D64A00EB55E5 /* MXSTableViewCell.swift in Sources */,
 				766C3F3B25245235002819E6 /* MXSOneAction.swift in Sources */,
 				765824D42509D64A00EB55E5 /* MXSCollectionViewLeftAlignLayout.swift in Sources */,
@@ -625,6 +640,7 @@
 				7654CDD8251C4F640053B4F3 /* MXSFont.swift in Sources */,
 				76053DAA24E39B4E001860E7 /* AppDelegate.swift in Sources */,
 				765824D62509D64A00EB55E5 /* MXSCollectionView.swift in Sources */,
+				76E9D0EA26453EF400D6E5C4 /* MXSPVESoloController.swift in Sources */,
 				764DE6492501F14700409586 /* MXSSkillAssemController.swift in Sources */,
 				76053E2324E68722001860E7 /* MXSHeroView.swift in Sources */,
 				7697A5C424ECB8F100FB93A6 /* MXSEnumDefines.swift in Sources */,

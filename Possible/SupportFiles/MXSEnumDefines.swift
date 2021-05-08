@@ -44,14 +44,16 @@ let indexSkillDesc: Int = 4
 
 //MARK:- Poker
 enum PokerColor : Int {
-    case heart = 0
+    case unknown = 0
+    case heart
     case spade
     case club
     case diamond
 }
 
 enum PokerState : Int {
-    case pass = 0
+    case unknown = 0
+    case pass
     case ready
     case handOn
     case transferring
@@ -71,6 +73,7 @@ enum PokerAction : Int {
 }
 
 enum ActionReplyResult : Int {
+    case unknown = 0
     case complete = 1
     case bear
     case NA
@@ -101,7 +104,8 @@ enum SkillPower : Int {
 }
 
 enum SkillState : Int {
-    case unused = 0
+    case unknown = 0
+    case unused
     /**被动 不可操作*/
     case keepOn
     /**关闭*/

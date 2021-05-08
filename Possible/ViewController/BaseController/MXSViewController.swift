@@ -44,7 +44,7 @@ class MXSViewController: UIViewController {
     // MARK: - NetServ
     /***/
     func havesomeMessage(_ dict:Dictionary<String, Any>) {
-        
+        print(dict)
     }
     public func startBrowser() { }
     public func stopBrowser() { }

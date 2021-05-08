@@ -10,6 +10,7 @@ import UIKit
 
 
 class MXSGroundController: MXSViewController {
+    
     let PPedMargin: CGFloat = 5.0
     
     var player: MXSHero = MXSHeroCmd.shared.getUnknownHero()
@@ -18,6 +19,7 @@ class MXSGroundController: MXSViewController {
     var pokerScrollView: UIScrollView = UIScrollView.init()
     var graspPokerViewes: Array<MXSPokerView> = Array<MXSPokerView>()
     var skillScrollView: UIScrollView = UIScrollView.init()
+    let pickHeroView = MXSPickHeroView.init(frame: CGRect.init(x: 0, y: 0, width: MXSSize.Sw, height: MXSSize.Sh))
     
     lazy var leadingView: MXSLeadingView = {
         let leader = MXSLeadingView.init()
@@ -55,7 +57,7 @@ class MXSGroundController: MXSViewController {
     
     let playerView = MXSHeroView.init()
     let oppontView = MXSHeroView.init()
-    public func pickHero(_ hero:MXSHero) {
+    public func pickedHero(_ hero:MXSHero) {
         player = hero
         player.isAxle = true
         player.concreteView = playerView
@@ -88,12 +90,20 @@ class MXSGroundController: MXSViewController {
         
         cycleActive()
     }
-    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        MXSNetServ.shared.belong = self
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
         /** self.backgroundColor = UIColor(patternImage: UIImage(named:"recentExam_bgimg")!) //平铺  */
         /*self.view.layer.contents = UIImage.init(named: "play_bg")?.cgImage  // 拉伸*/
+        self.initionalSubViewes()
+        /*--------------------------------------------*/
+        self.readyModelForView()
+    }
         
+    func initionalSubViewes() {
         let pveBtn = UIButton.init("Close", fontSize: 14, textColor: .black, backgColor: .darkGray)
         pveBtn.frame = CGRect.init(x: 15, y: 15, width: 64, height: 40)
         view.addSubview(pveBtn)
@@ -119,26 +129,21 @@ class MXSGroundController: MXSViewController {
         /*--------------------------------------------*/
         pokerScrollView.showsHorizontalScrollIndicator = false
         view.addSubview(pokerScrollView)
-        pokerScrollView.frame = CGRect.init(x: playerView.frame.maxX+10, y: MXSSize.Sh - (MXSSize.Ph + PPedMargin),
-                                             width: MXSSize.Sw - 10 - MXSSize.Hw - 10 - 10 - MXSSize.Hw, height: MXSSize.Ph + PPedMargin)
-        /*--------------------------------------------*/
+        pokerScrollView.frame = CGRect.init(x: playerView.frame.maxX+10,
+                                            y: MXSSize.Sh - (MXSSize.Ph + PPedMargin),
+                                            width: MXSSize.Sw - 10 - MXSSize.Hw - 10 - 10 - MXSSize.Hw,
+                                            height: MXSSize.Ph + PPedMargin)
         
-//        if MXSPokerCmd.shared.shuffle() {
-//            player.pokers.append(contentsOf: MXSPokerCmd.shared.push(6))
-//            layoutPokersInBox(update: 0)
-//            opponter.pokers.append(contentsOf: MXSPokerCmd.shared.push(6))
-//        }
-//
-//        joinedHeroes.append(player)
-//        joinedHeroes.append(opponter)
-//        /*--------------------------------------------*/
-//        //cycleActive()
-        
-        let pickHeroView = MXSPickHeroView(frame: self.view.bounds)
+        pickHeroView.frame = self.view.bounds
         view.addSubview(pickHeroView)
         pickHeroView.belong = self
     }
     
+    func readyModelForView () {
+        
+    }
+    
+    /**update 更新，0初始发牌*/
     func layoutPokersInBox(update: Int) {
         let pokers = player.pokers
         let count = pokers.count

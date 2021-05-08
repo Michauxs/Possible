@@ -36,8 +36,8 @@ class MXSPokerView: MXSBaseView {
             } else {
                 if org_y == 5.0 { return }
                 offset_y = 5.0
-                belong?.actionGuise = belong?.actionFate
-                belong?.colorGuise = belong?.color
+                belong?.actionGuise = belong!.actionFate
+                belong?.colorGuise = belong!.color
             }
             
             self.isUserInteractionEnabled = false

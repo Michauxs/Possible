@@ -56,9 +56,22 @@ class MXSTIPMask: MXSBaseView {
             m.edges.equalToSuperview()
         }
         
-        addSubview(titleLabel)
-        titleLabel.snp.makeConstraints { (m) in
+        let contentView = UIView.init()
+        contentView.backgroundColor = .alphaBlack
+        addSubview(contentView)
+        contentView.snp.makeConstraints { (m) in
             m.center.equalToSuperview()
+            m.size.equalTo(CGSize.init(width: 240, height: 80))
+        }
+        contentView.setRaius(2, borderColor: UIColor.gray, borderWitdh: 0)
+        
+        contentView.addSubview(titleLabel)
+        titleLabel.numberOfLines = 0;
+        titleLabel.textAlignment = .center
+        titleLabel.snp.makeConstraints { (m) in
+            m.centerY.equalToSuperview()
+            m.left.equalToSuperview().offset(20)
+            m.right.equalToSuperview().inset(20)
         }
     }
     

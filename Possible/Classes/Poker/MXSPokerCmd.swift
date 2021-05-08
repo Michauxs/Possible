@@ -9,12 +9,13 @@
 import UIKit
 
 class MXSPoker {
-    var state: PokerState?
-    var number: Int? = 0
-    var color: PokerColor?
-    var colorGuise: PokerColor?
-    var actionFate: PokerAction?
-    var actionGuise: PokerAction? {
+    var uid: Int = 0
+    var state: PokerState = .unknown
+    var number: Int = 0
+    var color: PokerColor = .unknown
+    var colorGuise: PokerColor = .unknown
+    var actionFate: PokerAction = .unknown
+    var actionGuise: PokerAction = .unknown {
         didSet {
             self.concreteView?.actionGuiseLabel.isHidden = actionFate == actionGuise
             self.concreteView?.actionGuise = actionGuise
@@ -27,12 +28,14 @@ class MXSPoker {
     init(_ attri:Array<Any>) {
         attribute = attri
         
-        state = attri[0] as? PokerState
-        number = attri[1] as? Int
-        color = attri[2] as? PokerColor
-        actionFate = attri[3] as? PokerAction
+        state = attri[0] as! PokerState
+        let n = attri[1] as! Int
+        number = n
+        let c = attri[2] as! PokerColor
+        color = c
+        actionFate = attri[3] as! PokerAction
         actionGuise = actionFate
-        
+        uid = c.rawValue * 100 + n as Int
     }
     
     var concreteView: MXSPokerView? {

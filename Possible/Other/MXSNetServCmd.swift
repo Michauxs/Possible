@@ -8,15 +8,27 @@
 
 import UIKit
 
-enum MessageStatus : Int {
+enum MessageType : Int {
+    case unknown = 0
     case request
     case cancelRquest
     case replyRequest
     case invite
     case cancelInvite
     case replyInvite
+    case readyOn
     case joined
+    case showHero
+    case pickHero
     case discard
+    case dealcard
+}
+enum ServiceStatus : Int {
+    case unknown = 0
+    case idle
+    case starting
+    case working
+    case stop
 }
 
 class MXSNetServ: NetService, NetServiceDelegate, StreamDelegate {
@@ -28,9 +40,7 @@ class MXSNetServ: NetService, NetServiceDelegate, StreamDelegate {
     var currentConnectCount: Int = 0
     
     /**已启动发布*/
-    var started: Bool = false
-    /**发布完成*/
-    var published: Bool = false
+    var status : ServiceStatus = .idle
     
     static let shared : MXSNetServ = {
         let single = MXSNetServ.init(domain: "local", type: "_mxs._tcp", name: UIDevice.current.name, port: 0)
@@ -42,11 +52,12 @@ class MXSNetServ: NetService, NetServiceDelegate, StreamDelegate {
     func connectToService(_ serv:NetService) -> Bool {
         var s_in: InputStream?
         var s_out: OutputStream?
+        print("connectToService getInputStream")
         let success = serv.getInputStream(&s_in, outputStream: &s_out)
         if success {
             MXSNetServ.shared.inputStream = s_in
             MXSNetServ.shared.outputStream = s_out
-            
+            print("connectToService success")
             openStreams()
         }
         return success
@@ -76,16 +87,17 @@ class MXSNetServ: NetService, NetServiceDelegate, StreamDelegate {
         currentConnectCount = 0
     }
     func publishOrRestart() {
-        closeStreams()
-        if !started {
-            MXSNetServ.shared.publish(options: .listenForConnections)
-            started = true
+        if status == .starting || status == .working {
+            return
         }
+        
+        closeStreams()
+        MXSNetServ.shared.publish(options: .listenForConnections)
+        status = .starting
     }
     func stopService() {
         MXSNetServ.shared.stop()
-        published = false
-        started = false
+        status = .idle
     }
     func offLine() {
         closeStreams()
@@ -94,6 +106,7 @@ class MXSNetServ: NetService, NetServiceDelegate, StreamDelegate {
     
     
     func send(_ message:Dictionary<String, Any>) {
+        print("send message: ", message, " 123")
         let data = try? JSONSerialization.data(withJSONObject: message, options: .prettyPrinted)
         if (data != nil) {
             let length = data?.withUnsafeBytes { MXSNetServ.shared.outputStream?.write($0, maxLength: data!.count) }
@@ -139,7 +152,7 @@ class MXSNetServ: NetService, NetServiceDelegate, StreamDelegate {
     
     //MARK:stream delegate
     func stream(_ aStream: Stream, handle eventCode: Stream.Event) {
-        print("\n=== aStream ===")
+        print("\n=== aStream ===", aStream)
         switch eventCode {
         case .openCompleted:
             openCompleted()
@@ -197,8 +210,8 @@ class MXSNetServ: NetService, NetServiceDelegate, StreamDelegate {
         /**完成链接 停止browser监测、当前service，输入、输出流不会停*/
         if currentConnectCount == expectConnectCount {
             print("openCompleted done")
-            self.belong?.stopBrowser()
-            stopService()
+//            self.belong?.stopBrowser()
+//            stopService()
             belong?.setupForConnected()
         }
     }
@@ -215,7 +228,15 @@ class MXSNetServ: NetService, NetServiceDelegate, StreamDelegate {
     //MARK:serv delegate
     func netServiceDidPublish(_ sender: NetService) {
         print("netServiceDidPublish")
-        published = true
+        status = .working
+    }
+    func netServiceDidResolveAddress(_ sender: NetService) {
+        print("netServiceDidResolveAddress", sender.name, sender.addresses, sender.hostName, sender.addresses?.first)
+        let data = sender.txtRecordData()
+        let dict = NetService.dictionary(fromTXTRecord: data!)
+        let info = String.init(data: dict["node"]!, encoding: String.Encoding.utf8)
+        print("mac info = ", info);
+
     }
     func netServiceDidStop(_ sender: NetService) {
         print("netServiceDidStop")
@@ -225,19 +246,21 @@ class MXSNetServ: NetService, NetServiceDelegate, StreamDelegate {
     }
     
     func netService(_ sender: NetService, didAcceptConnectionWith inputStream: InputStream, outputStream: OutputStream) {
-//        print(inputStream.)
+        print("didAcceptConnectionWith inputStream, outputStream")
+        
         if MXSNetServ.shared.inputStream != nil {
+            print("didAcceptConnectionWith other")
             inputStream.open()
             inputStream.close()
             outputStream.open()
             outputStream.close()
         }
         else {
-            stopService()
-            
+            print("didAcceptConnectionWith ")
+//            stopService()
+
             MXSNetServ.shared.inputStream = inputStream
             MXSNetServ.shared.outputStream = outputStream
-            
             openStreams()
         }
     }

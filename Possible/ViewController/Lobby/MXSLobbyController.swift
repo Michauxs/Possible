@@ -16,38 +16,49 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate
         let ip:IndexPath = args[1] as! IndexPath
         let server = services[ip.row]
         if MXSNetServ.shared.connectToService(server) {
-            stopBrowser()
+//            stopBrowser()
             
-            MXSNetServ.shared.send([kMessageType:MessageStatus.request.rawValue, kMessageValue:"Mymy"])
+            MXSNetServ.shared.send([kMessageType:MessageType.request.rawValue, kMessageValue:"请求接连，来自："+MXSNetServ.shared.name])
             MXSTIPMaskCmd.shared.showMaskWithTip("Waiting...", auto: false)
         }
     }
     
     override func havesomeMessage(_ dict:Dictionary<String, Any>) {
-        print(dict)
+        super.havesomeMessage(dict)
         
-        let type:MessageStatus = MessageStatus.init(rawValue: dict[kMessageType] as! Int)!
+        let type:MessageType = MessageType.init(rawValue: dict[kMessageType] as! Int)!
         switch type {
         case .request:
             let name = dict[kMessageValue] as! String
             let alert = UIAlertController.init(title: "接连请求", message: name, preferredStyle: .alert)
-            alert.addAction(UIAlertAction.init(title: "N", style: .cancel, handler: { (act) in
-                MXSNetServ.shared.send([kMessageType:MessageStatus.replyRequest.rawValue, kMessageValue:0])
+            alert.addAction(UIAlertAction.init(title: "拒绝", style: .cancel, handler: { (act) in
+                MXSNetServ.shared.send([kMessageType:MessageType.replyRequest.rawValue, kMessageValue:0])
             }))
-            alert.addAction(UIAlertAction.init(title: "Y", style: .default, handler: { (act) in
-                MXSNetServ.shared.send([kMessageType:MessageStatus.replyRequest.rawValue, kMessageValue:1])
+            alert.addAction(UIAlertAction.init(title: "接受", style: .default, handler: { (act) in
+                MXSNetServ.shared.send([kMessageType:MessageType.replyRequest.rawValue, kMessageValue:1])
+                let vc = MXSPVPServiceController.init()
+//                self.navigationController?.pushViewController(vc, animated: true)
+                vc.modalPresentationStyle = .overFullScreen
+                self.present(vc, animated: true) {
+                    
+                }
             }))
             self.present(alert, animated: true, completion: nil)
+            
         case .replyRequest:
             MXSTIPMaskCmd.shared.dispearMaskTip()
             let value = dict[kMessageValue] as! Int
-            if value == 0 { 
+            if value == 0 {
                 MXSTIPMaskCmd.shared.showMaskWithTip("connect be refused", auto:true)
-                MXSNetServ.shared.closeStreams()
-//                startBrowser()
+                
             }
             else {
                 MXSTIPMaskCmd.shared.showMaskWithTip("connected success", auto:true)
+                let vc = MXSPVPCustomerController.init()
+                vc.modalPresentationStyle = .overFullScreen
+                self.present(vc, animated: true) {
+                    
+                }
             }
             
         default: break
@@ -186,13 +197,13 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate
     
     //MARK: delegate
     func netServiceBrowserWillSearch(_ browser: NetServiceBrowser) {
-        if !MXSNetServ.shared.started {
-            MXSNetServ.shared.publishOrRestart()
-        }
+        MXSNetServ.shared.publishOrRestart()
     }
+    
     func netServiceBrowserDidStopSearch(_ browser: NetServiceBrowser) {
         
     }
+    
     func netServiceBrowser(_ browser: NetServiceBrowser, didFind service: NetService, moreComing: Bool) {
         print("- didFind")
         if !(MXSNetServ.shared.isEqual(service))  {

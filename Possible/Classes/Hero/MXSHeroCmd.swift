@@ -201,7 +201,7 @@ class MXSHero {
     func canDefense() -> Bool {
         if self.pickes.count == 0 { return false }
         
-        let action_pick = self.pickes.first!.actionGuise!
+        let action_pick = self.pickes.first!.actionGuise
         let action_attck:PokerAction = MXSJudge.cmd.leaderActiveAction!
         var action_reply: PokerAction?
         if action_attck == .attack || action_attck == .arrowes {

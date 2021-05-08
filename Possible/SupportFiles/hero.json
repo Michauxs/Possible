@@ -1,8 +1,10 @@
 [
-    ["Unknown",    "hero_000", 4, ["skill_010"], "unknown"],
     ["Gen. Yang",   "hero_026", 4, ["skill_012"], "desc"],
     ["Xia Ren",     "hero_034", 4, ["skill_011"], "desc"],
-    ["Moster Dian", "hero_016", 4, ["skill_010"], "default"],
+    ["Moster Tan", "hero_016", 4, ["skill_010"], "default"],
     ["Walker Wu",   "hero_012", 4, ["skill_013"], "desc"],
-    ["King Qin",    "hero_022", 3, ["skill_014"], "desc"],
+    ["King Li",   "hero_013", 4, ["skill_013"], "desc"],
+    ["King Liu",   "hero_014", 4, ["skill_013"], "desc"],
+    ["Dancer Li",   "hero_015", 3, ["skill_013"], "desc"],
+    ["King Qin",    "hero_022", 4, ["skill_014"], "desc"],
 ]
