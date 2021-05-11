@@ -22,6 +22,7 @@ enum MessageType : Int {
     case pickHero
     case discard
     case dealcard
+    case endGame
 }
 enum ServiceStatus : Int {
     case unknown = 0

@@ -112,6 +112,12 @@ class MXSPokerCmd {
             poker.state = .pass
         }
     }
-    
+    func someoneFromUid(_ uid:Int) -> MXSPoker? {
+        if let index = pokers.firstIndex(where: { (poker) -> Bool in poker.uid == uid }) {
+            let p = pokers[index]
+            return p
+        }
+        return nil
+    }
 }
 

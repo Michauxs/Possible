@@ -10,7 +10,13 @@ import UIKit
 
 class MXSPVPServiceController: MXSGroundController {
     var isService:Bool = false
-
+    override func didCloseGameBtnClick() {
+        self.dismiss(animated: true) {
+            MXSPokerCmd.shared.packagePoker()
+            MXSNetServ.shared.send([kMessageType:MessageType.endGame.rawValue, kMessageValue:1])
+        }
+    }
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
@@ -31,6 +37,26 @@ class MXSPVPServiceController: MXSGroundController {
         player.joingame()
         pickHeroView.isHidden = true
         MXSNetServ.shared.send([kMessageType:MessageType.pickHero.rawValue, kMessageValue:hero.photo])
+        
+        self.allPlayerReady()
+    }
+    
+    func allPlayerReady() {
+        if player.name == "Unknown" || opponter.name == "Unknown" {
+            return
+        }
+        if MXSPokerCmd.shared.shuffle() {
+            player.pokers.append(contentsOf: MXSPokerCmd.shared.push(6))
+            layoutPokersInBox(update: 0)
+            
+            let arr_p = MXSPokerCmd.shared.push(6)
+            opponter.pokers.append(contentsOf: arr_p)
+            var poker_uid_arr:Array<Int> = Array<Int>()
+            for poker in arr_p {
+                poker_uid_arr.append(poker.uid)
+            }
+            MXSNetServ.shared.send([kMessageType:MessageType.dealcard.rawValue, kMessageValue:poker_uid_arr])
+        }
     }
     
     override func havesomeMessage(_ dict: Dictionary<String, Any>) {
@@ -40,24 +66,28 @@ class MXSPVPServiceController: MXSGroundController {
         switch type {
         case .joined:
             print("some one joined game")
-            MXSNetServ.shared.send([kMessageType:MessageType.showHero.rawValue, kMessageValue:pickHeroView.heroData])
+            var div_hero:Array<String> = Array<String>()
+            for h in pickHeroView.heroData! {
+                div_hero.append(h.photo)
+            }
+            MXSNetServ.shared.send([kMessageType:MessageType.showHero.rawValue, kMessageValue:div_hero])
             
         case .pickHero:
-            let hero_photo = dict[kMessageValue] as! String
-            let hero = MXSHeroCmd.shared.someoneFromName(hero_photo)
-            opponter = hero
-            opponter.concreteView = oppontView
-            opponter.joingame()
-            
-            if MXSPokerCmd.shared.shuffle() {
-                player.pokers.append(contentsOf: MXSPokerCmd.shared.push(6))
-                layoutPokersInBox(update: 0)
+            let hero_name = dict[kMessageValue] as! String
+            if let hero = MXSHeroCmd.shared.someoneFromName(hero_name) {
+                opponter = hero
+                opponter.concreteView = oppontView
+                opponter.joingame()
                 
-                let arr_p = MXSPokerCmd.shared.push(6)
-                opponter.pokers.append(contentsOf: arr_p)
-                MXSNetServ.shared.send([kMessageType:MessageType.dealcard.rawValue, kMessageValue:arr_p])
+                self.allPlayerReady()
+            }
+        case .endGame:
+            self.dismiss(animated: true) {
+                MXSPokerCmd.shared.packagePoker()
             }
         default: break
         }
     }
+    
+    
 }

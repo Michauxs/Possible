@@ -364,7 +364,7 @@ class MXSHeroCmd {
         return nil
     }
     func getUnknownHero() -> MXSHero {
-        let attr = heroData[0]
+        let attr = ["Unknown", "hero_000", 4, ["skill_010"], "unknown"] as [Any]
         let hero = MXSHero.init(attr)
         return hero
     }
