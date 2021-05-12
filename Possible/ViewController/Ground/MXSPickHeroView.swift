@@ -65,6 +65,8 @@ class MXSHeroShowView: MXSBaseView {
 
 class MXSPickHeroView: MXSBaseView {
     weak var belong:MXSGroundController?
+    
+    var pickedCount:Int = 0
     let hero_width:CGFloat = 80.0
     let hero_height:CGFloat = 120.0
     let between:CGFloat = 3.0
@@ -115,8 +117,17 @@ class MXSPickHeroView: MXSBaseView {
 
     @objc func didTapedSelf(taped:UITapGestureRecognizer) {
         let view:MXSHeroShowView = taped.view as! MXSHeroShowView
+        if view.isSelect { return }
+        
+        pickedCount += 1
         view.isSelect = true
-        self.belong?.pickedHero(heroData![view.tag])
+        if pickedCount == 1 {
+            self.belong?.pickedHero(heroData![view.tag])
+        }
+        else {
+            if pickedCount > 2 { return }
+            self.belong?.pickedHero(heroData![view.tag], isOpponter: true)
+        }
         
 //        DispatchQueue.main.asyncAfter(deadline: .now()+1) {
 //            var index = Int.init(arc4random_uniform(UInt32(self.heroData!.count)))

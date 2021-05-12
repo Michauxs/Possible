@@ -48,11 +48,11 @@
 		7697A5CD24ECF4C100FB93A6 /* MXSSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7697A5CC24ECF4C100FB93A6 /* MXSSize.swift */; };
 		7697A5CF24EE453100FB93A6 /* MXSPokerCmd.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7697A5CE24EE453100FB93A6 /* MXSPokerCmd.swift */; };
 		76A038B8251D82CD0056C214 /* KT_GB2312 Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 76A038B7251D82CC0056C214 /* KT_GB2312 Bold.ttf */; };
+		76A0D29F264A7EE100768AA7 /* MXSNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76A0D29E264A7EE100768AA7 /* MXSNavigationController.swift */; };
 		76AC2AF4250F6DC1005884CF /* MXSSkillBtn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76AC2AF3250F6DC1005884CF /* MXSSkillBtn.swift */; };
 		76B4E9522506269000AD5CA3 /* MXSPassedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76B4E9512506269000AD5CA3 /* MXSPassedView.swift */; };
 		76B4E9542507769000AD5CA3 /* MXSView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76B4E9532507769000AD5CA3 /* MXSView.swift */; };
 		76DEB05825303E5300D954FC /* XK.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 76DEB05725303E5300D954FC /* XK.ttf */; };
-		76E9D0E526453DA800D6E5C4 /* MXSPVPSoloController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76E9D0E426453DA800D6E5C4 /* MXSPVPSoloController.swift */; };
 		76E9D0EA26453EF400D6E5C4 /* MXSPVESoloController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76E9D0E926453EF400D6E5C4 /* MXSPVESoloController.swift */; };
 		76E9D0EF26463FF700D6E5C4 /* MXSPVPServiceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76E9D0EE26463FF700D6E5C4 /* MXSPVPServiceController.swift */; };
 		76E9D0F42646401400D6E5C4 /* MXSPVPCustomerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76E9D0F32646401400D6E5C4 /* MXSPVPCustomerController.swift */; };
@@ -128,11 +128,11 @@
 		7697A5CC24ECF4C100FB93A6 /* MXSSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSSize.swift; sourceTree = "<group>"; };
 		7697A5CE24EE453100FB93A6 /* MXSPokerCmd.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSPokerCmd.swift; sourceTree = "<group>"; };
 		76A038B7251D82CC0056C214 /* KT_GB2312 Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "KT_GB2312 Bold.ttf"; sourceTree = "<group>"; };
+		76A0D29E264A7EE100768AA7 /* MXSNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSNavigationController.swift; sourceTree = "<group>"; };
 		76AC2AF3250F6DC1005884CF /* MXSSkillBtn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSSkillBtn.swift; sourceTree = "<group>"; };
 		76B4E9512506269000AD5CA3 /* MXSPassedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSPassedView.swift; sourceTree = "<group>"; };
 		76B4E9532507769000AD5CA3 /* MXSView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSView.swift; sourceTree = "<group>"; };
 		76DEB05725303E5300D954FC /* XK.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = XK.ttf; sourceTree = "<group>"; };
-		76E9D0E426453DA800D6E5C4 /* MXSPVPSoloController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSPVPSoloController.swift; sourceTree = "<group>"; };
 		76E9D0E926453EF400D6E5C4 /* MXSPVESoloController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSPVESoloController.swift; sourceTree = "<group>"; };
 		76E9D0EE26463FF700D6E5C4 /* MXSPVPServiceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSPVPServiceController.swift; sourceTree = "<group>"; };
 		76E9D0F32646401400D6E5C4 /* MXSPVPCustomerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSPVPCustomerController.swift; sourceTree = "<group>"; };
@@ -329,6 +329,7 @@
 			isa = PBXGroup;
 			children = (
 				76053DDA24E39C90001860E7 /* MXSViewController.swift */,
+				76A0D29E264A7EE100768AA7 /* MXSNavigationController.swift */,
 			);
 			path = BaseController;
 			sourceTree = "<group>";
@@ -379,7 +380,6 @@
 				76B4E9512506269000AD5CA3 /* MXSPassedView.swift */,
 				76963DC424FC922200007D9F /* MXSLeadingView.swift */,
 				76053DDB24E39C90001860E7 /* MXSGroundController.swift */,
-				76E9D0E426453DA800D6E5C4 /* MXSPVPSoloController.swift */,
 				76E9D0E926453EF400D6E5C4 /* MXSPVESoloController.swift */,
 				76E9D0EE26463FF700D6E5C4 /* MXSPVPServiceController.swift */,
 				76E9D0F32646401400D6E5C4 /* MXSPVPCustomerController.swift */,
@@ -605,7 +605,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				76E9D0E526453DA800D6E5C4 /* MXSPVPSoloController.swift in Sources */,
 				76053DDD24E39C90001860E7 /* MXSGroundController.swift in Sources */,
 				7654CDDA251C98D90053B4F3 /* MXSPickHeroView.swift in Sources */,
 				76E9D0EF26463FF700D6E5C4 /* MXSPVPServiceController.swift in Sources */,
@@ -634,6 +633,7 @@
 				765824E6250B51A500EB55E5 /* MXSAssemSkillItem.swift in Sources */,
 				7669BEE825C8EC660093ECFF /* MXSTIPMask.swift in Sources */,
 				765824D92509F63100EB55E5 /* MXSAssemHeroCell.swift in Sources */,
+				76A0D29F264A7EE100768AA7 /* MXSNavigationController.swift in Sources */,
 				76F92F4A24F4A5D20039478D /* MXSColor.swift in Sources */,
 				765824D22509D64A00EB55E5 /* MXSTableView.swift in Sources */,
 				765824DB2509F8B500EB55E5 /* MXSSkillView.swift in Sources */,

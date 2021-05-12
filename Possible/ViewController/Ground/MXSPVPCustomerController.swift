@@ -11,10 +11,9 @@ import UIKit
 class MXSPVPCustomerController: MXSGroundController {
     var isService:Bool = false
     override func didCloseGameBtnClick() {
-        self.dismiss(animated: true) {
-            MXSPokerCmd.shared.packagePoker()
-            MXSNetServ.shared.send([kMessageType:MessageType.endGame.rawValue, kMessageValue:1])
-        }
+        MXSPokerCmd.shared.packagePoker()
+        MXSNetServ.shared.send([kMessageType:MessageType.endGame.rawValue, kMessageValue:1])
+        self.navigationController?.popViewController(animated: true)
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -30,7 +29,7 @@ class MXSPVPCustomerController: MXSGroundController {
         
     }
     
-    override func pickedHero(_ hero: MXSHero) {
+    override func pickedHero(_ hero: MXSHero, isOpponter:Bool = false) {
         player = hero
         player.isAxle = true
         player.concreteView = playerView

@@ -50,14 +50,13 @@ class MXSGroundController: MXSViewController {
     }
     
     @objc func didCloseGameBtnClick() {
-        self.dismiss(animated: true) {
-            MXSPokerCmd.shared.packagePoker()
-        }
+        MXSPokerCmd.shared.packagePoker()
+        self.navigationController?.popViewController(animated: true)
     }
     
     let playerView = MXSHeroView.init()
     let oppontView = MXSHeroView.init()
-    public func pickedHero(_ hero:MXSHero) {
+    public func pickedHero(_ hero:MXSHero, isOpponter:Bool = false) {
         player = hero
         player.isAxle = true
         player.concreteView = playerView

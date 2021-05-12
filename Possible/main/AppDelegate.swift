@@ -33,8 +33,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, NetServiceDelegate, Strea
         
         /*----------------------*/
         let root_vc = MXSLobbyController()
+        let nav_vc = MXSNavigationController.init(rootViewController: root_vc)
+        nav_vc.setNavigationBarHidden(true, animated: false)
         window = UIWindow.init(frame: UIScreen.main.bounds)
-        window?.rootViewController = root_vc
+        window?.rootViewController = nav_vc
         window?.makeKeyAndVisible()
         
         MXSNetServ.shared.belong = root_vc

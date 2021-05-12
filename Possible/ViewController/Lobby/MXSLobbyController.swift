@@ -37,11 +37,7 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate
             alert.addAction(UIAlertAction.init(title: "接受", style: .default, handler: { (act) in
                 MXSNetServ.shared.send([kMessageType:MessageType.replyRequest.rawValue, kMessageValue:1])
                 let vc = MXSPVPServiceController.init()
-//                self.navigationController?.pushViewController(vc, animated: true)
-                vc.modalPresentationStyle = .overFullScreen
-                self.present(vc, animated: true) {
-                    
-                }
+                self.navigationController?.pushViewController(vc, animated: true)
             }))
             self.present(alert, animated: true, completion: nil)
             
@@ -55,10 +51,7 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate
             else {
                 MXSTIPMaskCmd.shared.showMaskWithTip("connected success", auto:true)
                 let vc = MXSPVPCustomerController.init()
-                vc.modalPresentationStyle = .overFullScreen
-                self.present(vc, animated: true) {
-                    
-                }
+                self.navigationController?.pushViewController(vc, animated: true)
             }
             
         default: break
@@ -79,11 +72,8 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate
     let closeBtn = UIButton.init(frame: CGRect.init(x: MXSSize.Sw*0.5, y: 0, width: 60, height: 40))
     
     @objc func didPVEBtnClick() {
-        let vc = MXSGroundController.init()
-        vc.modalPresentationStyle = .overFullScreen
-        self.present(vc, animated: true) {
-            
-        }
+        let vc = MXSPVESoloController.init()
+        self.navigationController?.pushViewController(vc, animated: true)
     }
     
     override func viewDidLoad() {
