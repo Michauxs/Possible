@@ -76,7 +76,7 @@ class MXSPVPCustomerController: MXSGroundController {
             layoutPokersInBox(update: 0)
             
         case .endGame:
-            self.dismiss(animated: true) { }
+            self.navigationController?.popViewController(animated: true)
             
         default: break
         }

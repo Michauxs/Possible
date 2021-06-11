@@ -69,6 +69,7 @@ class MXSPVPServiceController: MXSGroundController {
             for h in pickHeroView.heroData! {
                 div_hero.append(h.photo)
             }
+            //TODO：客户端加入时，服务器端还没有准备好数据
             MXSNetServ.shared.send([kMessageType:MessageType.showHero.rawValue, kMessageValue:div_hero])
             
         case .pickHero:
@@ -81,9 +82,8 @@ class MXSPVPServiceController: MXSGroundController {
                 self.allPlayerReady()
             }
         case .endGame:
-            self.dismiss(animated: true) {
-                MXSPokerCmd.shared.packagePoker()
-            }
+            MXSPokerCmd.shared.packagePoker()
+            self.navigationController?.popViewController(animated: true)
         default: break
         }
     }
