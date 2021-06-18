@@ -16,6 +16,8 @@ class MXSHero {
     var name: String = "HeroName"
     var photo: String = "hero_000"
     var graspCapacity: Int = 0
+    
+    //MARK:- hero property
     /**总量*/
     var LP: Int = 4
     /**当前量*/
@@ -166,6 +168,11 @@ class MXSHero {
     
     var isActive: Bool = false
     
+    //MARK:- hero action
+    public func disPokerCurrentPickes() {
+        
+    }
+    
     //MARK:- other hero
     public func collectCard () {
         self.pokers.append(contentsOf: MXSPokerCmd.shared.push(collectNumb))
@@ -173,31 +180,35 @@ class MXSHero {
     
     func canAttack() -> Bool {
         if self.pickes.count == 0  { return false }
+        
         let poker_0 = self.pickes.first!
         let action:PokerAction? = poker_0.actionGuise
-        
-        let passive = MXSJudge.cmd.passive
-        if passive.count == 0 && action == .recover && HP < LP { return true }
-        if passive.count == 0 && (action == .warFire || action == .arrowes) { return true }
-        if passive.count == 0  { return false }
-        
         if action == .unknown { return false }
         
-        if action == .attack {
-            return attackCount == 0
+        let passive = MXSJudge.cmd.passive
+        if passive.count == 0 {//自主牌/群
+            if action == .recover && HP < LP { return true }
+            if (action == .warFire || action == .arrowes) { return true }
+            return false
         }
-        if action == .duel {
-            return true
-        }
-        if (action == .steal || action == .destroy) && passive.first!.pokers.count != 0 {
-            return true
-        }
-        if action == .recover && passive.first!.HP < passive.first!.LP  {
-            return true
+        else {
+            if action == .attack {
+                return attackCount == 0
+            }
+            if action == .duel {
+                return true
+            }
+            if (action == .steal || action == .destroy) && passive.first!.pokers.count != 0 {
+                return true
+            }
+            if action == .recover && passive.first!.HP < passive.first!.LP  {
+                return true
+            }
         }
         
         return false
     }
+        
     func canDefense() -> Bool {
         if self.pickes.count == 0 { return false }
         

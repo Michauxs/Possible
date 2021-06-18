@@ -69,7 +69,7 @@ class MXSPVPServiceController: MXSGroundController {
             for h in pickHeroView.heroData! {
                 div_hero.append(h.photo)
             }
-            //TODO：客户端加入时，服务器端还没有准备好数据
+            //TODO：客户端加入时，主机端还没有准备好数据
             MXSNetServ.shared.send([kMessageType:MessageType.showHero.rawValue, kMessageValue:div_hero])
             
         case .pickHero:

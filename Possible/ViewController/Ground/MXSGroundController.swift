@@ -224,7 +224,11 @@ class MXSGroundController: MXSViewController {
         poker.state = .pass
         
         leadingView.isHidden = true
-        
+        player.disPokerCurrentPickes()
+        self.updateViewsResponAttackWithPickedPokeres(pokeres: player.pickes)
+    }
+    public func updateViewsResponAttackWithPickedPokeres(pokeres:Array<MXSPoker>) {
+        let poker = pokeres.first!
         if poker.actionGuise == PokerAction.attack {
             player.attackCount += 1
         }
