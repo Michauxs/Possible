@@ -21,7 +21,12 @@ enum MessageType : Int {
     case showHero
     case pickHero
     case discard
+    /**发牌*/
     case dealcard
+    /**攻防转化*/
+    case turnOver
+    /**报告状态：hp*/
+    case report
     case endGame
 }
 enum ServiceStatus : Int {

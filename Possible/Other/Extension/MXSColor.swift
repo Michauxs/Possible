@@ -53,7 +53,7 @@ public extension UIColor {
     //
     class var theme: UIColor {
         get {
-            return UIColor.init(red: 90/255, green: 210/255, blue: 200/255, alpha: 1)
+            return UIColor.init(red: 240/255, green: 150/255, blue: 75/255, alpha: 1)
         }
     }
     

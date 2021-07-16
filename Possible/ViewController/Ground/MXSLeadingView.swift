@@ -40,6 +40,7 @@ class MXSLeadingView: MXSBaseView {
     var certainBtn: UIButton?
     var state: LeadingState! {
         didSet {
+            self.isHidden = false
             switch state {
             case .attackUnPick:
                 certainBtn?.isEnabled = false

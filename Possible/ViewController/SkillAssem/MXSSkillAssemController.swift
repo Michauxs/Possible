@@ -20,10 +20,14 @@ class MXSSkillAssemController: MXSViewController {
     var skillViewAsseming: MXSSkillView?
     var skillMarkArray: Array<String> = Array<String> ()
     
+//    lazy var assemHeroView: UIImageView = {
+//        return UIImageView.init()
+//    }()
+    let assemHeroView: UIImageView = UIImageView.init()
+    let closeImgBtn:UIButton = UIButton.init("X", fontSize: 14, textColor: .white, backgColor: .darkGray)
+    
     @objc func didCloseGameBtnClick() {
-        self.dismiss(animated: true) {
-            
-        }
+        self.navigationController?.popViewController(animated: false)
     }
     @objc func didDoneBtnClick() {
         var tmp = Array<String>()
@@ -41,6 +45,18 @@ class MXSSkillAssemController: MXSViewController {
         alert.addAction(action)
         self.present(alert, animated: true, completion: nil)
         
+    }
+    @objc func didAdviceBtnClick() {
+        
+        if let photo = heroMark?.photo {
+            let suffix = photo.split(separator: "_").last
+            let name_new = "hero_assem_" + suffix!
+            let img = UIImage.init(named: name_new)
+            
+            assemHeroView.isHidden = false
+            closeImgBtn.isHidden = false
+            assemHeroView.image = img
+        }
     }
     
     override func viewDidLoad() {
@@ -89,6 +105,12 @@ class MXSSkillAssemController: MXSViewController {
         view.addSubview(nameLabel)
         nameLabel.frame = CGRect(x: mainTable!.frame.maxX+15, y: top_height+15, width: 100, height: 20)
         
+        let adviceBtn = UIButton.init("Advice", fontSize: 14, textColor: .white, backgColor: .darkGray)
+        adviceBtn.frame = CGRect.init(x: doneBtn.frame.minX, y: top_height+5, width: 64, height: top_height)
+        self.view.addSubview(adviceBtn)
+        adviceBtn.addTarget(self, action: #selector(didAdviceBtnClick), for: .touchUpInside)
+        /*--------------------------------------*/
+        
         let centerPoint:CGPoint = CGPoint(x: width_hero + width_assem*0.5, y: MXSSize.Sh*0.5)
         let sk_width: CGFloat = 44.0
         for index in 0...3 {
@@ -104,9 +126,23 @@ class MXSSkillAssemController: MXSViewController {
             sk_view.center = CGPoint(x: centerPoint.x - (sk_width+20.0)*x, y: centerPoint.y - (sk_width+20.0)*y)
             skillViewes.append(sk_view)
         }
+        /*--------------------------------------*/
+        let margin:CGFloat = 180.0
+        assemHeroView.frame = CGRect.init(x: margin, y: 0, width: MXSSize.Sw - margin*2, height: MXSSize.Sh)
+        self.view.addSubview(assemHeroView)
+        closeImgBtn.frame = CGRect.init(x: assemHeroView.frame.maxX, y: 0, width: 44, height: 44)
+        self.view.addSubview(closeImgBtn);
+        closeImgBtn.addTarget(self, action: #selector(didCloseImgBtnClick), for: .touchUpInside)
+        assemHeroView.isHidden = true
+        closeImgBtn.isHidden = true
+        /*--------------------------------------*/
         
         /**initional*/
         fillSkillView(hero: mainTable?.dlg!.dlgData!.first as? MXSHero)
+    }
+    @objc func didCloseImgBtnClick() {
+        assemHeroView.isHidden = true
+        closeImgBtn.isHidden = true
     }
     
     func fillSkillView(hero:MXSHero?) {

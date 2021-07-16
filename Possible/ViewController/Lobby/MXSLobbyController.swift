@@ -81,17 +81,18 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate
         let width = MXSSize.Sw * 0.25
 //        let textSign = "情深不寿，慧极必伤"
         let textSign = "sometimes ever，sometimes never."
-        //"sometimes ever，sometimes never."
-//        let text_center = CGPoint(x: width, y: MXSSize.Sh*0.5)
-        let textLabel = UILabel.init(text: textSign, fontSize: 1034, textColor: .gray, align: .left)
+        let textLabel = UILabel.init(text: textSign, fontSize: 1034, textColor: .darkText, align: .left)
         textLabel.sizeToFit()
+        textLabel.frame = CGRect(x: 45, y: 90, width: textLabel.bounds.width, height: textLabel.bounds.height)
         view.addSubview(textLabel)
         
-        let textLabel2 = UILabel.init(text: textSign, fontSize: 1034, textColor: .darkText, align: .left)
-        textLabel.frame = CGRect(x: 45.5, y: 90.5, width: textLabel.frame.width, height: textLabel.frame.height)
-        textLabel2.frame = CGRect(x: 45, y: 90, width: textLabel.frame.width, height: textLabel.frame.height)
-        view.addSubview(textLabel2)
-        
+        let shadow = NSShadow.init()
+        shadow.shadowOffset = CGSize.init(width: 1.0, height: 0.5)
+        shadow.shadowColor = UIColor.gray
+        shadow.shadowBlurRadius = 1;
+        let abs = NSMutableAttributedString.init(string: textSign)
+        abs.addAttribute(NSAttributedStringKey.shadow, value: shadow, range: NSMakeRange(0, textSign.count))
+        textLabel.attributedText = abs
         /*---------------------------------------------*/
         
         let label_height:CGFloat = 44.0
@@ -141,9 +142,7 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate
     
     
     @objc func assemBtnClick() {
-        self.present(MXSSkillAssemController(), animated: true) {
-            
-        }
+        self.navigationController?.pushViewController(MXSSkillAssemController(), animated: false)
     }
     @objc func deviceOffLine() {
         stopBrowser()

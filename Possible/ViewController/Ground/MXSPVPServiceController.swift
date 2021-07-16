@@ -81,12 +81,93 @@ class MXSPVPServiceController: MXSGroundController {
                 
                 self.allPlayerReady()
             }
+            
+        case .discard:
+            let poker_uid_arr = dict[kMessageValue] as! Array<Int>
+            let poker_arr = MXSPokerCmd.shared.getPokersFromUids(poker_uid_arr)
+            for p in poker_arr {
+                p.state = .pass
+            }
+            passedView.collectPoker(pokers: poker_arr)
+            leadingView.state = .defenseUnPick
+        case .turnOver:
+            player.isActive = true
+        
         case .endGame:
             MXSPokerCmd.shared.packagePoker()
             self.navigationController?.popViewController(animated: true)
+            
         default: break
         }
     }
     
+    //MARK:- leadingView
+    public override func certainForAttack() {
+        let poker = player.pickes.first!
+        var div_p:Array<Int> = Array<Int>()
+        for p in player.pickes {
+            div_p.append(p.uid)
+        }
+        MXSNetServ.shared.send([kMessageType:MessageType.discard.rawValue, kMessageValue:div_p])
+        
+        player.pokers.removeAll(where: {$0 === poker})
+        poker.state = .pass
+        
+        leadingView.isHidden = true
+        player.disPokerCurrentPickes()
+        layoutPokersInBox(update: 1)
+        
+    }
+    public override func cancelPickes() {
+        for poker in player.pickes { poker.isPicked = false }
+        player.pickes.removeAll()
+        MXSJudge.cmd.clearPassive()
+    }
+    public override func endActive() {
+        leadingView.isHidden = true
+        leadingView.state = .defenseUnPick
+        passedView.fadeout()
+        player.isActive = false;
+        MXSNetServ.shared.send([kMessageType:MessageType.turnOver.rawValue, kMessageValue:0])
+    }
+    public override func certainForDefense() {
+        MXSJudge.cmd.leaderReactive()
+        leadingView.isHidden = true
+        layoutPokersInBox(update: 1)
+        
+        cycleActive()
+    }
+    public override func cancelForDefense() {
+        if player.pickes.count != 0 {
+            for poker in player.pickes { poker.concreteView?.isUp = false }
+            player.pickes.removeAll()
+        }
+        
+        let action = MXSJudge.cmd.leaderActiveAction
+        if action == PokerAction.attack || action == PokerAction.warFire || action == PokerAction.arrowes {
+            player.minsHP()
+        }
+        if action == PokerAction.steal {
+            let index = Int(arc4random_uniform(UInt32(player.pokers.count)))
+            let poker_random = player.pokers.remove(at: index)
+            opponter.pokers.append(poker_random)
+            
+            passedView.willCollect = false
+            player.pickes.append(poker_random)
+            layoutPokersInBox(update: 1)
+        }
+        if action == PokerAction.destroy {
+            let index = Int(arc4random_uniform(UInt32(player.pokers.count)))
+            let poker_random = player.pokers.remove(at: index)
+            
+            player.pickes.append(poker_random)
+            layoutPokersInBox(update: 1)
+        }
+        
+        MXSJudge.cmd.leaderReactive()
+        leadingView.isHidden = true
+        
+        cycleActive()
+    }
     
 }

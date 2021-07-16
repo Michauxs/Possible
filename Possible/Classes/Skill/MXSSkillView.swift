@@ -52,7 +52,7 @@ class MXSSkillView: MXSBaseView {
         lightView.isHidden = true
         
         
-        self.setRaius(0.5, borderColor: .brown, borderWitdh: 0.5)
+        self.setRaius(0.5, borderColor: .theme, borderWitdh: 0.5)
     }
 
     @objc func didTapedSelf() {

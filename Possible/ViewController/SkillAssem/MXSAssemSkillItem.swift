@@ -20,7 +20,7 @@ class MXSAssemSkillItem: MXSCollectionCell {
         photoImageView.snp.makeConstraints { (m) in
             m.edges.equalTo(self).inset(UIEdgeInsets.init(top: 0, left: 0, bottom: 15, right: 0))
         }
-        photoImageView.setRaius(0.5, borderColor: .brown, borderWitdh: 1)
+        photoImageView.setRaius(0.5, borderColor: .theme, borderWitdh: 1)
         
         addSubview(nameLabel)
         nameLabel.snp.makeConstraints { (m) in

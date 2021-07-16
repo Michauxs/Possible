@@ -47,7 +47,11 @@ class MXSPoker {
             concreteView?.action = actionFate
         }
     }
-    
+    var isPicked: Bool = false {
+        didSet {
+            concreteView?.isUp = isPicked
+        }
+    }
 }
 
 
@@ -118,6 +122,21 @@ class MXSPokerCmd {
             return p
         }
         return nil
+    }
+    func getPokersFromUids(_ poker_uid_arr: Array<Int>) -> Array<MXSPoker> {
+//        if let index = pokers.firstIndex(where: { (poker) -> Bool in poker.uid == uid }) {
+//            let p = pokers[index]
+//            return p
+//        }
+//        return nil
+        
+        var poker_arr:Array<MXSPoker> = Array<MXSPoker>()
+        for uid in poker_uid_arr {
+            if let p = MXSPokerCmd.shared.someoneFromUid(uid) {
+                poker_arr.append(p)
+            }
+        }
+        return poker_arr
     }
 }
 

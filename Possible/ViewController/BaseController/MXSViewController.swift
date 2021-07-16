@@ -14,6 +14,13 @@ class MXSViewController: UIViewController {
         return MXSTIPMask.init()
     }()
     
+    public func receiveArgsBePost(args:Any) {
+        
+    }
+    public func receiveArgsBeBack(args:Any) {
+        
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = UIColor.init(100, 100, 120)
