@@ -52,8 +52,10 @@ class MXSPassedView: MXSBaseView {
         
         let sum_width = MXSSize.Pw * CGFloat(passPokeres.count)
         var org_x: CGFloat = 0.0
-        if sum_width <= self.frame.width { org_x = (self.frame.width - sum_width) * 0.5 }
-        else { org_x = self.frame.width - sum_width }
+        if sum_width <= self.frame.width {
+            org_x = (self.frame.width - sum_width) * 0.5 }
+        else {
+            org_x = self.frame.width - sum_width }
         
         for index in 0..<passPokeres.count {
             let pok = passPokeres[index]

@@ -55,6 +55,8 @@ class MXSPVPServiceController: MXSGroundController {
                 poker_uid_arr.append(poker.uid)
             }
             MXSNetServ.shared.send([kMessageType:MessageType.dealcard.rawValue, kMessageValue:poker_uid_arr])
+            
+            player.signStatus = .active
         }
     }
     
@@ -90,8 +92,10 @@ class MXSPVPServiceController: MXSGroundController {
             }
             passedView.collectPoker(pokers: poker_arr)
             leadingView.state = .defenseUnPick
+            
         case .turnOver:
-            player.isActive = true
+            player.signStatus = .active
+            leadingView.state = .attackUnPick
         
         case .endGame:
             MXSPokerCmd.shared.packagePoker()
@@ -99,6 +103,28 @@ class MXSPVPServiceController: MXSGroundController {
             
         default: break
         }
+    }
+    
+    //MARK:- hero
+    public override func someoneHeroTaped(_ heroView: MXSHeroView) {
+        print("controller action hero")
+        if player.signStatus != .active {
+            return
+        }
+        guard let hero = heroView.belong else {
+            return
+        }
+        
+        if hero.signStatus == .selected {
+            hero.signStatus = .blank
+            MXSJudge.cmd.removePassive(hero)
+        }
+        else {
+            hero.signStatus = .selected
+            MXSJudge.cmd.addPassive(hero)
+        }
+        checkCanCertainAction()
+        
     }
     
     //MARK:- leadingView
@@ -127,7 +153,7 @@ class MXSPVPServiceController: MXSGroundController {
         leadingView.isHidden = true
         leadingView.state = .defenseUnPick
         passedView.fadeout()
-        player.isActive = false;
+        player.signStatus = .blank
         MXSNetServ.shared.send([kMessageType:MessageType.turnOver.rawValue, kMessageValue:0])
     }
     public override func certainForDefense() {

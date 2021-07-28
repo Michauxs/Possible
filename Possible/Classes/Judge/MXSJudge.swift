@@ -42,14 +42,14 @@ class MXSJudge {
             leader?.endActiveAndClearHistory()
         }
         didSet {
-            leader?.isActive = true
+            leader?.signStatus = .active
             active = leader
         }
     }
     func leaderReactive() {
-        for one in passive { one.isActive = false }
+        for one in passive { one.signStatus = .blank }
         passive.removeAll()
-        leader?.isActive = true
+        leader?.signStatus = .active
     }
     
     func leaderDiscard(poker:Array<MXSPoker>, action:PokerAction) {
@@ -83,7 +83,7 @@ class MXSJudge {
         }
     }
     func next() {
-        for one in passive { one.isActive = false; one.isBeAimed = false}
+        for one in passive { one.signStatus = .blank}
         passive.removeAll()
         
         flowNote += 1
@@ -93,20 +93,30 @@ class MXSJudge {
     
     //MARK: - passive
     var passive:Array<MXSHero> = Array<MXSHero>()
+    
+    func addPassive(_ someone:MXSHero) {
+        passive.append(someone)
+    }
+    func removePassive(_ someone:MXSHero) {
+        if let index = passive.firstIndex(where: {$0 === someone}) {
+            let one = passive.remove(at: index)
+        }
+    }
+    
     func appendOrRemovePassive(_ someone:MXSHero) {
         if let index = passive.firstIndex(where: {$0 === someone}) {
             let one = passive.remove(at: index)
-            one.isBeAimed = false
+            one.signStatus = .blank
         }
         else {
             passive.append(someone)
-            someone.isBeAimed = true
+            someone.signStatus = .selected
         }
     }
     
     func clearPassive(){
         for one in passive {
-            one.isBeAimed = false
+            one.signStatus = .blank
         }
         passive.removeAll()
     }
@@ -115,13 +125,13 @@ class MXSJudge {
     func opponentActive() {
         if passive.count == 1 {
             let hero = passive.first!
-            hero.isActive = true
-            leader?.isActive = false
+            hero.signStatus = .active
+            leader?.signStatus = .blank
         }
     }
     
     func selectAllElseSelf() {
-        for one in passive { one.isActive = false; one.isBeAimed = false}
+        for one in passive { one.signStatus = .blank}
         passive.removeAll()
         /**先清除再添加 = 顺序加入*/
         for hero in subject {

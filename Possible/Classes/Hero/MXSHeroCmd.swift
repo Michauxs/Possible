@@ -17,84 +17,6 @@ class MXSHero {
     var photo: String = "hero_000"
     var graspCapacity: Int = 0
     
-    //MARK:- hero property
-    /**总量*/
-    var LP: Int = 4
-    /**当前量*/
-    var HP: Int = 4 {
-        didSet {
-            concreteView?.hp = HP
-            graspCapacity = HP
-            if HP == 0 {
-                self.concreteView?.controller?.someHeroHPZero(self)
-            }
-        }
-    }
-    var skillFate: Array<MXSSkill> = Array<MXSSkill>()
-    var skillExp: Array<MXSSkill> = Array<MXSSkill>() {
-        didSet {
-            //可以在这里做本地存储
-        }
-    }
-    var skillSet: Array<MXSSkill> = Array<MXSSkill>()
-    
-    func stopAllSkill(_ state:SkillState) {
-        for skill in skillSet.filter({$0.state == state}) {
-            skill.state = .unable
-        }
-    }
-    func startingSkill(_ skill:MXSSkill) {
-        skill.state = .enable
-        if let poker = pickes.first {
-            let _ = skill.disguisePoker(poker)
-        }
-    }
-    func stopSkill(_ skill:MXSSkill) {
-        skill.state = .unable
-        for poker in self.pickes {
-            poker.actionGuise = poker.actionFate
-            poker.colorGuise = poker.color
-        }
-    }
-    
-    var pokers: Array<MXSPoker> = []
-    lazy var pickes: Array<MXSPoker> = {
-        return Array<MXSPoker>.init()
-    }()
-    func pickPoker(_ poker:MXSPoker) {
-        pickes.append(poker)
-        for skill in skillSet.filter({$0.state == .enable || $0.state == .keepOn}) {
-            let _ = skill.disguisePoker(poker)
-        }
-        
-    }
-    func disPickPoker(_ poker:MXSPoker) {
-        poker.actionGuise = poker.actionFate
-        poker.colorGuise = poker.color
-        pickes.removeAll(where: {$0 === poker})
-    }
-    
-    var collectNumb: Int = 2
-    var attribute: Array<Any>?
-    var desc: String?
-    
-    var attackCount: Int = 0 {
-        didSet {
-            let arr = skillSet.filter { (item) -> Bool in item.power == SkillPower.WolfSt }
-            if arr.count > 0 {
-                attackCount = 0
-            }
-        }
-    }
-    var lastStep:MXSOneAction?
-    func endActiveAndClearHistory () {
-        stopAllSkill(.enable)
-        isActive = false
-        isHoldOn = false
-        lastStep = nil
-        attackCount = 0
-    }
-    
     /**name photo hp skills desc*/
     init(_ attr:Array<Any>) {
         attribute = attr
@@ -131,17 +53,53 @@ class MXSHero {
             concreteView?.skillsExp = self.skillExp
         }
     }
-    /**被选择*/
-    var isBeAimed: Bool = false {
+    
+    
+    //MARK:- hero property
+    /**总量*/
+    var LP: Int = 4
+    /**当前量*/
+    var HP: Int = 4 {
         didSet {
-            print("\(self.name) + isbeaimed \(isBeAimed)")
-            concreteView?.isSelected = isBeAimed
+            concreteView?.hp = HP
+            graspCapacity = HP
+            if HP == 0 {
+                self.concreteView?.controller?.someHeroHPZero(self)
+            }
         }
     }
-    /**在等待对方*/
-    var isHoldOn: Bool = false {
+    public func minsHP (_ hp:Int = 1) {
+        self.HP = HP - hp
+    }
+    public func plusHP (_ hp:Int = 1) {
+        self.HP = HP + hp
+    }
+    
+    //MARK:- skill
+    var skillFate: Array<MXSSkill> = Array<MXSSkill>()
+    var skillExp: Array<MXSSkill> = Array<MXSSkill>() {
         didSet {
-            concreteView?.isHoldOn = isHoldOn
+            //可以在这里做本地存储
+        }
+    }
+    var skillSet: Array<MXSSkill> = Array<MXSSkill>()
+    
+    func stopAllSkill(_ state:SkillState) {
+        for skill in skillSet.filter({$0.state == state}) {
+            skill.state = .unable
+        }
+    }
+    func startingSkill(_ skill:MXSSkill) {
+        skill.state = .enable
+        if let poker = pickes.first {
+            let _ = skill.disguisePoker(poker)
+        }
+    }
+    func stopSkill(_ skill:MXSSkill) {
+        skill.state = .unable
+        for poker in self.pickes {
+            poker.actionGuise = poker.actionFate
+            poker.colorGuise = poker.color
         }
     }
     
@@ -158,15 +116,52 @@ class MXSHero {
         skillSet.append(contentsOf: skillExp)
     }
     
-    /*--------------------------------------------*/
-    public func minsHP (_ hp:Int = 1) {
-        self.HP = HP - hp
+    //MARK:- pokers
+    var pokers: Array<MXSPoker> = []
+    lazy var pickes: Array<MXSPoker> = {
+        return Array<MXSPoker>.init()
+    }()
+    func pickPoker(_ poker:MXSPoker) {
+        pickes.append(poker)
+        for skill in skillSet.filter({$0.state == .enable || $0.state == .keepOn}) {
+            let _ = skill.disguisePoker(poker)
+        }
+        
     }
-    public func plusHP (_ hp:Int = 1) {
-        self.HP = HP + hp
+    func disPickPoker(_ poker:MXSPoker) {
+        poker.actionGuise = poker.actionFate
+        poker.colorGuise = poker.color
+        pickes.removeAll(where: {$0 === poker})
     }
     
-    var isActive: Bool = false
+    var collectNumb: Int = 2
+    var attribute: Array<Any>?
+    var desc: String?
+    
+    var attackCount: Int = 0 {
+        didSet {
+            let arr = skillSet.filter { (item) -> Bool in item.power == SkillPower.WolfSt }
+            if arr.count > 0 {
+                attackCount = 0
+            }
+        }
+    }
+    var lastStep:MXSOneAction?
+    func endActiveAndClearHistory () {
+        stopAllSkill(.enable)
+        signStatus = .blank
+        lastStep = nil
+        attackCount = 0
+    }
+    
+    
+    //MARK:- sign status
+    var signStatus:HeroSignStatus = .blank {
+        didSet {
+            concreteView?.signStatus = signStatus
+        }
+    }
+    var isCollectedCard:Bool = false
     
     //MARK:- hero action
     public func disPokerCurrentPickes() {
@@ -246,7 +241,7 @@ class MXSHero {
                 return false
             }
             
-            self.isActive = false
+            self.signStatus = .blank
             return true
         }
         else { // oneself \ group

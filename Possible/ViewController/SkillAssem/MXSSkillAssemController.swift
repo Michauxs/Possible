@@ -24,6 +24,7 @@ class MXSSkillAssemController: MXSViewController {
 //        return UIImageView.init()
 //    }()
     let assemHeroView: UIImageView = UIImageView.init()
+    let assemScrollView: UIScrollView = UIScrollView.init()
     let closeImgBtn:UIButton = UIButton.init("X", fontSize: 14, textColor: .white, backgColor: .darkGray)
     
     @objc func didCloseGameBtnClick() {
@@ -51,11 +52,16 @@ class MXSSkillAssemController: MXSViewController {
         if let photo = heroMark?.photo {
             let suffix = photo.split(separator: "_").last
             let name_new = "hero_assem_" + suffix!
-            let img = UIImage.init(named: name_new)
             
-            assemHeroView.isHidden = false
-            closeImgBtn.isHidden = false
-            assemHeroView.image = img
+            if let img = UIImage.init(named: name_new) {
+                
+                let content_height:CGFloat =  assemScrollView.bounds.size.width * img.size.height / img.size.width
+                assemHeroView.frame = CGRect.init(x: 0, y: 0, width: assemScrollView.bounds.size.width, height: content_height)
+                assemScrollView.contentSize = CGSize.init(width: 0, height: content_height)
+                assemScrollView.isHidden = false
+                closeImgBtn.isHidden = false
+                assemHeroView.image = img
+            }
         }
     }
     
@@ -127,13 +133,19 @@ class MXSSkillAssemController: MXSViewController {
             skillViewes.append(sk_view)
         }
         /*--------------------------------------*/
-        let margin:CGFloat = 180.0
-        assemHeroView.frame = CGRect.init(x: margin, y: 0, width: MXSSize.Sw - margin*2, height: MXSSize.Sh)
-        self.view.addSubview(assemHeroView)
-        closeImgBtn.frame = CGRect.init(x: assemHeroView.frame.maxX, y: 0, width: 44, height: 44)
+        let img_width:CGFloat = 260.0
+        let margin:CGFloat = (MXSSize.Sw - img_width) * 0.5
+        assemScrollView.frame = CGRect.init(x: margin, y: 0, width: img_width, height: MXSSize.Sh)
+        assemScrollView.showsHorizontalScrollIndicator = false
+        self.view.addSubview(assemScrollView)
+        
+        assemHeroView.frame = CGRect.init(x: margin, y: 0, width: img_width, height: MXSSize.Sh)
+        assemScrollView.addSubview(assemHeroView)
+        
+        closeImgBtn.frame = CGRect.init(x: assemScrollView.frame.maxX, y: 0, width: 44, height: 44)
         self.view.addSubview(closeImgBtn);
         closeImgBtn.addTarget(self, action: #selector(didCloseImgBtnClick), for: .touchUpInside)
-        assemHeroView.isHidden = true
+        assemScrollView.isHidden = true
         closeImgBtn.isHidden = true
         /*--------------------------------------*/
         
@@ -141,7 +153,7 @@ class MXSSkillAssemController: MXSViewController {
         fillSkillView(hero: mainTable?.dlg!.dlgData!.first as? MXSHero)
     }
     @objc func didCloseImgBtnClick() {
-        assemHeroView.isHidden = true
+        assemScrollView.isHidden = true
         closeImgBtn.isHidden = true
     }
     

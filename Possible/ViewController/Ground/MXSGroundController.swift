@@ -89,6 +89,8 @@ class MXSGroundController: MXSViewController {
         
         cycleActive()
     }
+    
+    //MARK:- viewdidload
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         MXSNetServ.shared.belong = self
@@ -252,30 +254,12 @@ class MXSGroundController: MXSViewController {
                 player.plusHP()
             }
         }
-        player.isActive = false
+        player.signStatus = .blank
         
         player.stopAllSkill(.enable)
         layoutPokersInBox(update: 1)
         cycleActive()
     }
-        
-    //            let group = DispatchGroup()
-    //            for hero in joinedHeroes {
-    //                if hero === player { continue }
-    //                    hero.isBeAimed = true
-    ////                hero.isActive = true
-    //                group.enter()
-    //                DispatchQueue.main.asyncAfter(deadline: .now()+1) {
-    //                    if let poker_return = hero.replyAttack() {
-    //                        self.passedView.collectPoker(pokers: [poker_return])
-    //                    }
-    //                    hero.isBeAimed = false
-    //                    group.leave()
-    //                }
-    //            }
-    //            group.notify(queue: DispatchQueue.main) {
-    //                self.leadingView.isHidden = true
-    //            }
     
     public func cancelPickes() {
         for poker in player.pickes { poker.concreteView?.isUp = false }
@@ -339,8 +323,8 @@ class MXSGroundController: MXSViewController {
                 leadingView.isHidden = false
                 if hero === MXSJudge.cmd.leader { //leader
                     leadingView.state = .attackUnPick
-                    if !hero.isHoldOn { //第一圈开始
-                        hero.isHoldOn = true
+                    if !hero.isCollectedCard { //第一圈开始
+                        hero.isCollectedCard = true
                         let arr = MXSPokerCmd.shared.push(2)
                         hero.pokers.append(contentsOf: arr)
                         newAndGraspMoreViews(arr)
@@ -355,9 +339,9 @@ class MXSGroundController: MXSViewController {
             }
             else { //AI /oppot
                 if hero === MXSJudge.cmd.leader { //leader
-                    if !hero.isHoldOn { //first
+                    if !hero.isCollectedCard { //first
                         hero.pokers.append(contentsOf: MXSPokerCmd.shared.push(2))
-                        hero.isHoldOn = true
+                        hero.isCollectedCard = true
                     }
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                         MXSJudge.cmd.appendOrRemovePassive(self.player)
@@ -433,6 +417,7 @@ class MXSGroundController: MXSViewController {
         checkCanCertainAction()
     }
     
+    //MARK:- hero
     public override func someoneHeroTaped(_ heroView: MXSHeroView) {
         print("controller action hero")
         /**被动响应 无需选择*/
@@ -442,8 +427,9 @@ class MXSGroundController: MXSViewController {
         checkCanCertainAction()
     }
     
+    //MARK:- action
     func checkCanCertainAction() {
-        if player.isBeAimed {
+        if player.signStatus == .focus {
             if player.canDefense() {
                 leadingView.state = .defenseReadyOn
             }

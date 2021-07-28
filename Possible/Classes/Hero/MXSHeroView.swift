@@ -12,31 +12,27 @@ import SnapKit
 class MXSHeroView: MXSBaseView {
     weak var belong:MXSHero?
     
+    let contentView :UIView = UIView()
+    let lightSign: UIView = UIView()
+    
     var portraitImage : UIImageView?
     var nameLabel: UILabel?
     var skillImages : Array<UIImageView>?
-    
     var HPBottle : Array<UIView>?
     
-    public lazy var lightSign: UIView = {
-        var sign = UIView.init()
-        sign.backgroundColor = .white
-        sign.frame = CGRect.init(x: 10, y: 10, width: 10, height: 10)
-        self.addSubview(sign)
-        return sign
-    }()
-    /**被选择*/
-    var isSelected: Bool? = false {
+    
+    var signStatus:HeroSignStatus = .blank {
         didSet {
-            self.lightSign.backgroundColor = .yellow
-            self.lightSign.isHidden = !isSelected!
-        }
-    }
-    /**在等待对方*/
-    var isHoldOn: Bool? = false {
-        didSet {
-            self.lightSign.backgroundColor = .green
-            self.lightSign.isHidden = !isHoldOn!
+            switch signStatus {
+            case .active:
+                self.lightSign.backgroundColor = .green
+            case .selected:
+                self.lightSign.backgroundColor = .red
+            case .focus:
+                self.lightSign.backgroundColor = .yellow
+            default:
+                self.lightSign.backgroundColor = .clear
+            }
         }
     }
     
@@ -47,7 +43,7 @@ class MXSHeroView: MXSBaseView {
         }
     }
     @objc func didTapedSelf() {
-        if self.belong!.isActive { return }
+        if self.belong!.signStatus == .active { return }
         self.controller?.someoneHeroTaped(self)
     }
     
@@ -61,7 +57,7 @@ class MXSHeroView: MXSBaseView {
                 skillView.layer.cornerRadius = CGFloat(heart_width*0.5)
                 skillView.backgroundColor = .red
                 skillView.alpha = 0.75
-                self.addSubview(skillView)
+                contentView.addSubview(skillView)
                 skillView.snp.makeConstraints { (make) in
                     make.top.equalTo(self).offset((heart_width+2.0) * Double(count) + 3)
                     make.right.equalTo(self).inset(5)
@@ -98,28 +94,33 @@ class MXSHeroView: MXSBaseView {
     }
     
     override func setupSubviews() {
-        backgroundColor = .cyan
-        self.bounds = CGRect.init(x: 0, y: 0, width: MXSSize.Hw, height: MXSSize.Hh)
-        clipsToBounds = true
+        
+        lightSign.frame = self.bounds
+        lightSign.backgroundColor = .clear
+        self.addSubview(lightSign)
+        
+        contentView.frame = CGRect(x: 1, y: 1, width: self.bounds.size.width - 2, height: self.bounds.size.height - 2)
+        contentView.backgroundColor = .cyan
+        self.addSubview(contentView)
         
         portraitImage = UIImageView.init(image: UIImage.init(named: "hero_001"))
-        portraitImage?.contentMode = .scaleAspectFill
-        self.addSubview(portraitImage!)
+        portraitImage?.contentMode = .scaleAspectFit
+        contentView.addSubview(portraitImage!)
         portraitImage?.snp.makeConstraints({ (make) in
             make.edges.equalTo(self).inset(UIEdgeInsets.init(top: 0, left: 0, bottom: 0, right: 0))
         })
         
         skillImages = Array.init()
-        let item_width = self.bounds.size.width * 0.25
+        let item_width = (self.bounds.size.width-2.0) * 0.25
         for index in 0...3 {
             let skillView = UIImageView.init(image: UIImage.init(named: "skill_001"))
             skillView.layer.cornerRadius = 0
             skillView.layer.borderWidth = 1;
             skillView.layer.borderColor = UIColor.init(red: 227/255, green: 137/255, blue: 60/255, alpha: 1).cgColor
-            self.addSubview(skillView)
+            contentView.addSubview(skillView)
             skillView.snp.makeConstraints { (make) in
-                make.left.equalTo(self).offset(item_width*CGFloat(index))
-                make.bottom.equalTo(self)
+                make.left.equalTo(contentView).offset(item_width*CGFloat(index))
+                make.bottom.equalTo(contentView)
                 make.size.equalTo(CGSize.init(width: item_width, height: item_width))
             }
             skillImages?.append(skillView)
@@ -129,10 +130,10 @@ class MXSHeroView: MXSBaseView {
         nameLabel?.textColor = .darkText
         nameLabel?.numberOfLines = 0
         nameLabel?.font = UIFont.systemFont(ofSize: 10, weight: .medium)
-        addSubview(nameLabel!)
+        contentView.addSubview(nameLabel!)
         nameLabel?.snp.makeConstraints({ (m) in
-            m.left.equalTo(self).offset(5)
-            m.top.equalTo(self).offset(5)
+            m.left.equalTo(contentView).offset(5)
+            m.top.equalTo(contentView).offset(5)
             m.width.equalTo(12)
         })
         

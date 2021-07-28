@@ -83,6 +83,10 @@ class MXSPVPCustomerController: MXSGroundController {
             }
             passedView.collectPoker(pokers: poker_arr)
             
+        case .turnOver:
+            player.signStatus = .active
+            leadingView.state = .attackUnPick
+            
         case .endGame:
             self.navigationController?.popViewController(animated: true)
             
@@ -115,10 +119,9 @@ class MXSPVPCustomerController: MXSGroundController {
     public override func endActive() {
         leadingView.isHidden = true
         leadingView.state = .defenseUnPick
-        
-        MXSJudge.cmd.next()
         passedView.fadeout()
-        cycleActive()
+        player.signStatus = .blank
+        MXSNetServ.shared.send([kMessageType:MessageType.turnOver.rawValue, kMessageValue:0])
     }
     public override func certainForDefense() {
         MXSJudge.cmd.leaderReactive()
@@ -157,6 +160,5 @@ class MXSPVPCustomerController: MXSGroundController {
         MXSJudge.cmd.leaderReactive()
         leadingView.isHidden = true
         
-        cycleActive()
     }
 }

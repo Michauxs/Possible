@@ -87,7 +87,7 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate
         view.addSubview(textLabel)
         
         let shadow = NSShadow.init()
-        shadow.shadowOffset = CGSize.init(width: 1.0, height: 0.5)
+        shadow.shadowOffset = CGSize.init(width: 0.5, height: 0.5)
         shadow.shadowColor = UIColor.gray
         shadow.shadowBlurRadius = 1;
         let abs = NSMutableAttributedString.init(string: textSign)

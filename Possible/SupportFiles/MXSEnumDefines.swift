@@ -42,6 +42,14 @@ let indexSkillPower: Int = 2
 let indexSkillMode: Int = 3
 let indexSkillDesc: Int = 4
 
+//MARK:- Hero
+//主动/被选择/等待操作
+enum HeroSignStatus {
+    case blank
+    case active
+    case selected
+    case focus
+}
 //MARK:- Poker
 enum PokerColor : Int {
     case unknown = 0
