@@ -18,7 +18,7 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate
         if MXSNetServ.shared.connectToService(server) {
 //            stopBrowser()
             
-            MXSNetServ.shared.send([kMessageType:MessageType.request.rawValue, kMessageValue:"请求接连，来自："+MXSNetServ.shared.name])
+            MXSNetServ.shared.send([kMessageType:MessageType.request.rawValue, kMessageValue:"请求接连，来自：" + MXSNetServ.shared.name])
             MXSTIPMaskCmd.shared.showMaskWithTip("Waiting...", auto: false)
         }
     }

@@ -82,12 +82,14 @@ class MXSPVPCustomerController: MXSGroundController {
                 p.state = .pass
             }
             passedView.collectPoker(pokers: poker_arr)
+            leadingView.state = .defenseUnPick
             
         case .turnOver:
             player.signStatus = .active
             leadingView.state = .attackUnPick
             
         case .endGame:
+            MXSNetServ.shared.closeStreams()
             self.navigationController?.popViewController(animated: true)
             
         default: break

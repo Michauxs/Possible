@@ -99,6 +99,7 @@ class MXSPVPServiceController: MXSGroundController {
         
         case .endGame:
             MXSPokerCmd.shared.packagePoker()
+            MXSNetServ.shared.closeStreams()
             self.navigationController?.popViewController(animated: true)
             
         default: break

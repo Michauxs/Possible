@@ -46,8 +46,8 @@ class MXSHero {
     var concreteView: MXSHeroView? {
         didSet {
             concreteView?.belong = self
-            concreteView?.nameLabel?.text = name
-            concreteView?.portraitImage?.image = UIImage.init(named: photo)
+            concreteView?.nameLabel.text = name
+            concreteView?.portraitImage.image = UIImage.init(named: photo)
             concreteView?.LP = LP
             graspCapacity = LP
             concreteView?.skillsExp = self.skillExp

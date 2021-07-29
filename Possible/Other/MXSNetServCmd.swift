@@ -45,6 +45,7 @@ class MXSNetServ: NetService, NetServiceDelegate, StreamDelegate {
     var expectConnectCount: Int = 2
     var currentConnectCount: Int = 0
     
+    var currentConnectServ:NetService?
     /**已启动发布*/
     var status : ServiceStatus = .idle
     
@@ -64,6 +65,8 @@ class MXSNetServ: NetService, NetServiceDelegate, StreamDelegate {
             MXSNetServ.shared.inputStream = s_in
             MXSNetServ.shared.outputStream = s_out
             print("connectToService success")
+            currentConnectServ = serv
+            
             openStreams()
         }
         return success
@@ -82,12 +85,12 @@ class MXSNetServ: NetService, NetServiceDelegate, StreamDelegate {
     func closeStreams() {
         if (MXSNetServ.shared.inputStream != nil) {
             
-            MXSNetServ.shared.inputStream?.remove(from: RunLoop.current, forMode: .defaultRunLoopMode)
             MXSNetServ.shared.inputStream?.close()
+            MXSNetServ.shared.inputStream?.remove(from: RunLoop.current, forMode: .defaultRunLoopMode)
             MXSNetServ.shared.inputStream = nil
             
-            MXSNetServ.shared.outputStream?.remove(from: RunLoop.current, forMode: .defaultRunLoopMode)
             MXSNetServ.shared.outputStream?.close()
+            MXSNetServ.shared.outputStream?.remove(from: RunLoop.current, forMode: .defaultRunLoopMode)
             MXSNetServ.shared.outputStream = nil
         }
         currentConnectCount = 0
@@ -109,7 +112,9 @@ class MXSNetServ: NetService, NetServiceDelegate, StreamDelegate {
         closeStreams()
         stopService()
     }
-    
+    func disConnect() {
+//        closeStreams()
+    }
     
     func send(_ message:Dictionary<String, Any>) {
         print("send message: ", message, " 123")
@@ -161,7 +166,15 @@ class MXSNetServ: NetService, NetServiceDelegate, StreamDelegate {
         print("\n=== aStream ===", aStream)
         switch eventCode {
         case .openCompleted:
-            openCompleted()
+            print("openCompleted +")
+            currentConnectCount += 1
+            /**完成链接 停止browser监测、当前service，输入、输出流不会停*/
+            if currentConnectCount == expectConnectCount {
+                print("openCompleted done")
+    //            self.belong?.stopBrowser()
+    //            stopService()
+                belong?.setupForConnected()
+            }
         case .hasSpaceAvailable:
             print("can write")
         case .hasBytesAvailable:
@@ -202,33 +215,17 @@ class MXSNetServ: NetService, NetServiceDelegate, StreamDelegate {
         case .errorOccurred:
             print("errorOccurred")
         case .endEncountered:
-            endEncountered()
+            print("endEncountered")
+            closeStreams()
+            
         default:
             print("nothing")
         }
     }
     
-    
-    //MARK:notifies
-    func openCompleted() {
-        print("openCompleted +")
-        currentConnectCount += 1
-        /**完成链接 停止browser监测、当前service，输入、输出流不会停*/
-        if currentConnectCount == expectConnectCount {
-            print("openCompleted done")
-//            self.belong?.stopBrowser()
-//            stopService()
-            belong?.setupForConnected()
-        }
-    }
+    //MARK:notifies msg
     func receiveMessage(_ msg:Dictionary<String, Any>) {
         self.belong!.havesomeMessage(msg)
-    }
-    func endEncountered() {
-        print("endEncountered")
-        MXSNetServ.shared.publishOrRestart()
-        belong?.startBrowser()
-        belong?.setupForNewGame()
     }
     
     //MARK:serv delegate

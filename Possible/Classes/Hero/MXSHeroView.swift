@@ -15,11 +15,10 @@ class MXSHeroView: MXSBaseView {
     let contentView :UIView = UIView()
     let lightSign: UIView = UIView()
     
-    var portraitImage : UIImageView?
-    var nameLabel: UILabel?
-    var skillImages : Array<UIImageView>?
-    var HPBottle : Array<UIView>?
-    
+    var portraitImage : UIImageView = UIImageView()
+    let nameLabel: UILabel = UILabel.init(text: "", fontSize: 610, textColor: .darkText, align: .center)
+    var skillImages : Array<UIImageView> = Array<UIImageView>.init()
+    var HPBottle : Array<UIView> = Array<UIView>()
     
     var signStatus:HeroSignStatus = .blank {
         didSet {
@@ -47,23 +46,20 @@ class MXSHeroView: MXSBaseView {
         self.controller?.someoneHeroTaped(self)
     }
     
-    var LP: Int? = 0 {
+    var LP: Int = 0 {
         didSet {
-            HPBottle = Array.init()
-            let heart_width = 12.0
+            let heart_width:CGFloat = 12.0
             var count = 0
-            while count < LP! {
-                let skillView = UIView()
-                skillView.layer.cornerRadius = CGFloat(heart_width*0.5)
-                skillView.backgroundColor = .red
-                skillView.alpha = 0.75
-                contentView.addSubview(skillView)
-                skillView.snp.makeConstraints { (make) in
-                    make.top.equalTo(self).offset((heart_width+2.0) * Double(count) + 3)
-                    make.right.equalTo(self).inset(5)
-                    make.size.equalTo(CGSize.init(width: heart_width, height: heart_width))
-                }
-                HPBottle!.append(skillView)
+            let content_width :CGFloat = contentView.bounds.size.width
+            while count < LP {
+                let heart_view = UIView()
+                heart_view.layer.cornerRadius = CGFloat(heart_width*0.5)
+                heart_view.backgroundColor = .red
+                heart_view.alpha = 0.75
+                contentView.addSubview(heart_view)
+                heart_view.frame = CGRect(x: content_width-5.0-heart_width, y: (heart_width+2.0) * CGFloat(count) + 3.0, width: heart_width, height: heart_width)
+                
+                HPBottle.append(heart_view)
                 count+=1
             }
             hp = LP
@@ -71,8 +67,8 @@ class MXSHeroView: MXSBaseView {
     }
     var hp: Int? = 0 {
         didSet {
-            for index in 0...self.HPBottle!.count-1 {
-                let h = self.HPBottle![index]
+            for index in 0...self.HPBottle.count-1 {
+                let h = self.HPBottle[index]
                 if index < hp! {
                     h.backgroundColor = .red
                 }
@@ -87,56 +83,47 @@ class MXSHeroView: MXSBaseView {
         didSet {
             for index in 0..<skillsExp!.count {
                 let skill = skillsExp![index]
-                let sk_view = skillImages![index]
+                let sk_view = skillImages[index]
                 sk_view.image = UIImage(named: String(format: "skill_%03d", arguments: [skill.power.rawValue]))
             }
         }
     }
     
     override func setupSubviews() {
+        self.bounds = CGRect(x: 0, y: 0, width: MXSSize.Hw, height: MXSSize.Hh)
         
         lightSign.frame = self.bounds
         lightSign.backgroundColor = .clear
         self.addSubview(lightSign)
         
-        contentView.frame = CGRect(x: 1, y: 1, width: self.bounds.size.width - 2, height: self.bounds.size.height - 2)
+        let padding :CGFloat = 2.0
+        let content_width :CGFloat = self.bounds.size.width - padding*2
+        let content_height :CGFloat = self.bounds.size.height - padding*2
+        contentView.frame = CGRect(x: padding, y: padding, width: content_width, height: content_height)
         contentView.backgroundColor = .cyan
         self.addSubview(contentView)
         
-        portraitImage = UIImageView.init(image: UIImage.init(named: "hero_001"))
-        portraitImage?.contentMode = .scaleAspectFit
-        contentView.addSubview(portraitImage!)
-        portraitImage?.snp.makeConstraints({ (make) in
-            make.edges.equalTo(self).inset(UIEdgeInsets.init(top: 0, left: 0, bottom: 0, right: 0))
-        })
+        portraitImage.image = UIImage.init(named: "hero_001")
+        portraitImage.contentMode = .scaleAspectFill
+        portraitImage.clipsToBounds = true
+        contentView.addSubview(portraitImage)
+        portraitImage.frame = contentView.bounds
         
-        skillImages = Array.init()
-        let item_width = (self.bounds.size.width-2.0) * 0.25
+        let item_width = content_width * 0.25
         for index in 0...3 {
             let skillView = UIImageView.init(image: UIImage.init(named: "skill_001"))
             skillView.layer.cornerRadius = 0
             skillView.layer.borderWidth = 1;
             skillView.layer.borderColor = UIColor.init(red: 227/255, green: 137/255, blue: 60/255, alpha: 1).cgColor
             contentView.addSubview(skillView)
-            skillView.snp.makeConstraints { (make) in
-                make.left.equalTo(contentView).offset(item_width*CGFloat(index))
-                make.bottom.equalTo(contentView)
-                make.size.equalTo(CGSize.init(width: item_width, height: item_width))
-            }
-            skillImages?.append(skillView)
+            skillView.frame = CGRect(x: item_width*CGFloat(index), y: content_height-item_width, width: item_width, height: item_width)
+            skillImages.append(skillView)
         }
         
-        nameLabel = UILabel.init()
-        nameLabel?.textColor = .darkText
-        nameLabel?.numberOfLines = 0
-        nameLabel?.font = UIFont.systemFont(ofSize: 10, weight: .medium)
-        contentView.addSubview(nameLabel!)
-        nameLabel?.snp.makeConstraints({ (m) in
-            m.left.equalTo(contentView).offset(5)
-            m.top.equalTo(contentView).offset(5)
-            m.width.equalTo(12)
-        })
+        contentView.addSubview(nameLabel)
+        nameLabel.frame = CGRect(x: 0, y: 5, width: 14, height: content_height-item_width)
         
     }
+    
     
 }

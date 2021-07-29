@@ -118,6 +118,7 @@ class MXSGroundController: MXSViewController {
         /*--------------------------------------------*/
         self.view.addSubview(playerView)
         playerView.frame = CGRect.init(x: 10, y: MXSSize.Sh - MXSSize.Hh, width: MXSSize.Hw, height: MXSSize.Hh)
+//        playerView.frame.origin
         
         self.view.addSubview(oppontView)
         oppontView.frame = CGRect(x: (MXSSize.Sw - MXSSize.Hw)*0.5, y: 0, width: MXSSize.Hw, height: MXSSize.Hh)
