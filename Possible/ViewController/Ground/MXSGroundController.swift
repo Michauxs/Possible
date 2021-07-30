@@ -141,7 +141,7 @@ class MXSGroundController: MXSViewController {
         pickHeroView.belong = self
     }
     
-    func readyModelForView () {
+    func readyModelForView() {
         
     }
     
@@ -402,6 +402,7 @@ class MXSGroundController: MXSViewController {
     }
     
     
+    //MARK:- poker
     @objc public func someonePokerTaped(_ pokerView: MXSPokerView) {
         if let index = player.pokers.firstIndex(where: {$0 === pokerView.belong}) {
             print("controller action pok at " + "\(index)")

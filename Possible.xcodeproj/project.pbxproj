@@ -53,6 +53,8 @@
 		76AC2AF4250F6DC1005884CF /* MXSSkillBtn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76AC2AF3250F6DC1005884CF /* MXSSkillBtn.swift */; };
 		76B4E9522506269000AD5CA3 /* MXSPassedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76B4E9512506269000AD5CA3 /* MXSPassedView.swift */; };
 		76B4E9542507769000AD5CA3 /* MXSView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76B4E9532507769000AD5CA3 /* MXSView.swift */; };
+		76D036D726B39ACF00D312F9 /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 76D036D626B39ACF00D312F9 /* Launch Screen.storyboard */; };
+		76D036D926B3FBE200D312F9 /* MXSPVPController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76D036D826B3FBE000D312F9 /* MXSPVPController.swift */; };
 		76DEB05825303E5300D954FC /* XK.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 76DEB05725303E5300D954FC /* XK.ttf */; };
 		76E9D0EA26453EF400D6E5C4 /* MXSPVESoloController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76E9D0E926453EF400D6E5C4 /* MXSPVESoloController.swift */; };
 		76E9D0EF26463FF700D6E5C4 /* MXSPVPServiceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76E9D0EE26463FF700D6E5C4 /* MXSPVPServiceController.swift */; };
@@ -134,6 +136,8 @@
 		76AC2AF3250F6DC1005884CF /* MXSSkillBtn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSSkillBtn.swift; sourceTree = "<group>"; };
 		76B4E9512506269000AD5CA3 /* MXSPassedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSPassedView.swift; sourceTree = "<group>"; };
 		76B4E9532507769000AD5CA3 /* MXSView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSView.swift; sourceTree = "<group>"; };
+		76D036D626B39ACF00D312F9 /* Launch Screen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
+		76D036D826B3FBE000D312F9 /* MXSPVPController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSPVPController.swift; sourceTree = "<group>"; };
 		76DEB05725303E5300D954FC /* XK.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = XK.ttf; sourceTree = "<group>"; };
 		76E9D0E926453EF400D6E5C4 /* MXSPVESoloController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSPVESoloController.swift; sourceTree = "<group>"; };
 		76E9D0EE26463FF700D6E5C4 /* MXSPVPServiceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSPVPServiceController.swift; sourceTree = "<group>"; };
@@ -270,6 +274,7 @@
 			isa = PBXGroup;
 			children = (
 				76053DA924E39B4E001860E7 /* AppDelegate.swift */,
+				76D036D626B39ACF00D312F9 /* Launch Screen.storyboard */,
 			);
 			path = main;
 			sourceTree = "<group>";
@@ -391,6 +396,7 @@
 				76963DC424FC922200007D9F /* MXSLeadingView.swift */,
 				76053DDB24E39C90001860E7 /* MXSGroundController.swift */,
 				76E9D0E926453EF400D6E5C4 /* MXSPVESoloController.swift */,
+				76D036D826B3FBE000D312F9 /* MXSPVPController.swift */,
 				76E9D0EE26463FF700D6E5C4 /* MXSPVPServiceController.swift */,
 				76E9D0F32646401400D6E5C4 /* MXSPVPCustomerController.swift */,
 			);
@@ -545,6 +551,7 @@
 				7654CDD4251B52060053B4F3 /* KT_GB2312.ttf in Resources */,
 				76053DB324E39B5A001860E7 /* Assets.xcassets in Resources */,
 				765824DF250A08E300EB55E5 /* skill.json in Resources */,
+				76D036D726B39ACF00D312F9 /* Launch Screen.storyboard in Resources */,
 				76053E2024E68635001860E7 /* Default-568h@2x.png in Resources */,
 				76F92F4324F397C50039478D /* LaunchImage-Landscape-667h~iPhone.png in Resources */,
 				76DEB05825303E5300D954FC /* XK.ttf in Resources */,
@@ -655,6 +662,7 @@
 				765E6E76269584B7005499E9 /* MXSVCExchangeCmd.swift in Sources */,
 				764DE6492501F14700409586 /* MXSSkillAssemController.swift in Sources */,
 				76053E2324E68722001860E7 /* MXSHeroView.swift in Sources */,
+				76D036D926B3FBE200D312F9 /* MXSPVPController.swift in Sources */,
 				7697A5C424ECB8F100FB93A6 /* MXSEnumDefines.swift in Sources */,
 				76B4E9542507769000AD5CA3 /* MXSView.swift in Sources */,
 				764DE64F25020F8700409586 /* MXSButton.swift in Sources */,

@@ -93,6 +93,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, NetServiceDelegate, Strea
         
     }
 
-
+//    func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
+//        return .landscapeLeft
+//    }
 }
 

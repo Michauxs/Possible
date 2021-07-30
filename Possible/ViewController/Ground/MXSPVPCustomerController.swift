@@ -8,21 +8,11 @@
 
 import UIKit
 
-class MXSPVPCustomerController: MXSGroundController {
-    var isService:Bool = false
-    override func didCloseGameBtnClick() {
-        MXSPokerCmd.shared.packagePoker()
-        MXSNetServ.shared.send([kMessageType:MessageType.endGame.rawValue, kMessageValue:1])
-        self.navigationController?.popViewController(animated: true)
-    }
+class MXSPVPCustomerController: MXSPVPController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         MXSNetServ.shared.send([kMessageType:MessageType.joined.rawValue, kMessageValue:1])
-    }
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
     }
 
     override func readyModelForView() {
@@ -96,6 +86,47 @@ class MXSPVPCustomerController: MXSGroundController {
         }
     }
     
+    //MARK:- hero
+    public override func someoneHeroTaped(_ heroView: MXSHeroView) {
+        print("controller action hero")
+        if player.signStatus != .active {
+            return
+        }
+        guard let hero = heroView.belong else {
+            return
+        }
+        
+        if hero.signStatus == .selected {
+            hero.signStatus = .blank
+            MXSJudge.cmd.removePassive(hero)
+        }
+        else {
+            hero.signStatus = .selected
+            MXSJudge.cmd.addPassive(hero)
+        }
+        checkCanCertainAction()
+    }
+    
+    //MARK:- poker
+    @objc public override func someonePokerTaped(_ pokerView: MXSPokerView) {
+        if let index = player.pokers.firstIndex(where: {$0 === pokerView.belong}) {
+            print("controller action pok at " + "\(index)")
+        }
+        
+        pokerView.isUp = !pokerView.isUp
+        if player.signStatus != .active {
+            return
+        }
+        
+        let poker = pokerView.belong!
+        if pokerView.isUp {
+            player.pickPoker(poker)
+        } else {
+            player.disPickPoker(poker)
+        }
+        
+        checkCanCertainAction()
+    }
     
     //MARK:- leadingView
     public override func certainForAttack() {
@@ -122,6 +153,7 @@ class MXSPVPCustomerController: MXSGroundController {
         leadingView.isHidden = true
         leadingView.state = .defenseUnPick
         passedView.fadeout()
+        
         player.signStatus = .blank
         MXSNetServ.shared.send([kMessageType:MessageType.turnOver.rawValue, kMessageValue:0])
     }

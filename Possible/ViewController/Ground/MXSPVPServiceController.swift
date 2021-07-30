@@ -8,21 +8,7 @@
 
 import UIKit
 
-class MXSPVPServiceController: MXSGroundController {
-    var isService:Bool = false
-    override func didCloseGameBtnClick() {
-        MXSPokerCmd.shared.packagePoker()
-        MXSNetServ.shared.send([kMessageType:MessageType.endGame.rawValue, kMessageValue:1])
-        self.navigationController?.popViewController(animated: true)
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        
-    }
-    override func viewDidLoad() {
-        super.viewDidLoad()
-    }
+class MXSPVPServiceController: MXSPVPController {
 
     override func readyModelForView() {
         pickHeroView.heroData = MXSHeroCmd.shared.allHeroModel()
@@ -57,6 +43,7 @@ class MXSPVPServiceController: MXSGroundController {
             MXSNetServ.shared.send([kMessageType:MessageType.dealcard.rawValue, kMessageValue:poker_uid_arr])
             
             player.signStatus = .active
+            leadingView.state = .attackUnPick
         }
     }
     
@@ -125,7 +112,27 @@ class MXSPVPServiceController: MXSGroundController {
             MXSJudge.cmd.addPassive(hero)
         }
         checkCanCertainAction()
+    }
+    
+    //MARK:- poker
+    @objc public override func someonePokerTaped(_ pokerView: MXSPokerView) {
+        if let index = player.pokers.firstIndex(where: {$0 === pokerView.belong}) {
+            print("controller action pok at " + "\(index)")
+        }
         
+        pokerView.isUp = !pokerView.isUp
+        if player.signStatus != .active {
+            return
+        }
+        
+        let poker = pokerView.belong!
+        if pokerView.isUp {
+            player.pickPoker(poker)
+        } else {
+            player.disPickPoker(poker)
+        }
+        
+        checkCanCertainAction()
     }
     
     //MARK:- leadingView
@@ -154,6 +161,7 @@ class MXSPVPServiceController: MXSGroundController {
         leadingView.isHidden = true
         leadingView.state = .defenseUnPick
         passedView.fadeout()
+        
         player.signStatus = .blank
         MXSNetServ.shared.send([kMessageType:MessageType.turnOver.rawValue, kMessageValue:0])
     }
