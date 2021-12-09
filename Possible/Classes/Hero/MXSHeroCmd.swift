@@ -18,14 +18,14 @@ class MXSHero {
     var graspCapacity: Int = 0
     
     /**name photo hp skills desc*/
-    init(_ attr:Array<Any>) {
+    init(_ attr:Dictionary<String,Any>) {
         attribute = attr
         
-        if let tmp_n = attr[indexHeroName] as? String { name = tmp_n }
-        if let tmp_p = attr[indexHeroPhoto] as? String { photo = tmp_p }
-        if let tmp_lp = attr[indexHeroHP] as? Int { LP = tmp_lp }
+        if let tmp_n = attr[kStringName] as? String { name = tmp_n }
+        if let tmp_p = attr[kStringImage] as? String { photo = tmp_p }
+        if let tmp_lp = attr[kStringHP] as? Int { LP = tmp_lp }
         
-        if let uu_skills = attr[indexHeroSKFate] as? Array<String> {
+        if let uu_skills = attr[kStringSKFate] as? Array<String> {
             for uu in uu_skills {
                 let skill = MXSSkillCmd.shared.getSkillFromUUMark(uu)
                 skillFate.append(skill)
@@ -40,7 +40,7 @@ class MXSHero {
             skillSet.append(contentsOf: skillExp)
         }
         
-        if attr.count > indexHeroDesc { desc = attr[indexHeroDesc] as? String }
+        if attr.count > kStringDesc { desc = attr[kStringDesc] as? String }
     }
     
     var concreteView: MXSHeroView? {
@@ -362,7 +362,7 @@ class MXSHeroCmd {
     }
     
     func someoneFromName(_ uu:String) -> MXSHero? {
-        if let index = heroData.firstIndex(where: { (hero) -> Bool in hero[indexHeroPhoto] as! String == uu }) {
+        if let index = heroData.firstIndex(where: { (hero) -> Bool in hero[kStringImage] as! String == uu }) {
             let attr = heroData[index]
             let hero = MXSHero.init(attr)
             return hero

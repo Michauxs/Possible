@@ -1,11 +1,77 @@
 {
-    "skill_000":["unknown",     "skill_000", 0, 0, "desc"],
-    "skill_001":["lock",        "skill_001", 1, 0, "desc"],
-    "skill_002":["blank",       "skill_002", 2, 0, "desc"],
+    "skill_000":{
+        "name": "unknown",
+        "image": "skill_000",
+        "power": 0,
+        "mode": 0,
+        "desc": "desc"
+    },
+    "skill_001":{
+        "name": "lock",
+        "image": "skill_001",
+        "power": 1,
+        "mode": 0,
+        "desc": "desc"
+    },
+    "skill_002":{
+        "name": "blank",
+        "image": "skill_002",
+        "power": 2,
+        "mode": 0,
+        "desc": "desc"
+    },
     
-    "skill_010":["RedA",        "skill_010", 10, 2, "desc"],
-    "skill_011":["XiaDan",      "skill_011", 11, 2, "desc"],
-    "skill_012":["Wolf St",     "skill_012", 12, 1, "desc"],
-    "skill_013":["Drink",       "skill_013", 13, 2, "desc"],
-    "skill_014":["AllOfMe",     "skill_014", 14, 2, "desc"],
+    "skill_010":{
+        "name": "RedA",
+        "image": "skill_010",
+        "power": 10,
+        "mode": 1,
+        "desc": "desc"
+    },
+    "skill_011":{
+        "name": "XiaDan",
+        "image": "skill_011",
+        "power": 11,
+        "mode": 1,
+        "need":{"target":1,"poker_grasp":1,"poker_pick":0,"poker_color":1},
+        "waiting":{"who":3,"poker_pick":1},
+        "judge":{"according":1,"order_by":1},
+        "effect":{"self":{"count_attack":2,"numb_aim":2,"deepen":0,"hp":0}, "opponent":{"count_attack":2,"numb_aim":2,"deepen":0,"hp":0}},
+        "field":{"hp":0},
+        "desc": "desc"
+    },
+    "skill_012":{
+        "name": "Wolf_St",
+        "image": "skill_012",
+        "power": 12,
+        "mode": 2,
+        "effect":{"count_attack":-1},
+        "desc": "desc"
+    },
+    "skill_013":{
+        "name": "Drink",
+        "image": "skill_013",
+        "power": 13,
+        "mode": 1,
+        "desc": "desc"
+    },
+    "skill_014":{
+        "name": "AllOfMe",
+        "image": "skill_014",
+        "power": 14,
+        "mode": 2,
+        "desc": "desc"
+    },
+    "skill_015":{
+        "name": "SanBF",
+        "image": "skill_015",
+        "power": 14,
+        "mode": 1,
+        "need":{"target":1,"poker_grasp":1,"poker_pick":1,"poker_action":1, "next_key":"waiting"},
+        "waiting":{"who":2,"poker_pick":1, "next_key":"judge"},
+        "judge":{"according":1,"order_by":1},
+        "effect":{"self":{"count_attack":2,"numb_aim":2,"deepen":0,"hp":0}, "opponent":{"count_attack":2,"numb_aim":2,"deepen":0,"hp":0}},
+        "field":{"hp":0},
+        "desc": "desc"
+    }
 }

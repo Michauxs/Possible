@@ -30,17 +30,16 @@ let FontKaiTiBold: String = "Kaiti SC"
 let FontKaiTiRegular: String = "KaiTi_GB2312"
 let FontXingKai: String = "FZXingKai-S04S"
 
-let indexHeroName: Int = 0
-let indexHeroPhoto: Int = 1
-let indexHeroHP: Int = 2
-let indexHeroSKFate: Int = 3
-let indexHeroDesc: Int = 4
 
-let indexSkillName: Int = 0
-let indexSkillPhoto: Int = 1
-let indexSkillPower: Int = 2
-let indexSkillMode: Int = 3
-let indexSkillDesc: Int = 4
+let kStringName: String = "name"
+let kStringImage: String = "image"
+let kStringHP: String = "hp"
+let kStringSKFate: String = "skill_fate"
+let kStringDesc: String = "desc"
+
+let kStringSkillPower: String = "power"
+let kStringSkillMode: String = "mode"
+
 
 //MARK:- Hero
 //主动/被选择/等待操作
@@ -123,4 +122,22 @@ enum SkillState : Int {
     /**开启后 持续生效*/
     case staring
 }
-
+enum SkillMode : Int {
+    case unknown = 0
+    /**主动*/
+    case active = 1
+    /**被动*/
+    case possive = 2
+    /**触发式*/
+    case triggerWillGetPok = 10
+    
+    case triggerWillAttack = 15
+    case triggerDoneAttack = 16
+    case triggerDefAttack = 17
+    
+    case triggerWillDefence = 20
+    case triggerDoneDefence = 21
+    
+    case triggerInjured = 25
+    case triggerRecovery = 30
+}

@@ -28,15 +28,16 @@ class MXSSkill {
     }
     
     //["name", "skill_000", 0, "desc"]
-    init(_ attr:Array<Any>) {
+    init(_ attr:Dictionary<String,Any>) {
         attribute = attr
         
-        name = attr[indexSkillName] as? String
-        photo = attr[indexSkillPhoto] as? String
-        if let tmp_p = attr[indexSkillPower] as? Int { power = SkillPower(rawValue: tmp_p) ?? SkillPower.unKnown}
-        if let tmp_s = attr[indexSkillMode] as? Int { state = SkillState(rawValue: tmp_s) ?? SkillState.unused}
-        desc = attr[indexSkillDesc] as? String
+        name = attr[kStringName] as? String
+        photo = attr[kStringImage] as? String
+        if let tmp_p = attr[kStringSkillPower] as? Int { power = SkillPower(rawValue: tmp_p) ?? SkillPower.unKnown}
+        if let tmp_s = attr[kStringSkillMode] as? Int { state = SkillState(rawValue: tmp_s) ?? SkillState.unused}
+        desc = attr[kStringDesc] as? String
     }
+    
     convenience init() {
         self.init(MXSSkillCmd.shared.signetData[SkillBlankPhoto]!)
     }

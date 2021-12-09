@@ -396,9 +396,7 @@
 				76963DC424FC922200007D9F /* MXSLeadingView.swift */,
 				76053DDB24E39C90001860E7 /* MXSGroundController.swift */,
 				76E9D0E926453EF400D6E5C4 /* MXSPVESoloController.swift */,
-				76D036D826B3FBE000D312F9 /* MXSPVPController.swift */,
-				76E9D0EE26463FF700D6E5C4 /* MXSPVPServiceController.swift */,
-				76E9D0F32646401400D6E5C4 /* MXSPVPCustomerController.swift */,
+				76EDF983273376B9005B903A /* PVP */,
 			);
 			path = Ground;
 			sourceTree = "<group>";
@@ -419,6 +417,16 @@
 				766C3F3A25245235002819E6 /* MXSOneAction.swift */,
 			);
 			path = Judge;
+			sourceTree = "<group>";
+		};
+		76EDF983273376B9005B903A /* PVP */ = {
+			isa = PBXGroup;
+			children = (
+				76D036D826B3FBE000D312F9 /* MXSPVPController.swift */,
+				76E9D0EE26463FF700D6E5C4 /* MXSPVPServiceController.swift */,
+				76E9D0F32646401400D6E5C4 /* MXSPVPCustomerController.swift */,
+			);
+			path = PVP;
 			sourceTree = "<group>";
 		};
 		76F92F4824F4A5970039478D /* Other */ = {
