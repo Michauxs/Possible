@@ -11,7 +11,7 @@ import UIKit
 class MXSPVPServiceController: MXSPVPController {
 
     override func readyModelForView() {
-        pickHeroView.heroData = MXSHeroCmd.shared.allHeroModel()
+        pickHeroView.heroData = MXSHeroCmd.shared.allHeroModel
     }
     
     override func pickedHero(_ hero: MXSHero, isOpponter:Bool = false) {
@@ -27,7 +27,7 @@ class MXSPVPServiceController: MXSPVPController {
     }
     
     func allPlayerReady() {
-        if player.name == "Unknown" || opponter.name == "Unknown" {
+        if player.name == kStringUnknown || opponter.name == kStringUnknown {
             return
         }
         if MXSPokerCmd.shared.shuffle() {

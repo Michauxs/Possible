@@ -13,8 +13,8 @@ class MXSGroundController: MXSViewController {
     
     let PPedMargin: CGFloat = 5.0
     
-    var player: MXSHero = MXSHeroCmd.shared.getUnknownHero()
-    var opponter: MXSHero = MXSHeroCmd.shared.getUnknownHero()
+    var player: MXSHero = MXSHeroCmd.shared.getNewBlankHero()
+    var opponter: MXSHero = MXSHeroCmd.shared.getNewBlankHero()
     
     var pokerScrollView: UIScrollView = UIScrollView.init()
     var graspPokerViewes: Array<MXSPokerView> = Array<MXSPokerView>()

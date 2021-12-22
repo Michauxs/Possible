@@ -87,7 +87,7 @@ class MXSSkillAssemController: MXSViewController {
         self.view.addSubview(mainTable!)
         mainTable?.register(cellNames: ["MXSAssemHeroCell"], delegate: MXSTableDlg(), vc: self, rowHeight: 64)
         
-        mainTable?.dlg!.dlgData = MXSHeroCmd.shared.allHeroModel()
+        mainTable?.dlg!.dlgData = MXSHeroCmd.shared.allHeroModel
         /*--------------------------------------*/
         let inset:CGFloat = 10.0
         mainCollection = MXSCollectionView.init(frame: CGRect(x: MXSSize.Sw-width_skill, y: top_height, width: width_skill, height: mainTable!.frame.height), layout: nil, spacing: [5.0, 7.0])

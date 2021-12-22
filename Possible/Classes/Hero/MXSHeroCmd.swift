@@ -10,7 +10,6 @@ import UIKit
 
 class MXSHero {
     var isAxle: Bool = false
-//    var isFighting: Bool = false
     var adjustGrasp: Bool = false
     
     var name: String = "HeroName"
@@ -40,7 +39,7 @@ class MXSHero {
             skillSet.append(contentsOf: skillExp)
         }
         
-        if attr.count > kStringDesc { desc = attr[kStringDesc] as? String }
+        desc = attr[kStringDesc] as? String
     }
     
     var concreteView: MXSHeroView? {
@@ -135,7 +134,7 @@ class MXSHero {
     }
     
     var collectNumb: Int = 2
-    var attribute: Array<Any>?
+    var attribute: Dictionary<String,Any> = [:]
     var desc: String?
     
     var attackCount: Int = 0 {
@@ -331,7 +330,17 @@ class MXSHero {
 
 class MXSHeroCmd {
     
-    var heroData: Array<Array<Any>> = Array<Array<Any>>()
+    var heroData: Array<Dictionary<String,Any>> = []
+    
+    lazy var allHeroModel : [MXSHero] = {
+        var all : [MXSHero] = [MXSHero]()
+        for attr in heroData {
+            all.append(MXSHero.init(attr))
+        }
+        return all
+    }()
+    
+    lazy var unknownHero: MXSHero = MXSHero.init(["name": "Unknown", "image": "hero_000", "hp": 4, "skill": ["skill_010"], "desc": "unknown" ])
     
     static let shared : MXSHeroCmd = {
         let single = MXSHeroCmd.init()
@@ -340,11 +349,7 @@ class MXSHeroCmd {
         // 带throws的方法需要抛异常
         do {
             let data = try Data(contentsOf: url)
-            let array: Array<Array<Any>> = try! JSONSerialization.jsonObject(with: data, options: .mutableContainers) as! Array<Array<Any>>
-//            for attr in array {
-//                let hero = MXSHero.init(attr)
-//                single.heroData.append(hero)
-//            }
+            let array: [[String : Any]] = try! JSONSerialization.jsonObject(with: data, options: .mutableContainers) as! [[String : Any]]
             single.heroData = array
         } catch let error as Error? {
             print("读取本地数据出现错误!",error as Any)
@@ -369,17 +374,8 @@ class MXSHeroCmd {
         }
         return nil
     }
-    func getUnknownHero() -> MXSHero {
-        let attr = ["Unknown", "hero_000", 4, ["skill_010"], "unknown"] as [Any]
-        let hero = MXSHero.init(attr)
-        return hero
-    }
     
-    func allHeroModel() -> Array<MXSHero> {
-        var tmp = Array<MXSHero>()
-        for attr in heroData {
-            tmp.append(MXSHero.init(attr))
-        }
-        return tmp
+    func getNewBlankHero() ->MXSHero {
+        return MXSHero.init(["name": "Unknown", "image": "hero_000", "hp": 4, "skill": ["skill_010"], "desc": "unknown" ])
     }
 }

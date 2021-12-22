@@ -194,10 +194,14 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate
     }
     
     func netServiceBrowser(_ browser: NetServiceBrowser, didFind service: NetService, moreComing: Bool) {
-        print("- didFind")
-        if !(MXSNetServ.shared.isEqual(service))  {
+        print("self is: " + "\(MXSNetServ.shared)" + " === didFind: " + "\(service)")
+        
+        if MXSNetServ.shared == service {
+            print("- didFind Self")
+        }
+        else {
             services.append(service)
-            print("service +1 \n")
+            print("- didFind service +1 \n")
         }
         if !moreComing {
             mainTable?.dlg?.dlgData = services
@@ -206,7 +210,7 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate
     }
     func netServiceBrowser(_ browser: NetServiceBrowser, didRemove service: NetService, moreComing: Bool) {
         print("- didRemove")
-        if !(MXSNetServ.shared.isEqual(service))  {
+        if !MXSNetServ.shared.isEqual(service)  {
             services.removeAll { (item) -> Bool in item.isEqual(service) }
         }
         if !moreComing {
@@ -215,19 +219,8 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate
         }
     }
     
-    
     func netServiceBrowser(_ browser: NetServiceBrowser, didFindDomain domainString: String, moreComing: Bool) {
         print(domainString)
     }
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
 
 }

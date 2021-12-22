@@ -25,7 +25,7 @@ class MXSPVPController: MXSGroundController {
     }
 
     override func readyModelForView() {
-        pickHeroView.heroData = MXSHeroCmd.shared.allHeroModel()
+        pickHeroView.heroData = MXSHeroCmd.shared.allHeroModel
     }
     
     override func pickedHero(_ hero: MXSHero, isOpponter:Bool = false) {
@@ -37,28 +37,6 @@ class MXSPVPController: MXSGroundController {
         pickHeroView.isHidden = true
         MXSNetServ.shared.send([kMessageType:MessageType.pickHero.rawValue, kMessageValue:hero.photo])
         
-        self.allPlayerReady()
-    }
-    
-    func allPlayerReady() {
-        if player.name == "Unknown" || opponter.name == "Unknown" {
-            return
-        }
-        if MXSPokerCmd.shared.shuffle() {
-            player.pokers.append(contentsOf: MXSPokerCmd.shared.push(6))
-            layoutPokersInBox(update: 0)
-            
-            let arr_p = MXSPokerCmd.shared.push(6)
-            opponter.pokers.append(contentsOf: arr_p)
-            var poker_uid_arr:Array<Int> = Array<Int>()
-            for poker in arr_p {
-                poker_uid_arr.append(poker.uid)
-            }
-            MXSNetServ.shared.send([kMessageType:MessageType.dealcard.rawValue, kMessageValue:poker_uid_arr])
-            
-            player.signStatus = .active
-            leadingView.state = .attackUnPick
-        }
     }
     
     override func havesomeMessage(_ dict: Dictionary<String, Any>) {
@@ -82,7 +60,6 @@ class MXSPVPController: MXSGroundController {
                 opponter.concreteView = oppontView
                 opponter.joingame()
                 
-                self.allPlayerReady()
             }
             
         case .discard:

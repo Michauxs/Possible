@@ -17,7 +17,7 @@ class MXSPVESoloController: MXSGroundController {
     }
     
     override func readyModelForView() {
-        pickHeroView.heroData = MXSHeroCmd.shared.allHeroModel()
+        pickHeroView.heroData = MXSHeroCmd.shared.allHeroModel
     }
     
     override func pickedHero(_ hero: MXSHero, isOpponter:Bool = false) {

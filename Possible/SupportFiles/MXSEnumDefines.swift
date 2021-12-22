@@ -39,6 +39,7 @@ let kStringDesc: String = "desc"
 
 let kStringSkillPower: String = "power"
 let kStringSkillMode: String = "mode"
+let kStringUnknown: String = "Unknown"
 
 
 //MARK:- Hero

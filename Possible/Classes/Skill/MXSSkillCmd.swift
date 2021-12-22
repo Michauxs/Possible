@@ -21,14 +21,14 @@ class MXSSkill {
     var desc: String?
     var photo: String?
     
-    var attribute:Array<Any> = MXSSkillCmd.shared.signetData[SkillBlankPhoto]!
+    var attribute:[String : Any] = MXSSkillCmd.shared.skillData[SkillBlankPhoto]!
     
     func resetAttr() {
-        attribute = MXSSkillCmd.shared.signetData[SkillBlankPhoto]!
+        attribute = MXSSkillCmd.shared.skillData[SkillBlankPhoto]!
     }
     
     //["name", "skill_000", 0, "desc"]
-    init(_ attr:Dictionary<String,Any>) {
+    init(_ attr:[String : Any]) {
         attribute = attr
         
         name = attr[kStringName] as? String
@@ -39,7 +39,7 @@ class MXSSkill {
     }
     
     convenience init() {
-        self.init(MXSSkillCmd.shared.signetData[SkillBlankPhoto]!)
+        self.init(MXSSkillCmd.shared.skillData[SkillBlankPhoto]!)
     }
     var concreteView: MXSSkillView? {
         didSet {
@@ -67,7 +67,7 @@ class MXSSkill {
 class MXSSkillCmd {
 
     //["name", "skill_000", 0, "desc"]
-    var signetData: Dictionary<String,Array<Any>> = Dictionary<String,Array<Any>>()
+    var skillData: [String : [String : Any]] = [:]
     
     static let shared : MXSSkillCmd = {
         let single = MXSSkillCmd.init()
@@ -76,8 +76,8 @@ class MXSSkillCmd {
         
         do {
             let data = try Data(contentsOf: url)
-            let dict: Dictionary<String,Array<Any>> = try! JSONSerialization.jsonObject(with: data, options: .mutableContainers) as! Dictionary<String,Array<Any>>
-            single.signetData = dict
+            let dict: [String : [String : Any]] = try! JSONSerialization.jsonObject(with: data, options: .mutableContainers) as! [String : [String : Any]]
+            single.skillData = dict
             
         } catch let error as Error? {
             print("读取本地数据出现错误!",error as Any)
@@ -88,7 +88,7 @@ class MXSSkillCmd {
     
     //MARK:各种获得Skill方法
     func getSkillFromUUMark(_ uu: String) -> MXSSkill {
-        if let attr = signetData[uu] {
+        if let attr : [String : Any] = skillData[uu] {
             let skill = MXSSkill.init(attr)
             return skill
         }
@@ -106,7 +106,7 @@ class MXSSkillCmd {
     //MARK:array类型元数据
     func arrayModelData() -> Array<String> {
         var tmp = Array<String>()
-        for (key, _) in signetData {
+        for (key, _) in skillData {
             tmp.append(key)
         }
         
