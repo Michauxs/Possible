@@ -57,14 +57,13 @@ class MXSHeroShowView: MXSBaseView {
         selectSign.setRaius(wh*0.5, borderColor: .orange, borderWitdh: 1.0)
         selectSign.isHidden = true
         
-        self.layer.cornerRadius = 2.0
-        self.layer.borderColor = UIColor.orange.cgColor
-        self.layer.borderWidth = 1.0
+        self.setRaius(2.0, borderColor: .gray, borderWitdh: 0.5)
     }
 }
 
 class MXSPickHeroView: MXSBaseView {
     weak var belong:MXSGroundController?
+    var pickType:PickHeroType = .PVE
     
     var pickedCount:Int = 0
     let hero_width:CGFloat = 80.0
@@ -72,30 +71,40 @@ class MXSPickHeroView: MXSBaseView {
     let between:CGFloat = 3.0
     let numb_col = 4
     let contentView = UIView()
+    let tipsLabel:UILabel = UILabel.init(text: "", fontSize: 314, textColor: .gray, align: .left)
     var conctectViewes:Array<MXSHeroShowView> = Array<MXSHeroShowView>()
     var heroData:Array<MXSHero>? {
         didSet {
+            guard heroData != nil else {
+                return
+            }
             let content_width:CGFloat = hero_width * CGFloat(numb_col) + between * CGFloat(numb_col-1)
             let padding_left:CGFloat = (self.frame.width - content_width) * 0.5
-            if (heroData != nil) {
-                for index in 0 ..< heroData!.count {
-                    let row = index/numb_col
-                    let col = index%numb_col
-                    let view = MXSHeroShowView()
-                    view.frame = CGRect(x: padding_left + (hero_width+between)*CGFloat(col), y: (hero_height+between)*CGFloat(row), width: hero_width, height: hero_height)
-                    view.tag = index
-                    contentView.addSubview(view)
-                    conctectViewes.append(view)
-                    
-                    let hero = heroData![index]
-                    view.photo = hero.photo
-                    view.name = hero.name
-                    
-                    view.isUserInteractionEnabled = true
-                    view.addGestureRecognizer(UITapGestureRecognizer.init(target: self, action: #selector(didTapedSelf(taped:))))
-                    
-                }
+            for index in 0 ..< heroData!.count {
+                let row = index/numb_col
+                let col = index%numb_col
+                let view = MXSHeroShowView()
+                view.frame = CGRect(x: padding_left + (hero_width+between)*CGFloat(col), y: (hero_height+between)*CGFloat(row), width: hero_width, height: hero_height)
+                view.tag = index
+                contentView.addSubview(view)
+                conctectViewes.append(view)
+                
+                let hero = heroData![index]
+                view.photo = hero.photo
+                view.name = hero.name
+                
+                view.isUserInteractionEnabled = true
+                view.addGestureRecognizer(UITapGestureRecognizer.init(target: self, action: #selector(didTapedSelf(taped:))))
+                
             }
+            
+            contentView.addSubview( tipsLabel)
+            tipsLabel.snp.makeConstraints { make in
+                make.left.equalTo(contentView).offset(padding_left*0.5)
+                make.top.equalTo(contentView).offset(20)
+                make.width.equalTo(20)
+            }
+            tipsLabel.text = "请选择主体"
         }
     }
     

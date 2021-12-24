@@ -43,6 +43,11 @@ let kStringUnknown: String = "Unknown"
 
 
 //MARK:- Hero
+enum PickHeroType {
+    case PVE
+    case PVP
+}
+
 //主动/被选择/等待操作
 enum HeroSignStatus {
     case blank

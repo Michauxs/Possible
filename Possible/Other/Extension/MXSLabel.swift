@@ -24,6 +24,7 @@ public extension UILabel {
         if fontSize>300.0 && fontSize<600 {self.font = UIFont.systemFont(ofSize: fontSize-300.0, weight: .regular)}
         if fontSize<300.0 {self.font = UIFont.systemFont(ofSize: fontSize-300.0, weight: .light)}
         self.textAlignment = align
+        self.numberOfLines = 0
     }
 
 }

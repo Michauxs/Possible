@@ -169,8 +169,6 @@ class MXSPVPServiceController: MXSPVPController {
         MXSJudge.cmd.leaderReactive()
         leadingView.isHidden = true
         layoutPokersInBox(update: 1)
-        
-        cycleActive()
     }
     public override func cancelForDefense() {
         if player.pickes.count != 0 {
@@ -201,8 +199,6 @@ class MXSPVPServiceController: MXSPVPController {
         
         MXSJudge.cmd.leaderReactive()
         leadingView.isHidden = true
-        
-        cycleActive()
     }
     
 }

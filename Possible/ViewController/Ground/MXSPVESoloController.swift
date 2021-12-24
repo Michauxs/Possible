@@ -170,7 +170,7 @@ class MXSPVESoloController: MXSGroundController {
     }
     
     //MARK:- cycle active exchange
-    override func cycleActive() {
+    func cycleActive() {
         if let hero = MXSJudge.cmd.active {
             if hero.isAxle {
                 leadingView.isHidden = false

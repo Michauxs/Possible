@@ -14,10 +14,6 @@ class MXSPVPCustomerController: MXSPVPController {
         super.viewDidAppear(animated)
         MXSNetServ.shared.send([kMessageType:MessageType.joined.rawValue, kMessageValue:1])
     }
-
-    override func readyModelForView() {
-        
-    }
     
     override func pickedHero(_ hero: MXSHero, isOpponter:Bool = false) {
         player = hero
@@ -161,8 +157,6 @@ class MXSPVPCustomerController: MXSPVPController {
         MXSJudge.cmd.leaderReactive()
         leadingView.isHidden = true
         layoutPokersInBox(update: 1)
-        
-        cycleActive()
     }
     public override func cancelForDefense() {
         if player.pickes.count != 0 {

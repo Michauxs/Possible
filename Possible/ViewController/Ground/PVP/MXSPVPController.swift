@@ -25,7 +25,7 @@ class MXSPVPController: MXSGroundController {
     }
 
     override func readyModelForView() {
-        pickHeroView.heroData = MXSHeroCmd.shared.allHeroModel
+        pickHeroView.pickType = .PVP
     }
     
     override func pickedHero(_ hero: MXSHero, isOpponter:Bool = false) {
@@ -160,8 +160,6 @@ class MXSPVPController: MXSGroundController {
         MXSJudge.cmd.leaderReactive()
         leadingView.isHidden = true
         layoutPokersInBox(update: 1)
-        
-        cycleActive()
     }
     public override func cancelForDefense() {
         if player.pickes.count != 0 {
@@ -192,8 +190,6 @@ class MXSPVPController: MXSGroundController {
         
         MXSJudge.cmd.leaderReactive()
         leadingView.isHidden = true
-        
-        cycleActive()
     }
     
     //MARK:- diffrent
