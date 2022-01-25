@@ -154,7 +154,7 @@ class MXSHero {
     }
     
     
-    //MARK:- sign status
+    // MARK: - sign status
     var signStatus:HeroSignStatus = .blank {
         didSet {
             concreteView?.signStatus = signStatus
@@ -162,7 +162,7 @@ class MXSHero {
     }
     var isCollectedCard:Bool = false
     
-    //MARK:- hero action
+    // MARK: - hero action
     public func disPokerCurrentPickes() {
         
     }
@@ -183,7 +183,6 @@ class MXSHero {
         if passive.count == 0 {//自主牌/群
             if action == .recover && HP < LP { return true }
             if (action == .warFire || action == .arrowes) { return true }
-            return false
         }
         else {
             if action == .attack {
@@ -376,6 +375,8 @@ class MXSHeroCmd {
     }
     
     func getNewBlankHero() ->MXSHero {
-        return MXSHero.init(["name": "Unknown", "image": "hero_000", "hp": 4, "skill": ["skill_010"], "desc": "unknown" ])
+        let hero = MXSHero.init(["name": "Unknown", "image": "hero_000", "hp": 4, "skill": ["skill_010"], "desc": "unknown" ])
+        print("new a hero: " + "\(hero)")
+        return hero
     }
 }

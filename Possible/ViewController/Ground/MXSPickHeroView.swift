@@ -128,25 +128,34 @@ class MXSPickHeroView: MXSBaseView {
         let view:MXSHeroShowView = taped.view as! MXSHeroShowView
         if view.isSelect { return }
         
-        pickedCount += 1
         view.isSelect = true
-        if pickedCount == 1 {
+        if pickedCount == 0 {
             self.belong?.pickedHero(heroData![view.tag])
+            pickedCount += 1
+            
+            if pickType == .PVP {
+                autoHiddenSelfAfter(1500)
+            }
+            else {
+                tipsLabel.text = "请选择客体"
+            }
         }
-        else {
-            if pickedCount > 2 { return }
+        else if pickedCount == 1 {
+            
             self.belong?.pickedHero(heroData![view.tag], isOpponter: true)
+            pickedCount += 1
+            autoHiddenSelfAfter(1500)
+            
+            tipsLabel.text = "即将开始。"
         }
+        else { return }
+    }
         
-//        DispatchQueue.main.asyncAfter(deadline: .now()+1) {
-//            var index = Int.init(arc4random_uniform(UInt32(self.heroData!.count)))
-//            if index == view.tag { index += 1 }
-//            self.conctectViewes[index].isSelect = true
-//
-//            self.belong?.autoPickHero(self.heroData![index])
+    func autoHiddenSelfAfter(_ m_second:Int = 1000) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(m_second)) {
 //            self.isHidden = true
-//        }
-        
+            self.removeFromSuperview()
+        }
     }
     
     

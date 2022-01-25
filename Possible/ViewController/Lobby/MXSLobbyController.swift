@@ -73,7 +73,7 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate
     
     @objc func didPVEBtnClick() {
         let vc = MXSPVESoloController.init()
-        self.navigationController?.pushViewController(vc, animated: true)
+        self.navigationController?.pushViewController(vc, animated: false)
     }
     
     override func viewDidLoad() {
@@ -194,7 +194,7 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate
     }
     
     func netServiceBrowser(_ browser: NetServiceBrowser, didFind service: NetService, moreComing: Bool) {
-        print("self is: " + "\(MXSNetServ.shared)" + " === didFind: " + "\(service)")
+        print("self is: " + "\(MXSNetServ.shared)" + " == didFind: " + "\(service)")
         
         if MXSNetServ.shared == service {
             print("- didFind Self")

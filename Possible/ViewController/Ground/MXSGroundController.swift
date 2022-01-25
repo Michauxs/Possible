@@ -17,7 +17,10 @@ class MXSGroundController: MXSViewController {
     var opponter: MXSHero = MXSHeroCmd.shared.getNewBlankHero()
     
     var pokerScrollView: UIScrollView = UIScrollView.init()
+    
+    /**pokerScrollView.subviews中的pokerview**/
     var graspPokerViewes: Array<MXSPokerView> = Array<MXSPokerView>()
+    
     var skillScrollView: UIScrollView = UIScrollView.init()
     let pickHeroView = MXSPickHeroView.init(frame: CGRect.init(x: 0, y: 0, width: MXSSize.Sw, height: MXSSize.Sh))
     
@@ -50,6 +53,8 @@ class MXSGroundController: MXSViewController {
     }
     
     @objc func didCloseGameBtnClick() {
+        player.pokers.removeAll()
+        opponter.pokers.removeAll()
         MXSPokerCmd.shared.packagePoker()
         self.navigationController?.popViewController(animated: true)
     }
@@ -63,21 +68,12 @@ class MXSGroundController: MXSViewController {
         
         player.joingame()
     }
-    public func autoPickHero(_ hero:MXSHero) {
-        opponter = hero
-        opponter.concreteView = oppontView
-        
-        if MXSPokerCmd.shared.shuffle() {
-            player.pokers.append(contentsOf: MXSPokerCmd.shared.push(6))
-            layoutPokersInBox(update: 0)
-            opponter.pokers.append(contentsOf: MXSPokerCmd.shared.push(6))
-        }
-        opponter.joingame()
-        /*--------------------------------------------*/
+    
+    public func layoutSkillViews(skilles:[MXSSkill]) {
         
         let btn_height:CGFloat = 40.0
         var height_sum:CGFloat = 5.0
-        for skill in player.skillSet {
+        for skill in skilles {
             if skill.power == .blank || skill.power == .unKnown || skill.power == .lock { continue }
             let btn = MXSSkillBtn.init(skill:skill)
             btn.frame = CGRect(x: 5, y: height_sum, width: skillScrollView.frame.width-10.0, height: btn_height)
@@ -143,7 +139,7 @@ class MXSGroundController: MXSViewController {
         
     }
     
-    /**update 更新，0初始发牌*/
+    /**update 1更新，0初始发牌*/
     func layoutPokersInBox(update: Int) {
         let pokers = player.pokers
         let count = pokers.count
@@ -354,7 +350,7 @@ class MXSGroundController: MXSViewController {
         checkCanCertainAction()
     }
     
-    //MARK:- action
+    // MARK: - check every one step action
     func checkCanCertainAction() {
         if player.signStatus == .focus {
             if player.canDefense() {

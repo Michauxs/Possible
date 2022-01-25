@@ -12,8 +12,6 @@ class MXSPVESoloController: MXSGroundController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
     }
     
     override func readyModelForView() {
@@ -24,43 +22,32 @@ class MXSPVESoloController: MXSGroundController {
         if isOpponter {
             opponter = hero
             opponter.concreteView = oppontView
-            
-            if MXSPokerCmd.shared.shuffle() {
-                player.pokers.append(contentsOf: MXSPokerCmd.shared.push(6))
-                layoutPokersInBox(update: 0)
-                opponter.pokers.append(contentsOf: MXSPokerCmd.shared.push(6))
-            }
             opponter.joingame()
-            /*--------------------------------------------*/
             
-            let btn_height:CGFloat = 40.0
-            var height_sum:CGFloat = 5.0
-            for skill in player.skillSet {
-                if skill.power == .blank || skill.power == .unKnown || skill.power == .lock { continue }
-                let btn = MXSSkillBtn.init(skill:skill)
-                btn.frame = CGRect(x: 5, y: height_sum, width: skillScrollView.frame.width-10.0, height: btn_height)
-                skillScrollView.addSubview(btn)
-                height_sum += btn_height+3
-                btn.addTarget(self, action: #selector(didSkillBtnClick(btn:)), for: .touchUpInside)
-            }
-            skillScrollView.contentSize = CGSize.init(width: 0, height: height_sum)
-            
-            pickHeroView.isHidden = true
-            cycleActive()
+            allHeroReady()
         }
         else {
             player = hero
+            player.joingame()
             player.isAxle = true
             player.concreteView = playerView
+//            layoutSkillViews(skilles: player.skillSet)
             
-            player.joingame()
             MXSNetServ.shared.send([kMessageType:MessageType.pickHero.rawValue, kMessageValue:hero.photo])
+        }
+    }
+    func allHeroReady() {
+        if MXSPokerCmd.shared.shuffle() {
+            player.pokers.append(contentsOf: MXSPokerCmd.shared.push(6))
+            layoutPokersInBox(update: 0)
             
+            opponter.pokers.append(contentsOf: MXSPokerCmd.shared.push(6))
         }
         
+        activeExchange(player)
     }
 
-    //MARK:- Skill
+    // MARK: - Skill
     @objc override func didSkillBtnClick(btn:MXSSkillBtn) {
 //        btn.isSelected = !btn.isSelected
         print(btn.power as Any)
@@ -72,7 +59,7 @@ class MXSPVESoloController: MXSGroundController {
         checkCanCertainAction()
     }
     
-    //MARK:- leadingView
+    // MARK: - leadingView
     public override func certainForAttack() {
         let poker = player.pickes.first!
         player.pokers.removeAll(where: {$0 === poker})
@@ -169,7 +156,26 @@ class MXSPVESoloController: MXSGroundController {
         cycleActive()
     }
     
-    //MARK:- cycle active exchange
+    // MARK: - 1.action cycle / 2.active exchange
+    func activeExchange(_ leader:MXSHero) {
+        /**通用数据部分**/
+        MXSJudge.cmd.leader = leader
+        let pokers = MXSPokerCmd.shared.push(2)
+        leader.pokers.append(contentsOf: pokers)
+        
+        /**player视图部分**/
+        if leader.isAxle {
+            leadingView.state = .attackUnPick
+            newAndGraspMoreViews(pokers)
+            
+            player.adjustGrasp = true
+            layoutPokersInBox(update: 1)
+        }
+    }
+            
+    func actionCycle() {
+        
+    }
     func cycleActive() {
         if let hero = MXSJudge.cmd.active {
             if hero.isAxle {
@@ -241,7 +247,7 @@ class MXSPVESoloController: MXSGroundController {
         newAndGraspMoreViews([poker])
     }
     
-    override func newAndGraspMoreViews(_ pokers:Array<MXSPoker>){
+    override func newAndGraspMoreViews(_ pokers:Array<MXSPoker>) {
         let view_last = graspPokerViewes.last
         for poker in pokers {
             let pokerView = MXSPokerView.init()
@@ -270,7 +276,7 @@ class MXSPVESoloController: MXSGroundController {
         checkCanCertainAction()
     }
     
-    //MARK:- hero
+    // MARK: - hero
     public override func someoneHeroTaped(_ heroView: MXSHeroView) {
         print("controller action hero")
         /**被动响应 无需选择*/
@@ -280,29 +286,7 @@ class MXSPVESoloController: MXSGroundController {
         checkCanCertainAction()
     }
     
-    //MARK:- action
-    override func checkCanCertainAction() {
-        if player.signStatus == .focus {
-            if player.canDefense() {
-                leadingView.state = .defenseReadyOn
-            }
-            else {
-                leadingView.state = .defenseUnPick
-            }
-        }
-        else {
-            if player.canAttack() {
-                leadingView.state = .attackReadyOn
-            }
-            else {
-                if player.pickes.count > 0 { leadingView.state = .attackPicked }
-                else { leadingView.state = .attackUnPick }
-            }
-        }
-            
-    }
-    
-    //MARK:application
+    // MARK: - application
     override var prefersStatusBarHidden: Bool {
         return true
     }
