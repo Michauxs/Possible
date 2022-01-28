@@ -167,7 +167,7 @@ class MXSGroundController: MXSViewController {
                 pokerView.showWidth = margin_count
                 graspPokerViewes.append(pokerView)
                 index += 1
-            }
+            }3
             graspPokerViewes.last?.showWidth = MXSSize.Pw
         }
         else {

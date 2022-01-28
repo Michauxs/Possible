@@ -44,7 +44,7 @@ class MXSPVESoloController: MXSGroundController {
             opponter.pokers.append(contentsOf: MXSPokerCmd.shared.push(6))
         }
         
-        activeExchange(player)
+        leaderExchange(player)
     }
 
     // MARK: - Skill
@@ -68,6 +68,8 @@ class MXSPVESoloController: MXSGroundController {
         leadingView.isHidden = true
         player.disPokerCurrentPickes()
         self.updateViewsResponAttackWithPickedPokeres(pokeres: player.pickes)
+        
+        actionCycle()
     }
     public override func updateViewsResponAttackWithPickedPokeres(pokeres:Array<MXSPoker>) {
         let poker = pokeres.first!
@@ -113,7 +115,7 @@ class MXSPVESoloController: MXSGroundController {
         
         MXSJudge.cmd.next()
         passedView.fadeout()
-        cycleActive()
+        leaderExchange(opponter)
     }
     
     public override func certainForDefense() {
@@ -153,17 +155,16 @@ class MXSPVESoloController: MXSGroundController {
         MXSJudge.cmd.leaderReactive()
         leadingView.isHidden = true
         
-        cycleActive()
+        actionCycle()
     }
     
-    // MARK: - 1.action cycle / 2.active exchange
-    func activeExchange(_ leader:MXSHero) {
+    // MARK: - cycle: 1.leader exchange  2.active action  3.possive action
+    func leaderExchange(_ leader:MXSHero) {
         /**通用数据部分**/
         MXSJudge.cmd.leader = leader
         let pokers = MXSPokerCmd.shared.push(2)
         leader.pokers.append(contentsOf: pokers)
         
-        /**player视图部分**/
         if leader.isAxle {
             leadingView.state = .attackUnPick
             newAndGraspMoreViews(pokers)
@@ -171,94 +172,72 @@ class MXSPVESoloController: MXSGroundController {
             player.adjustGrasp = true
             layoutPokersInBox(update: 1)
         }
+        
+        activeActionCycle()
     }
             
-    func actionCycle() {
+    func activeActionCycle {
+        guard let hero = MXSJudge.cmd.leader else {
+            return
+        }
+        /**player视图部分**/
+        if hero.isAxle {
+            leadingView.state = .attackUnPick
+            newAndGraspMoreViews(pokers)
+            
+            player.adjustGrasp = true
+            layoutPokersInBox(update: 1)
+        }
+        else {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                MXSJudge.cmd.appendOrRemovePassive(self.player)
+                if let poker = hero.hasPokerDoAttack() {
+                    hero.pickes.append(poker)
+                    if hero.discard() {
+                    }
+                    hero.pickes.removeAll()
+                    self.passedView.collectPoker(pokers: [poker])
+                }
+                else {
+                    MXSJudge.cmd.next()
+                    self.passedView.fadeout()
+                }
+                self.actionCycle()
+            }
+        }
         
     }
-    func cycleActive() {
-        if let hero = MXSJudge.cmd.active {
-            if hero.isAxle {
-                leadingView.isHidden = false
-                if hero === MXSJudge.cmd.leader { //leader
-                    leadingView.state = .attackUnPick
-                    if !hero.isCollectedCard { //第一圈开始
-                        hero.isCollectedCard = true
-                        let arr = MXSPokerCmd.shared.push(2)
-                        hero.pokers.append(contentsOf: arr)
-                        newAndGraspMoreViews(arr)
-                        player.adjustGrasp = true
-                        layoutPokersInBox(update: 1)
-                    }
-                }
-                else {//passive
-                    leadingView.state = .defenseUnPick
-                    
-                }
-            }
-            else { //AI /oppot
-                if hero === MXSJudge.cmd.leader { //leader
-                    if !hero.isCollectedCard { //first
-                        hero.pokers.append(contentsOf: MXSPokerCmd.shared.push(2))
-                        hero.isCollectedCard = true
-                    }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                        MXSJudge.cmd.appendOrRemovePassive(self.player)
-                        if let poker = hero.hasPokerDoAttack() {
-                            hero.pickes.append(poker)
-                            if hero.discard() {
-                            }
-                            hero.pickes.removeAll()
-                            self.passedView.collectPoker(pokers: [poker])
-                        }
-                        else {
-                            
-                            MXSJudge.cmd.next()
-                            self.passedView.fadeout()
-                        }
-                        self.cycleActive()
-                    }
-                    
-                }
-                else {//passive
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                        if let poker_return = hero.replyAttack() {
-                            if poker_return.state == PokerState.transferring {// steal
-                                self.playerCollectPoker(poker_return)
-                                self.layoutPokersInBox(update: 1)
-                            }
-                            else {//destroy / defense
-                                self.passedView.collectPoker(pokers: [poker_return])
-                            }
-                        }
-                        
-                        MXSJudge.cmd.leaderReactive()
-                        self.cycleActive()
-                    }
-                }
-            }
+    func possiveActionCycle {
+        guard let hero = MXSJudge.cmd.passive.first else {
+            return
+        }
         
+        if hero.isAxle {
+            leadingView.state = .defenseUnPick
+        }
+        else {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                if let poker_return = hero.replyAttack() {
+                    if poker_return.state == PokerState.transferring {// steal
+                        self.playerCollectPoker(poker_return)
+                        self.layoutPokersInBox(update: 1)
+                    }
+                    else {//destroy / defense
+                        self.passedView.collectPoker(pokers: [poker_return])
+                    }
+                }
+                
+                MXSJudge.cmd.leaderReactive()
+                self.actionCycle()
+            }
         }
     }
-        
+    
     override func playerCollectPoker(_ poker: MXSPoker) {
         player.pokers.append(poker)
         poker.state = .handOn
         newAndGraspMoreViews([poker])
     }
-    
-    override func newAndGraspMoreViews(_ pokers:Array<MXSPoker>) {
-        let view_last = graspPokerViewes.last
-        for poker in pokers {
-            let pokerView = MXSPokerView.init()
-            pokerScrollView.addSubview(pokerView)
-            pokerView.frame = CGRect.init(x: view_last?.frame.origin.x ?? 0.0, y: PPedMargin, width: MXSSize.Pw, height: MXSSize.Ph)
-            pokerView.controller = self
-            poker.concreteView = pokerView
-            graspPokerViewes.append(pokerView)
-        }
-    }
-    
     
     @objc public override func someonePokerTaped(_ pokerView: MXSPokerView) {
         if let index = player.pokers.firstIndex(where: {$0 === pokerView.belong}) {

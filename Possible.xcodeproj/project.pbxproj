@@ -53,6 +53,8 @@
 		76AC2AF4250F6DC1005884CF /* MXSSkillBtn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76AC2AF3250F6DC1005884CF /* MXSSkillBtn.swift */; };
 		76B4E9522506269000AD5CA3 /* MXSPassedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76B4E9512506269000AD5CA3 /* MXSPassedView.swift */; };
 		76B4E9542507769000AD5CA3 /* MXSView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76B4E9532507769000AD5CA3 /* MXSView.swift */; };
+		76CB0A5F27A0F2A400F7D56E /* MXSHero.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76CB0A5E27A0F2A400F7D56E /* MXSHero.swift */; };
+		76CB0A6127A1232500F7D56E /* MXSHeroAI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76CB0A6027A1232500F7D56E /* MXSHeroAI.swift */; };
 		76D036D726B39ACF00D312F9 /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 76D036D626B39ACF00D312F9 /* Launch Screen.storyboard */; };
 		76D036D926B3FBE200D312F9 /* MXSPVPController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76D036D826B3FBE000D312F9 /* MXSPVPController.swift */; };
 		76DEB05825303E5300D954FC /* XK.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 76DEB05725303E5300D954FC /* XK.ttf */; };
@@ -136,6 +138,8 @@
 		76AC2AF3250F6DC1005884CF /* MXSSkillBtn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSSkillBtn.swift; sourceTree = "<group>"; };
 		76B4E9512506269000AD5CA3 /* MXSPassedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSPassedView.swift; sourceTree = "<group>"; };
 		76B4E9532507769000AD5CA3 /* MXSView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSView.swift; sourceTree = "<group>"; };
+		76CB0A5E27A0F2A400F7D56E /* MXSHero.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSHero.swift; sourceTree = "<group>"; };
+		76CB0A6027A1232500F7D56E /* MXSHeroAI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSHeroAI.swift; sourceTree = "<group>"; };
 		76D036D626B39ACF00D312F9 /* Launch Screen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
 		76D036D826B3FBE000D312F9 /* MXSPVPController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSPVPController.swift; sourceTree = "<group>"; };
 		76DEB05725303E5300D954FC /* XK.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = XK.ttf; sourceTree = "<group>"; };
@@ -383,6 +387,8 @@
 			isa = PBXGroup;
 			children = (
 				76F92F4424F3D8850039478D /* MXSHeroCmd.swift */,
+				76CB0A5E27A0F2A400F7D56E /* MXSHero.swift */,
+				76CB0A6027A1232500F7D56E /* MXSHeroAI.swift */,
 				76053E2224E68722001860E7 /* MXSHeroView.swift */,
 			);
 			path = Hero;
@@ -641,6 +647,7 @@
 				7654CDD2251AF0EF0053B4F3 /* MXSDeviceCell.swift in Sources */,
 				7697A5C824ECBD1500FB93A6 /* MXSBaseView.swift in Sources */,
 				7697A5CF24EE453100FB93A6 /* MXSPokerCmd.swift in Sources */,
+				76CB0A6127A1232500F7D56E /* MXSHeroAI.swift in Sources */,
 				76AC2AF4250F6DC1005884CF /* MXSSkillBtn.swift in Sources */,
 				7697A5CD24ECF4C100FB93A6 /* MXSSize.swift in Sources */,
 				766C3F3925243814002819E6 /* MXSJudge.swift in Sources */,
@@ -671,6 +678,7 @@
 				764DE6492501F14700409586 /* MXSSkillAssemController.swift in Sources */,
 				76053E2324E68722001860E7 /* MXSHeroView.swift in Sources */,
 				76D036D926B3FBE200D312F9 /* MXSPVPController.swift in Sources */,
+				76CB0A5F27A0F2A400F7D56E /* MXSHero.swift in Sources */,
 				7697A5C424ECB8F100FB93A6 /* MXSEnumDefines.swift in Sources */,
 				76B4E9542507769000AD5CA3 /* MXSView.swift in Sources */,
 				764DE64F25020F8700409586 /* MXSButton.swift in Sources */,
