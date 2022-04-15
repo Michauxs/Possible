@@ -13,7 +13,6 @@ class MXSHero {
     
     // MARK: - property only note
     var isAxle: Bool = false
-    var adjustGrasp: Bool = false
     
     var name: String = "HeroName"
     var photo: String = "hero_000"
@@ -164,9 +163,6 @@ class MXSHero {
     // MARK: - hero action
     var lastStep:MXSOneAction?
     var currentAction:MXSOneAction?
-    public func disPokerCurrentPickes() {
-        
-    }
     
     //MARK:- other hero
     public func collectCard () {

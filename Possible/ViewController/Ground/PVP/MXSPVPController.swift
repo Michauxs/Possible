@@ -139,8 +139,6 @@ class MXSPVPController: MXSGroundController {
         poker.state = .pass
         
         leadingView.isHidden = true
-        player.disPokerCurrentPickes()
-        layoutPokersInBox(update: 1)
         
     }
     public override func cancelPickes() {
@@ -159,7 +157,7 @@ class MXSPVPController: MXSGroundController {
     public override func certainForDefense() {
         MXSJudge.cmd.leaderReactive()
         leadingView.isHidden = true
-        layoutPokersInBox(update: 1)
+//        layoutPokersInBox(update: 1)
     }
     public override func cancelForDefense() {
         if player.pickes.count != 0 {
@@ -176,16 +174,16 @@ class MXSPVPController: MXSGroundController {
             let poker_random = player.pokers.remove(at: index)
             opponter.pokers.append(poker_random)
             
-            passedView.willCollect = false
-            player.pickes.append(poker_random)
-            layoutPokersInBox(update: 1)
+//            passedView.willCollect = false
+//            player.pickes.append(poker_random)
+//            layoutPokersInBox(update: 1)
         }
         if action == PokerAction.destroy {
             let index = Int(arc4random_uniform(UInt32(player.pokers.count)))
             let poker_random = player.pokers.remove(at: index)
             
             player.pickes.append(poker_random)
-            layoutPokersInBox(update: 1)
+//            layoutPokersInBox(update: 1)
         }
         
         MXSJudge.cmd.leaderReactive()

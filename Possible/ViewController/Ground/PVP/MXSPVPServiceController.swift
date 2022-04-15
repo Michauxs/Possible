@@ -31,8 +31,9 @@ class MXSPVPServiceController: MXSPVPController {
             return
         }
         if MXSPokerCmd.shared.shuffle() {
-            player.pokers.append(contentsOf: MXSPokerCmd.shared.push(6))
-            layoutPokersInBox(update: 0)
+            let pokers = MXSPokerCmd.shared.push(6)
+            player.pokers.append(contentsOf: pokers)
+            pokerScrollView!.appendPoker(pokers: pokers)
             
             let arr_p = MXSPokerCmd.shared.push(6)
             opponter.pokers.append(contentsOf: arr_p)
@@ -136,69 +137,6 @@ class MXSPVPServiceController: MXSPVPController {
     }
     
     //MARK:- leadingView
-    public override func certainForAttack() {
-        let poker = player.pickes.first!
-        var div_p:Array<Int> = Array<Int>()
-        for p in player.pickes {
-            div_p.append(p.uid)
-        }
-        MXSNetServ.shared.send([kMessageType:MessageType.discard.rawValue, kMessageValue:div_p])
-        
-        player.pokers.removeAll(where: {$0 === poker})
-        poker.state = .pass
-        
-        leadingView.isHidden = true
-        player.disPokerCurrentPickes()
-        layoutPokersInBox(update: 1)
-        
-    }
-    public override func cancelPickes() {
-        for poker in player.pickes { poker.isPicked = false }
-        player.pickes.removeAll()
-        MXSJudge.cmd.clearPassive()
-    }
-    public override func endActive() {
-        leadingView.isHidden = true
-        leadingView.state = .defenseUnPick
-        passedView.fadeout()
-        
-        player.signStatus = .blank
-        MXSNetServ.shared.send([kMessageType:MessageType.turnOver.rawValue, kMessageValue:0])
-    }
-    public override func certainForDefense() {
-        MXSJudge.cmd.leaderReactive()
-        leadingView.isHidden = true
-        layoutPokersInBox(update: 1)
-    }
-    public override func cancelForDefense() {
-        if player.pickes.count != 0 {
-            for poker in player.pickes { poker.concreteView?.isUp = false }
-            player.pickes.removeAll()
-        }
-        
-        let action = MXSJudge.cmd.leaderActiveAction
-        if action == PokerAction.attack || action == PokerAction.warFire || action == PokerAction.arrowes {
-            player.minsHP()
-        }
-        if action == PokerAction.steal {
-            let index = Int(arc4random_uniform(UInt32(player.pokers.count)))
-            let poker_random = player.pokers.remove(at: index)
-            opponter.pokers.append(poker_random)
-            
-            passedView.willCollect = false
-            player.pickes.append(poker_random)
-            layoutPokersInBox(update: 1)
-        }
-        if action == PokerAction.destroy {
-            let index = Int(arc4random_uniform(UInt32(player.pokers.count)))
-            let poker_random = player.pokers.remove(at: index)
-            
-            player.pickes.append(poker_random)
-            layoutPokersInBox(update: 1)
-        }
-        
-        MXSJudge.cmd.leaderReactive()
-        leadingView.isHidden = true
-    }
+    
     
 }

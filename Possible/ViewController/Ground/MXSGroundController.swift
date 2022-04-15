@@ -26,7 +26,7 @@ class MXSGroundController: MXSViewController {
     
     lazy var leadingView: MXSLeadingView = {
         let leader = MXSLeadingView.init()
-        let pokerViewFrame = pokerScrollView.frame
+        let pokerViewFrame = pokerScrollView!.frame
         leader.frame = CGRect(x: pokerViewFrame.minX, y: pokerViewFrame.minY - 44, width: pokerViewFrame.width, height: 44)
         view.addSubview(leader)
         leader.belong = self
@@ -62,11 +62,7 @@ class MXSGroundController: MXSViewController {
     let playerView = MXSHeroView.init()
     let oppontView = MXSHeroView.init()
     public func pickedHero(_ hero:MXSHero, isOpponter:Bool = false) {
-        player = hero
-        player.isAxle = true
-        player.concreteView = playerView
         
-        player.joingame()
     }
     
     public func layoutSkillViews(skilles:[MXSSkill]) {
@@ -128,7 +124,7 @@ class MXSGroundController: MXSViewController {
                                                                     width: MXSSize.Sw - 10 - MXSSize.Hw - 10 - 10 - MXSSize.Hw,
                                                                     height: MXSSize.Ph + PPedMargin),
                                                  controller: self)
-        view.addSubview(pokerScrollView)
+        view.addSubview(pokerScrollView!)
         /*--------------------------------------------*/
         pickHeroView.frame = self.view.bounds
         view.addSubview(pickHeroView)
@@ -139,68 +135,6 @@ class MXSGroundController: MXSViewController {
         
     }
     
-    /**update 1更新，0初始发牌*/
-    func layoutPokersInBox(update: Int) {
-        let pokers = player.pokers
-        let count = pokers.count
-        var margin_count = MXSSize.Pw+1
-        let need_width = margin_count * CGFloat(count-1) + MXSSize.Pw
-        
-        let box_width = MXSSize.Sw - MXSSize.Hw*2.0 - 30
-        //如果正常间隔2pt会超过box宽度，则1.折叠 2.减小间距
-        if need_width > box_width {
-            margin_count = (box_width - MXSSize.Pw) / CGFloat(count-1)
-        }
-        //如果折叠后每张所得显示区域太小，则强制重置展示宽度，并开启滚动
-        if margin_count < MXSSize.PTextVerLimit { margin_count = MXSSize.PTextVerLimit }
-        pokerScrollView.contentSize = CGSize.init(width: margin_count*CGFloat(count-1)+MXSSize.Pw, height: 0)
-        /*--------------------------*/
-        if update == 0 {
-            var index = 0
-            while index < pokers.count {
-                let pok = pokers[index]
-                let pokerView = MXSPokerView.init()
-                pokerScrollView.addSubview(pokerView)
-                pokerView.frame = CGRect.init(x: margin_count * CGFloat(index), y: PPedMargin, width: MXSSize.Pw, height: MXSSize.Ph)
-                pokerView.controller = self
-                pok.concreteView = pokerView
-                pokerView.showWidth = margin_count
-                graspPokerViewes.append(pokerView)
-                index += 1
-            }
-            graspPokerViewes.last?.showWidth = MXSSize.Pw
-        }
-        else {
-            if passedView.willCollect { passedView.collectPoker(pokers: player.pickes) }
-            else { passedView.willCollect = true }
-            
-            for poker in player.pickes {
-                graspPokerViewes.removeAll(where: {$0 === poker.concreteView})
-                if poker.concreteView?.superview == pokerScrollView {
-                     //steal
-                    poker.concreteView?.removeFromSuperview()
-                }
-                self.player.pokers.removeAll(where: {$0 === poker})
-            }
-            
-            for index in 0..<graspPokerViewes.count {
-                let pokerView = graspPokerViewes[index]
-                pokerView.showWidth = margin_count
-                let p_frame = pokerView.frame
-                UIView.animate(withDuration: 0.15) {
-                    pokerView.frame = CGRect.init(x: margin_count * CGFloat(index), y: self.PPedMargin, width: p_frame.size.width, height: p_frame.size.height)
-                }
-            }
-            graspPokerViewes.last?.showWidth = MXSSize.Pw
-            
-            if pokerScrollView.contentSize.width > box_width && player.adjustGrasp {
-                pokerScrollView.setContentOffset(CGPoint(x: pokerScrollView.contentSize.width - box_width, y: 0), animated: true)
-                player.adjustGrasp = false
-            }
-            
-            player.pickes.removeAll()
-        }
-    }
     
     //MARK: - Skill
     @objc func didSkillBtnClick(btn:MXSSkillBtn) {
@@ -209,42 +143,19 @@ class MXSGroundController: MXSViewController {
     
     //MARK: - leadingView
     public func certainForAttack() {
+        leadingView.isHidden = true
+        
         let poker = player.pickes.first!
         player.pokers.removeAll(where: {$0 === poker})
         poker.state = .pass
         
-        leadingView.isHidden = true
-        player.disPokerCurrentPickes()
-        self.updateViewsResponAttackWithPickedPokeres(pokeres: player.pickes)
-    }
-    public func updateViewsResponAttackWithPickedPokeres(pokeres:Array<MXSPoker>) {
-        let poker = pokeres.first!
-        if poker.actionGuise == PokerAction.attack {
-            player.attackCount += 1
-        }
-        else if poker.actionGuise == PokerAction.duel {
-            MXSJudge.cmd.passive.first?.minsHP()
-            MXSJudge.cmd.clearPassive()
-
-            leadingView.isHidden = false
-            leadingView.state = .attackUnPick
-            
-            player.stopAllSkill(.enable)
-            layoutPokersInBox(update: 1)
-            return
-        }
-        else if poker.actionGuise == PokerAction.recover {
-            if let aimed = MXSJudge.cmd.passive.first { //has aim
-                aimed.plusHP()
-            }
-            else {
-                player.plusHP()
-            }
-        }
-        player.signStatus = .blank
+        pokerScrollView!.removePoker(pokers: player.pickes)
+        passedView.collectPoker(pokers: player.pickes)
         
-        player.stopAllSkill(.enable)
-        layoutPokersInBox(update: 1)
+        self.updateViewsWaitOpponterRespon()
+    }
+    public func updateViewsWaitOpponterRespon() {
+        
     }
     
     public func cancelPickes() {
@@ -264,7 +175,7 @@ class MXSGroundController: MXSViewController {
     public func certainForDefense() {
         MXSJudge.cmd.leaderReactive()
         leadingView.isHidden = true
-        layoutPokersInBox(update: 1)
+        
     }
     public func cancelForDefense() {
         if player.pickes.count != 0 {
@@ -279,18 +190,18 @@ class MXSGroundController: MXSViewController {
         if action == PokerAction.steal {
             let index = Int(arc4random_uniform(UInt32(player.pokers.count)))
             let poker_random = player.pokers.remove(at: index)
-            opponter.pokers.append(poker_random)
             
-            passedView.willCollect = false
-            player.pickes.append(poker_random)
-            layoutPokersInBox(update: 1)
+            player.pokers.removeAll(where: {$0 === poker_random})
+            pokerScrollView!.removePoker(pokers: [poker_random])
+            
+            opponter.pokers.append(poker_random)
         }
         if action == PokerAction.destroy {
             let index = Int(arc4random_uniform(UInt32(player.pokers.count)))
             let poker_random = player.pokers.remove(at: index)
             
-            player.pickes.append(poker_random)
-            layoutPokersInBox(update: 1)
+            player.pokers.removeAll(where: {$0 === poker_random})
+            pokerScrollView!.removePoker(pokers: [poker_random])
         }
         
         MXSJudge.cmd.leaderReactive()
@@ -300,19 +211,7 @@ class MXSGroundController: MXSViewController {
     override func playerCollectPoker(_ poker: MXSPoker) {
         player.pokers.append(poker)
         poker.state = .handOn
-        newAndGraspMoreViews([poker])
-    }
-    
-    func newAndGraspMoreViews(_ pokers:Array<MXSPoker>){
-        let view_last = graspPokerViewes.last
-        for poker in pokers {
-            let pokerView = MXSPokerView.init()
-            pokerScrollView.addSubview(pokerView)
-            pokerView.frame = CGRect.init(x: view_last?.frame.origin.x ?? 0.0, y: PPedMargin, width: MXSSize.Pw, height: MXSSize.Ph)
-            pokerView.controller = self
-            poker.concreteView = pokerView
-            graspPokerViewes.append(pokerView)
-        }
+//        newAndGraspMoreViews([poker])
     }
     
     

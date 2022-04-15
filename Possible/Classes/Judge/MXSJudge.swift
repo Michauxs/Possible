@@ -132,10 +132,12 @@ class MXSJudge {
     //MARK: - passive
     var passive:Array<MXSHero> = Array<MXSHero>()
     
-    func passiveCanDefense() -> Bool {
+    func passiveCanDefense(pokerBlock:(String) -> Void) -> Bool {
         if passive.count < 1 {
             return false
         }
+        
+        pokerBlock("s")
         
         let passive_one = passive.first!
         if passive_one.pickes.count < 1 { return false }

@@ -12,7 +12,6 @@ class MXSPassedView: MXSBaseView {
 
     var passPokeres: Array<MXSPoker> = Array<MXSPoker>()
     var offset_x: CGFloat = 0.0
-    var willCollect:Bool = true
     
     func readyOffsetX () {
         offset_x = (self.frame.width - MXSSize.Pw) * 0.5
