@@ -16,7 +16,7 @@ class MXSGroundController: MXSViewController {
     var player: MXSHero = MXSHeroCmd.shared.getNewBlankHero()
     var opponter: MXSHero = MXSHeroCmd.shared.getNewBlankHero()
     
-    var pokerScrollView: UIScrollView = UIScrollView.init()
+    var pokerScrollView: MXSGraspPokerView?
     
     /**pokerScrollView.subviews中的pokerview**/
     var graspPokerViewes: Array<MXSPokerView> = Array<MXSPokerView>()
@@ -123,13 +123,13 @@ class MXSGroundController: MXSViewController {
         view.addSubview(skillScrollView)
         
         /*--------------------------------------------*/
-        pokerScrollView.showsHorizontalScrollIndicator = false
+        pokerScrollView = MXSGraspPokerView.init(frame: CGRect.init(x: playerView.frame.maxX+10,
+                                                                    y: MXSSize.Sh - (MXSSize.Ph + PPedMargin),
+                                                                    width: MXSSize.Sw - 10 - MXSSize.Hw - 10 - 10 - MXSSize.Hw,
+                                                                    height: MXSSize.Ph + PPedMargin),
+                                                 controller: self)
         view.addSubview(pokerScrollView)
-        pokerScrollView.frame = CGRect.init(x: playerView.frame.maxX+10,
-                                            y: MXSSize.Sh - (MXSSize.Ph + PPedMargin),
-                                            width: MXSSize.Sw - 10 - MXSSize.Hw - 10 - 10 - MXSSize.Hw,
-                                            height: MXSSize.Ph + PPedMargin)
-        
+        /*--------------------------------------------*/
         pickHeroView.frame = self.view.bounds
         view.addSubview(pickHeroView)
         pickHeroView.belong = self
@@ -167,7 +167,7 @@ class MXSGroundController: MXSViewController {
                 pokerView.showWidth = margin_count
                 graspPokerViewes.append(pokerView)
                 index += 1
-            }3
+            }
             graspPokerViewes.last?.showWidth = MXSSize.Pw
         }
         else {
@@ -202,19 +202,12 @@ class MXSGroundController: MXSViewController {
         }
     }
     
-    //MARK:- Skill
+    //MARK: - Skill
     @objc func didSkillBtnClick(btn:MXSSkillBtn) {
-//        btn.isSelected = !btn.isSelected
-        print(btn.power as Any)
-        if btn.isSelected {
-            player.stopSkill(btn.belong!)
-        } else {
-            player.startingSkill(btn.belong!)
-        }
-        checkCanCertainAction()
+        
     }
     
-    //MARK:- leadingView
+    //MARK: - leadingView
     public func certainForAttack() {
         let poker = player.pickes.first!
         player.pokers.removeAll(where: {$0 === poker})
@@ -323,7 +316,7 @@ class MXSGroundController: MXSViewController {
     }
     
     
-    //MARK:- poker
+    //MARK: - poker
     @objc public func someonePokerTaped(_ pokerView: MXSPokerView) {
         if let index = player.pokers.firstIndex(where: {$0 === pokerView.belong}) {
             print("controller action pok at " + "\(index)")
@@ -334,13 +327,13 @@ class MXSGroundController: MXSViewController {
         if pokerView.isUp {
             player.pickPoker(poker)
         } else {
-            player.disPickPoker(poker)
+            player.freePoker(poker)
         }
         
         checkCanCertainAction()
     }
     
-    //MARK:- hero
+    //MARK: - hero
     public override func someoneHeroTaped(_ heroView: MXSHeroView) {
         print("controller action hero")
         /**被动响应 无需选择*/
@@ -353,7 +346,7 @@ class MXSGroundController: MXSViewController {
     // MARK: - check every one step action
     func checkCanCertainAction() {
         if player.signStatus == .focus {
-            if player.canDefense() {
+            if MXSJudge.cmd.passiveCanDefense() {
                 leadingView.state = .defenseReadyOn
             }
             else {
@@ -361,18 +354,20 @@ class MXSGroundController: MXSViewController {
             }
         }
         else {
-            if player.canAttack() {
+            if MXSJudge.cmd.leaderCanAttack() {
                 leadingView.state = .attackReadyOn
             }
             else {
-                if player.pickes.count > 0 { leadingView.state = .attackPicked }
+                if player.pickes.count > 0 {
+                    leadingView.state = .attackPicked
+                }
                 else { leadingView.state = .attackUnPick }
             }
         }
-            
+        
     }
     
-    //MARK:application
+    //MARK: - application
     override var prefersStatusBarHidden: Bool {
         return true
     }

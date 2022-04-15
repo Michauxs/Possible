@@ -118,7 +118,7 @@ class MXSPVPCustomerController: MXSPVPController {
         if pokerView.isUp {
             player.pickPoker(poker)
         } else {
-            player.disPickPoker(poker)
+            player.freePoker(poker)
         }
         
         checkCanCertainAction()

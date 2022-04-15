@@ -42,9 +42,47 @@ class MXSJudge {
             leader?.endActiveAndClearHistory()
         }
         didSet {
-            leader?.signStatus = .active
-            active = leader
+            if leader != nil {
+                leader!.currentAction = MXSOneAction(axle: leader!)
+                leader!.signStatus = .active
+                active = leader
+            }
         }
+    }
+    
+    func leaderCanAttack() -> Bool {
+        guard leader != nil else {
+            return false
+        }
+        if leader!.pickes.count == 0  { return false }
+        
+        guard leader!.pickes.first != nil else { //test this code
+            return false
+        }
+        
+        let action:PokerAction = leader!.currentAction!.action
+        if action == .unknown { return false }
+        
+        if passive.count == 0 { //no aim
+            if action == .recover && leader!.HPCurrent < leader!.HPSum { return true }
+            if (action == .warFire || action == .arrowes) { return true }
+        }
+        else {
+            if action == .attack {
+                return leader!.attackCount < leader!.attackLimit
+            }
+            if action == .duel {
+                return true
+            }
+            if (action == .steal || action == .destroy) && passive.first!.pokers.count > 0 {
+                return true
+            }
+            if action == .recover && passive.first!.HPCurrent < passive.first!.HPSum  {
+                return true
+            }
+        }
+        
+        return false
     }
     func leaderReactive() {
         for one in passive { one.signStatus = .blank }
@@ -93,6 +131,35 @@ class MXSJudge {
     
     //MARK: - passive
     var passive:Array<MXSHero> = Array<MXSHero>()
+    
+    func passiveCanDefense() -> Bool {
+        if passive.count < 1 {
+            return false
+        }
+        
+        let passive_one = passive.first!
+        if passive_one.pickes.count < 1 { return false }
+        
+        let action_pick: PokerAction = passive_one.pickes.first!.actionGuise
+        
+        let action_attck: PokerAction = self.leader!.currentAction!.action
+        
+        var action_reply: PokerAction?
+        if action_attck == .attack || action_attck == .arrowes {
+            action_reply = .defense
+        }
+        else if action_attck == .steal || action_attck == .destroy {
+            action_reply = .detect
+        }
+        else if action_attck == .warFire {
+            action_reply = .attack
+        }
+        else {
+            action_reply = .unknown
+        }
+        
+        return action_reply == action_pick
+    }
     
     func addPassive(_ someone:MXSHero) {
         passive.append(someone)

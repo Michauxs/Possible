@@ -6,6 +6,8 @@
 //  Copyright © 2022 boyuan. All rights reserved.
 //
 
+import Foundation
+
 extension MXSHero {
     
     /**AI 操作逻辑设定*/

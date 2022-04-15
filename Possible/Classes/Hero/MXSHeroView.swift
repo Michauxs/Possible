@@ -46,12 +46,12 @@ class MXSHeroView: MXSBaseView {
         self.controller?.someoneHeroTaped(self)
     }
     
-    var LP: Int = 0 {
+    var HPSum: Int = 0 {
         didSet {
             let heart_width:CGFloat = 12.0
             var count = 0
             let content_width :CGFloat = contentView.bounds.size.width
-            while count < LP {
+            while count < HPSum {
                 let heart_view = UIView()
                 heart_view.layer.cornerRadius = CGFloat(heart_width*0.5)
                 heart_view.backgroundColor = .red
@@ -62,18 +62,18 @@ class MXSHeroView: MXSBaseView {
                 HPBottle.append(heart_view)
                 count+=1
             }
-            hp = LP
+            HPCurrent = HPSum
         }
     }
-    var hp: Int? = 0 {
+    var HPCurrent: Int? = 0 {
         didSet {
             for index in 0...self.HPBottle.count-1 {
-                let h = self.HPBottle[index]
-                if index < hp! {
-                    h.backgroundColor = .red
+                let hp = self.HPBottle[index]
+                if index < HPCurrent! {
+                    hp.backgroundColor = .red
                 }
                 else {
-                    h.backgroundColor = .gray
+                    hp.backgroundColor = .gray
                 }
             }
         }

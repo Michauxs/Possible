@@ -70,7 +70,7 @@ class MXSPassedView: MXSBaseView {
         for pok in passPokeres {
             UIView.animate(withDuration: 0.5, animations: {
                 pok.concreteView!.alpha = 0
-                pok.concreteView!.frame = CGRect.init(x: -MXSSize.Pw, y: 0, width: MXSSize.Pw, height: MXSSize.Ph)
+                pok.concreteView!.frame = CGRect.init(x: -MXSSize.Pw, y: 0, width: MXSSize.Pw, height: MXSSize.Ph)// <-
             }) { (success) in
                 pok.concreteView!.removeFromSuperview()
                 pok.concreteView = nil

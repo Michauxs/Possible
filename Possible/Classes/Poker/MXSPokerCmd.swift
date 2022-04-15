@@ -33,8 +33,10 @@ class MXSPoker {
         number = n
         let c = attri[2] as! PokerColor
         color = c
-        actionFate = attri[3] as! PokerAction
-        actionGuise = actionFate
+        colorGuise = c
+        let a = attri[3] as! PokerAction
+        actionFate = a
+        actionGuise = a
         uid = c.rawValue * 100 + n as Int
     }
     
