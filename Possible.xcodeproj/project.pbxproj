@@ -17,6 +17,7 @@
 		76053E2024E68635001860E7 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 76053E1F24E68635001860E7 /* Default-568h@2x.png */; };
 		76053E2324E68722001860E7 /* MXSHeroView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76053E2224E68722001860E7 /* MXSHeroView.swift */; };
 		76053E2524E68BE8001860E7 /* SnapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 76053E2424E68BE8001860E7 /* SnapKit.framework */; };
+		764B9DAC280EA3830003364B /* MXSEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 764B9DAB280EA3830003364B /* MXSEffect.swift */; };
 		764DE6492501F14700409586 /* MXSSkillAssemController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 764DE6482501F14700409586 /* MXSSkillAssemController.swift */; };
 		764DE64D25020B7C00409586 /* MXSLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 764DE64C25020B7C00409586 /* MXSLabel.swift */; };
 		764DE64F25020F8700409586 /* MXSButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 764DE64E25020F8700409586 /* MXSButton.swift */; };
@@ -103,6 +104,7 @@
 		76053E1F24E68635001860E7 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		76053E2224E68722001860E7 /* MXSHeroView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSHeroView.swift; sourceTree = "<group>"; };
 		76053E2424E68BE8001860E7 /* SnapKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SnapKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		764B9DAB280EA3830003364B /* MXSEffect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSEffect.swift; sourceTree = "<group>"; };
 		764DE6482501F14700409586 /* MXSSkillAssemController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSSkillAssemController.swift; sourceTree = "<group>"; };
 		764DE64C25020B7C00409586 /* MXSLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSLabel.swift; sourceTree = "<group>"; };
 		764DE64E25020F8700409586 /* MXSButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSButton.swift; sourceTree = "<group>"; };
@@ -369,10 +371,10 @@
 		76AC2AF52514B34F005884CF /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				76AFA909263A949F00D958F2 /* Judge */,
 				76AC2AF82514B34F005884CF /* Hero */,
 				76AC2AF72514B34F005884CF /* Poker */,
 				76AC2AF62514B34F005884CF /* Skill */,
+				76AFA909263A949F00D958F2 /* Judge */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -432,6 +434,7 @@
 			children = (
 				766C3F3825243814002819E6 /* MXSJudge.swift */,
 				766C3F3A25245235002819E6 /* MXSOneAction.swift */,
+				764B9DAB280EA3830003364B /* MXSEffect.swift */,
 			);
 			path = Judge;
 			sourceTree = "<group>";
@@ -663,6 +666,7 @@
 				76AC2AF4250F6DC1005884CF /* MXSSkillBtn.swift in Sources */,
 				7697A5CD24ECF4C100FB93A6 /* MXSSize.swift in Sources */,
 				766C3F3925243814002819E6 /* MXSJudge.swift in Sources */,
+				764B9DAC280EA3830003364B /* MXSEffect.swift in Sources */,
 				76B4E9522506269000AD5CA3 /* MXSPassedView.swift in Sources */,
 				764DE64D25020B7C00409586 /* MXSLabel.swift in Sources */,
 				7697A5C624ECBC1E00FB93A6 /* MXSPokerView.swift in Sources */,

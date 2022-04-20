@@ -32,11 +32,11 @@ class MXSPVPServiceController: MXSPVPController {
         }
         if MXSPokerCmd.shared.shuffle() {
             let pokers = MXSPokerCmd.shared.push(6)
-            player.pokers.append(contentsOf: pokers)
+            player.getPoker(pokers)
             pokerScrollView!.appendPoker(pokers: pokers)
             
             let arr_p = MXSPokerCmd.shared.push(6)
-            opponter.pokers.append(contentsOf: arr_p)
+            opponter.getPoker(arr_p)
             var poker_uid_arr:Array<Int> = Array<Int>()
             for poker in arr_p {
                 poker_uid_arr.append(poker.uid)
@@ -95,25 +95,7 @@ class MXSPVPServiceController: MXSPVPController {
     }
     
     //MARK:- hero
-    public override func someoneHeroTaped(_ heroView: MXSHeroView) {
-        print("controller action hero")
-        if player.signStatus != .active {
-            return
-        }
-        guard let hero = heroView.belong else {
-            return
-        }
-        
-        if hero.signStatus == .selected {
-            hero.signStatus = .blank
-            MXSJudge.cmd.removePassive(hero)
-        }
-        else {
-            hero.signStatus = .selected
-            MXSJudge.cmd.addPassive(hero)
-        }
-        checkCanCertainAction()
-    }
+    
     
     //MARK:- poker
     @objc public override func someonePokerTaped(_ pokerView: MXSPokerView) {

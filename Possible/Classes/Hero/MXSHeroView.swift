@@ -65,11 +65,11 @@ class MXSHeroView: MXSBaseView {
             HPCurrent = HPSum
         }
     }
-    var HPCurrent: Int? = 0 {
+    var HPCurrent: Int = 0 {
         didSet {
             for index in 0...self.HPBottle.count-1 {
                 let hp = self.HPBottle[index]
-                if index < HPCurrent! {
+                if index < HPCurrent {
                     hp.backgroundColor = .red
                 }
                 else {

@@ -96,11 +96,11 @@ class MXSPVPController: MXSGroundController {
         
         if hero.signStatus == .selected {
             hero.signStatus = .blank
-            MXSJudge.cmd.removePassive(hero)
+            MXSJudge.cmd.leader?.takeOrDisAimAtHero(hero)
         }
         else {
             hero.signStatus = .selected
-            MXSJudge.cmd.addPassive(hero)
+            MXSJudge.cmd.leader?.takeOrDisAimAtHero(hero)
         }
         checkCanCertainAction()
     }
@@ -141,11 +141,7 @@ class MXSPVPController: MXSGroundController {
         leadingView.isHidden = true
         
     }
-    public override func cancelPickes() {
-        for poker in player.pickes { poker.isPicked = false }
-        player.pickes.removeAll()
-        MXSJudge.cmd.clearPassive()
-    }
+    
     public override func endActive() {
         leadingView.isHidden = true
         leadingView.state = .defenseUnPick
@@ -157,38 +153,8 @@ class MXSPVPController: MXSGroundController {
     public override func certainForDefense() {
         MXSJudge.cmd.leaderReactive()
         leadingView.isHidden = true
-//        layoutPokersInBox(update: 1)
     }
-    public override func cancelForDefense() {
-        if player.pickes.count != 0 {
-            for poker in player.pickes { poker.concreteView?.isUp = false }
-            player.pickes.removeAll()
-        }
-        
-        let action = MXSJudge.cmd.leaderActiveAction
-        if action == PokerAction.attack || action == PokerAction.warFire || action == PokerAction.arrowes {
-            player.minsHP()
-        }
-        if action == PokerAction.steal {
-            let index = Int(arc4random_uniform(UInt32(player.pokers.count)))
-            let poker_random = player.pokers.remove(at: index)
-            opponter.pokers.append(poker_random)
-            
-//            passedView.willCollect = false
-//            player.pickes.append(poker_random)
-//            layoutPokersInBox(update: 1)
-        }
-        if action == PokerAction.destroy {
-            let index = Int(arc4random_uniform(UInt32(player.pokers.count)))
-            let poker_random = player.pokers.remove(at: index)
-            
-            player.pickes.append(poker_random)
-//            layoutPokersInBox(update: 1)
-        }
-        
-        MXSJudge.cmd.leaderReactive()
-        leadingView.isHidden = true
-    }
+    
     
     //MARK:- diffrent
     

@@ -51,7 +51,8 @@ class MXSPokerView: MXSBaseView {
     var showWidth: CGFloat = MXSSize.Pw {
         didSet {
             var font_size = showWidth*0.5
-            if font_size > 18 { font_size = 18 }
+            if font_size > 20 { font_size = 20 }
+            else if font_size < 13 { font_size = 13 }
             //actionLabel.font = UIFont.systemFont(ofSize: font_size, weight: .bold)
             actionLabel.font = UIFont.init(name: FontXingKai, size: font_size)
             contentView.snp.updateConstraints({ (m) in

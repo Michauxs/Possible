@@ -10,19 +10,12 @@ import UIKit
 
 class MXSJudge {
     /**
-     * |      --------cycle------>      |
+     * |      --------cycle------>       |
      * |
-     * |  leader <- active -> _passive_ |
+     * | leader <- _active -> _responder |
      * |
-     * |      <-------cycle-------      |
+     * |      <-------cycle-------       |
      */
-    
-    static func translateHeroModel(_ model:MXSHero) -> Dictionary<String, Any> {
-        return ["name":""]
-    }
-    static func translateHeroModelArray(_ model:Array<MXSHero>) -> Array<Dictionary<String, Any>> {
-        return [["name":""]]
-    }
     
     static let cmd : MXSJudge = {
         let single = MXSJudge.init()
@@ -33,21 +26,23 @@ class MXSJudge {
     /**hero action pokeres aim?  /hp  /cycle  */
     var diary:Array<MXSOneAction> = Array<MXSOneAction>()
     
-    //MARK: - leader
-    var leaderActiveAction:PokerAction?
-    var leaderActiveDiscard:Array<MXSPoker>?
+    //MARK: - leader cycle
+    var flowNote:Int = 0
     var leader:MXSHero? {
-        willSet {
-            passive.removeAll()
-            leader?.endActiveAndClearHistory()
-        }
         didSet {
-            if leader != nil {
-                leader!.currentAction = MXSOneAction(axle: leader!)
-                leader!.signStatus = .active
-                active = leader
-            }
+            leader!.currentAction = MXSOneAction(axle: leader!, type: .active)
+            leader!.signStatus = .active
+            leader!.cycleState = .leader
         }
+    }
+    func next() {
+        for hero in subject { hero.cycleState = .blank }
+        self.leader?.endActiveAndClearHistory()
+        
+        print("did set flow note")
+        flowNote += 1
+        let hero = subject[flowNote%subject.count]
+        self.leader = hero
     }
     
     func leaderCanAttack() -> Bool {
@@ -63,7 +58,7 @@ class MXSJudge {
         let action:PokerAction = leader!.currentAction!.action
         if action == .unknown { return false }
         
-        if passive.count == 0 { //no aim
+        if responder.count == 0 { //no aim
             if action == .recover && leader!.HPCurrent < leader!.HPSum { return true }
             if (action == .warFire || action == .arrowes) { return true }
         }
@@ -74,145 +69,132 @@ class MXSJudge {
             if action == .duel {
                 return true
             }
-            if (action == .steal || action == .destroy) && passive.first!.pokers.count > 0 {
+            if (action == .steal || action == .destroy) && responder.first!.pokers.count > 0 {
                 return true
             }
-            if action == .recover && passive.first!.HPCurrent < passive.first!.HPSum  {
+            if action == .recover && responder.first!.HPCurrent < responder.first!.HPSum  {
                 return true
             }
         }
         
         return false
     }
+    
     func leaderReactive() {
-        for one in passive { one.signStatus = .blank }
-        passive.removeAll()
+        clearResponder()
         leader?.signStatus = .active
-    }
-    
-    func leaderDiscard(poker:Array<MXSPoker>, action:PokerAction) {
-        let one = MXSOneAction(someone: leader!, act: action, pok: poker, to: passive)
-        diary.append(one)
-    }
-    
-    func findHistoryPoker() -> Array<MXSPoker> {
-        for index in 0...diary.count {
-            let last = diary[diary.count - index]
-            if last.hero === leader {
-                return last.pokers
-            }
-        }
-        return Array<MXSPoker>()
-    }
-//    func oppoentDiscard(poker:Array<MXSPoker>, action:PokerAction) {
-//
-//    }
-    
-    //MARK: - active
-    var active:MXSHero?
-    
-    var flowNote:Int = -1 {
-        didSet {
-            print("did set flow note")
-            if flowNote == subject.count {
-                print("reset flow note 0")
-                flowNote = 0
-            }
-        }
-    }
-    func next() {
-        for one in passive { one.signStatus = .blank}
-        passive.removeAll()
         
-        flowNote += 1
-        let hero = subject[flowNote]
-        self.leader = hero
-    }
-    
-    //MARK: - passive
-    var passive:Array<MXSHero> = Array<MXSHero>()
-    
-    func passiveCanDefense(pokerBlock:(String) -> Void) -> Bool {
-        if passive.count < 1 {
-            return false
-        }
-        
-        pokerBlock("s")
-        
-        let passive_one = passive.first!
-        if passive_one.pickes.count < 1 { return false }
-        
-        let action_pick: PokerAction = passive_one.pickes.first!.actionGuise
-        
-        let action_attck: PokerAction = self.leader!.currentAction!.action
-        
-        var action_reply: PokerAction?
-        if action_attck == .attack || action_attck == .arrowes {
-            action_reply = .defense
-        }
-        else if action_attck == .steal || action_attck == .destroy {
-            action_reply = .detect
-        }
-        else if action_attck == .warFire {
-            action_reply = .attack
-        }
-        else {
-            action_reply = .unknown
-        }
-        
-        return action_reply == action_pick
-    }
-    
-    func addPassive(_ someone:MXSHero) {
-        passive.append(someone)
-    }
-    func removePassive(_ someone:MXSHero) {
-        if let index = passive.firstIndex(where: {$0 === someone}) {
-            let one = passive.remove(at: index)
-        }
-    }
-    
-    func appendOrRemovePassive(_ someone:MXSHero) {
-        if let index = passive.firstIndex(where: {$0 === someone}) {
-            let one = passive.remove(at: index)
-            one.signStatus = .blank
-        }
-        else {
-            passive.append(someone)
-            someone.signStatus = .selected
-        }
-    }
-    
-    func clearPassive(){
-        for one in passive {
-            one.signStatus = .blank
-        }
-        passive.removeAll()
+        leader?.lastStep = leader?.currentAction
+        leader!.currentAction = MXSOneAction(axle: leader!, type: .active)
     }
     
     
-    func opponentActive() {
-        if passive.count == 1 {
-            let hero = passive.first!
-            hero.signStatus = .active
-            leader?.signStatus = .blank
+    //MARK: - responder
+//    var responder:Array<MXSHero> = Array<MXSHero>()
+    var responder:Array<MXSHero> {
+        return self.subject.filter { hero in
+            hero.cycleState == .responder
         }
+    }
+    
+    func aimHavingPoker() -> Bool {
+        let hero:MXSHero = responder.first!
+        return hero.pokers.count > 0
+    }
+    
+    func responderReplyAction(reBlock:(_ can :Bool, _ pokers :Array<MXSPoker>?) -> Void) {
+//        let action: PokerAction = self.leader!.currentAction!.action
+//        if action == .warFire || action == .arrowes {
+//            selectAllElseSelf()
+//        }
+        let responder_one = responder.first!
+        if responder_one.pokers.count < 1 {
+            reBlock(false, nil)
+            return
+        }
+        let action_reply: PokerAction = self.leader!.currentAction!.reply.act
+        MXSLog("opponter pokers: " + "\(responder_one.pokers)")
+        let contain = responder_one.pokers.filter { poker in
+            poker.actionGuise == action_reply
+        }
+        if contain.count > 0 {
+            print(contain.first!)
+            reBlock(true, [contain.first!])
+        }
+        else { reBlock(false, nil) }
+    }
+    
+    func responderSufferConsequence(reBlock:(_ spoils :SpoilsType, _ pokers :Array<MXSPoker>?) -> Void) {
+        let hero:MXSHero = responder.first!
+        let action = MXSJudge.cmd.leader?.currentAction?.action
+        switch action {
+        case .unknown, .defense, .detect, .give, .none:
+            reBlock(.nothing, nil)
+        case .attack, .warFire, .arrowes, .duel:
+            hero.minsHP()
+            reBlock(.nothing, nil)
+        case .steal:
+            let random = hero.rollRandomPoker()
+            hero.losePoker([random])
+            MXSJudge.cmd.leader?.getPoker([random])
+            reBlock(.wrest, [random])
+        case .destroy:
+            let random = hero.rollRandomPoker()
+            hero.losePoker([random])
+            reBlock(.destroy, [random])
+        case .recover:
+            let _ = hero.plusHP()
+            reBlock(.nothing, nil)
+        }
+    }
+    
+    
+    func appendOrRemoveResponder(_ hero:MXSHero) {
+        if hero.cycleState == .blank {
+            hero.cycleState = .responder
+            hero.signStatus = .selected
+        }
+        else if hero.cycleState == .responder {
+            hero.cycleState = .blank
+            hero.signStatus = .blank
+        }
+    }
+    
+    func clearResponder() {
+        for hero in responder {
+            hero.cycleState = .blank
+            hero.signStatus = .blank
+        }
+//        for hero in subject {
+//            if hero.cycleState != .leader {
+//                hero.cycleState = .blank
+//                hero.signStatus = .blank
+//            }
+//        }
     }
     
     func selectAllElseSelf() {
-        for one in passive { one.signStatus = .blank}
-        passive.removeAll()
-        /**先清除再添加 = 顺序加入*/
-        for hero in subject {
-            if hero === leader { continue }
-            passive.append(hero)
+        let others = self.subject.filter { hero in
+            hero.cycleState == .blank
         }
-        /**
-         for hero in subject {
-             if hero === leader  || passive.contains(where: {$0 === hero}) { continue }
-             passive.append(hero)
-         }
-         */
+        for hero in others {
+            hero.cycleState = .responder
+            hero.signStatus = .selected
+        }
     }
     
+    
+    //MARK: - for AI
+    
+    func returnMinHero() -> MXSHero {
+//        let others = self.subject.filter { hero in
+//            hero.cycleState == .blank
+//        }
+//        return others.first!
+        print("Judge.subject: " + "\(self.subject)")
+        let hero = self.subject.first { hero in
+            hero.cycleState == .blank
+        }
+        return hero!
+    }
 }

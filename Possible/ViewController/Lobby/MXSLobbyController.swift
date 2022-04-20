@@ -159,13 +159,13 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate
     override public func startBrowser() {
         if startedBrowser { return }
         
-        print("startBrowser")
+        MXSLog("startBrowser")
         servBrowser.delegate = self
         servBrowser.searchForServices(ofType: "_mxs._tcp", inDomain: "local")
         startedBrowser = true
     }
     override public func stopBrowser() {
-        print("stopBrowser")
+        MXSLog("stopBrowser")
         servBrowser.stop()
         services.removeAll()
         mainTable?.dlg?.dlgData = services
@@ -194,14 +194,14 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate
     }
     
     func netServiceBrowser(_ browser: NetServiceBrowser, didFind service: NetService, moreComing: Bool) {
-        print("self is: " + "\(MXSNetServ.shared)" + " == didFind: " + "\(service)")
+        MXSLog("self is: " + "\(MXSNetServ.shared)" + " == didFind: " + "\(service)")
         
         if MXSNetServ.shared == service {
-            print("- didFind Self")
+            MXSLog("- didFind Self")
         }
         else {
             services.append(service)
-            print("- didFind service +1 \n")
+            MXSLog("- didFind service +1 \n")
         }
         if !moreComing {
             mainTable?.dlg?.dlgData = services
@@ -209,7 +209,7 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate
         }
     }
     func netServiceBrowser(_ browser: NetServiceBrowser, didRemove service: NetService, moreComing: Bool) {
-        print("- didRemove")
+        MXSLog("- didRemove")
         if !MXSNetServ.shared.isEqual(service)  {
             services.removeAll { (item) -> Bool in item.isEqual(service) }
         }

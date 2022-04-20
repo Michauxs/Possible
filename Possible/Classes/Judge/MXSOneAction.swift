@@ -12,13 +12,17 @@ enum CycleType : String{
     case start = "start"
     case end = "end"
 }
-enum OneStepType {
-    case unknown
-    case seplier
-    case aimOther
-    case oneself
+enum ActionType {
+    case active
+    case reply
 }
 
+enum EffectType {
+    case unknown
+    case hp
+    case poker
+//    case attackCount
+}
 
 class MXSOneAction {
     
@@ -27,21 +31,25 @@ class MXSOneAction {
         var numb:Int = 0
         var color:PokerColor = .unknown
         var act:PokerAction = .unknown
-        var count:Int = 0
+        var count:Int = 0//
         
         func reset() {
             type = 0; numb = 0; color = .unknown; act = .unknown; count = 0;
         }
     }
     class ActionEffect {
-        var type:Int = 0
+        var type:EffectType = .unknown
         var numb:Int = 0
         var count:Int = 0
+    }
+    class ActionConsequence {
+        
     }
     
     var cycleSign:CycleType = .start
     
     weak var hero:MXSHero?
+    var type:ActionType = .active
     var skill:MXSSkill?
     var action:PokerAction = .unknown {
         didSet {
@@ -60,13 +68,17 @@ class MXSOneAction {
             case .duel:
                 reply.count = 1
                 reply.act = .attack
+            case .give:
+                reply.count = -1
+                reply.act = .unknown
             }
         }
     }
     lazy var pokers:Array<MXSPoker> = Array<MXSPoker>()
     lazy var aim:Array<MXSHero> = Array<MXSHero>()
     lazy var reply:ActionReply = ActionReply()
-    
+    lazy var effect:ActionEffect = ActionEffect()
+    lazy var consequence:ActionConsequence = ActionConsequence()
     
     func reset() {
         reply.reset()
@@ -78,8 +90,9 @@ class MXSOneAction {
     init() {
         
     }
-    init(axle:MXSHero) {
-        hero = axle
+    init(axle:MXSHero, type:ActionType) {
+        self.hero = axle
+        self.type = type
     }
     
     init(someone:MXSHero, act:PokerAction, pok:Array<MXSPoker>, to:Array<MXSHero>) {

@@ -8,6 +8,11 @@
 
 import UIKit
 
+func MXSLog(_ args:Any, _ sign:String = "MXSSwift") {
+    #if DEBUG
+        print(Date.init(), sign, ":", args)
+    #endif
+}
 
 let kMessageType: String = "develop_message_type"
 let kMessageValue: String = "develop_message_value"
@@ -83,6 +88,7 @@ enum PokerAction : Int {
     case destroy
     case detect
     case recover
+    case give
 }
 
 enum ActionReplyResult : Int {
@@ -146,4 +152,19 @@ enum SkillMode : Int {
     
     case triggerInjured = 25
     case triggerRecovery = 30
+}
+
+
+enum SpoilsType {
+    case nothing
+    case destroy
+    case wrest
+    case gain
+}
+
+enum CycleState {
+    case blank
+    case leader
+    case responder
+    case active
 }

@@ -12,13 +12,13 @@ class MXSHeroCmd {
     
     var heroData: Array<Dictionary<String,Any>> = []
     
-    lazy var allHeroModel : [MXSHero] = {
+    var allHeroModel :[MXSHero] {
         var all : [MXSHero] = [MXSHero]()
-        for attr in heroData {
+        for attr in MXSHeroCmd.shared.heroData {
             all.append(MXSHero.init(attr))
         }
         return all
-    }()
+    }
     
     lazy var unknownHero: MXSHero = MXSHero.init(["name": "Unknown", "image": "hero_000", "hp": 4, "skill": ["skill_010"], "desc": "unknown" ])
     

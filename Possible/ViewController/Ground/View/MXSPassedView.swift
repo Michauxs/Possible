@@ -71,7 +71,7 @@ class MXSPassedView: MXSBaseView {
                 pok.concreteView!.alpha = 0
                 pok.concreteView!.frame = CGRect.init(x: -MXSSize.Pw, y: 0, width: MXSSize.Pw, height: MXSSize.Ph)// <-
             }) { (success) in
-                pok.concreteView!.removeFromSuperview()
+                pok.concreteView?.removeFromSuperview()
                 pok.concreteView = nil
             }
         }

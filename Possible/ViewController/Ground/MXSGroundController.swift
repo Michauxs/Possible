@@ -145,71 +145,62 @@ class MXSGroundController: MXSViewController {
     public func certainForAttack() {
         leadingView.isHidden = true
         
-        let poker = player.pickes.first!
-        player.pokers.removeAll(where: {$0 === poker})
-        poker.state = .pass
-        
         pokerScrollView!.removePoker(pokers: player.pickes)
         passedView.collectPoker(pokers: player.pickes)
+        MXSJudge.cmd.leader?.discardPoker()
         
         self.updateViewsWaitOpponterRespon()
     }
     public func updateViewsWaitOpponterRespon() {
-        
+        //sub object
     }
     
-    public func cancelPickes() {
+    public func cancelForAttack() {
         for poker in player.pickes { poker.concreteView?.isUp = false }
         player.pickes.removeAll()
-        MXSJudge.cmd.clearPassive()
+        MXSJudge.cmd.clearResponder()
     }
         
     public func endActive() {
         leadingView.isHidden = true
-        leadingView.state = .defenseUnPick
         
-        MXSJudge.cmd.next()
         passedView.fadeout()
+        MXSJudge.cmd.next()
+        
+        endLeaderCycle()
+    }
+    func endLeaderCycle() {
+        
     }
     
     public func certainForDefense() {
-        MXSJudge.cmd.leaderReactive()
         leadingView.isHidden = true
         
+        responderReply()
     }
-    public func cancelForDefense() {
-        if player.pickes.count != 0 {
-            for poker in player.pickes { poker.concreteView?.isUp = false }
-            player.pickes.removeAll()
-        }
+    func responderReply() {
+        MXSJudge.cmd.leaderReactive()
+        //sub object
+    }
         
-        let action = MXSJudge.cmd.leaderActiveAction
-        if action == PokerAction.attack || action == PokerAction.warFire || action == PokerAction.arrowes {
-            player.minsHP()
-        }
-        if action == PokerAction.steal {
-            let index = Int(arc4random_uniform(UInt32(player.pokers.count)))
-            let poker_random = player.pokers.remove(at: index)
-            
-            player.pokers.removeAll(where: {$0 === poker_random})
-            pokerScrollView!.removePoker(pokers: [poker_random])
-            
-            opponter.pokers.append(poker_random)
-        }
-        if action == PokerAction.destroy {
-            let index = Int(arc4random_uniform(UInt32(player.pokers.count)))
-            let poker_random = player.pokers.remove(at: index)
-            
-            player.pokers.removeAll(where: {$0 === poker_random})
-            pokerScrollView!.removePoker(pokers: [poker_random])
+    public func cancelForDefense() {
+        leadingView.isHidden = true
+        
+        MXSJudge.cmd.responderSufferConsequence { spoils, pokers in
+            if spoils == .destroy || spoils == .wrest {
+                pokerScrollView!.removePoker(pokers: pokers!)
+            }
         }
         
         MXSJudge.cmd.leaderReactive()
-        leadingView.isHidden = true
+        responderCantReply()
+    }
+    func responderCantReply() {
+        //sub object
     }
         
     override func playerCollectPoker(_ poker: MXSPoker) {
-        player.pokers.append(poker)
+        player.getPoker([poker])
         poker.state = .handOn
 //        newAndGraspMoreViews([poker])
     }
@@ -238,19 +229,21 @@ class MXSGroundController: MXSViewController {
         /**被动响应 无需选择*/
         if leadingView.state == LeadingState.defenseUnPick { return }
         
-        MXSJudge.cmd.appendOrRemovePassive(heroView.belong!)
+        MXSJudge.cmd.leader?.takeOrDisAimAtHero(heroView.belong!)
         checkCanCertainAction()
     }
     
-    // MARK: - check every one step action
+    //MARK: - check every one step action
     func checkCanCertainAction() {
         if player.signStatus == .focus {
-            if MXSJudge.cmd.passiveCanDefense() {
-                leadingView.state = .defenseReadyOn
-            }
-            else {
-                leadingView.state = .defenseUnPick
-            }
+            MXSJudge.cmd.responderReplyAction { can, pokers in
+                if can {
+                    leadingView.state = .defenseReadyOn
+                }
+                else {
+                    leadingView.state = .defenseUnPick
+                }
+            }//
         }
         else {
             if MXSJudge.cmd.leaderCanAttack() {

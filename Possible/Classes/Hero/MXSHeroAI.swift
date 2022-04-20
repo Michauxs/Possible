@@ -15,7 +15,7 @@ extension MXSHero {
     func replyAttack() -> MXSPoker? {
         if isAxle { return nil }
         
-        let action_attck = MXSJudge.cmd.leaderActiveAction
+        let action_attck = MXSJudge.cmd.leader?.currentAction?.action
         switch action_attck {
         case .attack:
             return minsHPOrDefenseWithAction(.defense)
@@ -68,21 +68,32 @@ extension MXSHero {
         }
     }
     
-    /*--------------------------------------------*/
-    public func hasPokerDoAttack() -> MXSPoker? {
-        if MXSJudge.cmd.passive.count == 0 || self.pokers.count == 0 { return nil }
+    //MARK: - AI leader
+    func choiceResponder() {
+        self.takeOrDisAimAtHero(MXSJudge.cmd.returnMinHero())
+    }
+    
+    public func hasPokerDoAttack(reBlock:(_ has :Bool, _ pokers :Array<MXSPoker>?, _ skill:MXSSkill?) -> Void) {
+        if MXSJudge.cmd.responder.count == 0 || self.pokers.count == 0 {
+            reBlock(false, nil, nil)
+        }
         
+        var hasPoker:Bool = false
         for action in MXSPokerCmd.shared.priority {
             if let index = self.pokers.firstIndex(where: { (item) -> Bool in item.actionGuise == action }) {
                 let poker = self.pokers[index]
                 /**attack yet , check next action*/
                 if (action == PokerAction.attack ) && self.attackCount != 0 { continue }
                 /**aim no anyone poker , check next action*/
-                if (action == PokerAction.steal || action == PokerAction.destroy) && MXSJudge.cmd.passive.first!.pokers.count == 0 { continue }
-                return poker
+                if (action == PokerAction.steal || action == PokerAction.destroy) && MXSJudge.cmd.aimHavingPoker() { continue }
+                
+                hasPoker = true
+                reBlock(hasPoker, [poker], nil)
+                return
             }
         }
-        return nil
+        
+        reBlock(false, nil, nil)
     }
     
 }

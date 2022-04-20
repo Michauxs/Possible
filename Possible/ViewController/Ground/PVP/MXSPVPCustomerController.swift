@@ -58,7 +58,7 @@ class MXSPVPCustomerController: MXSPVPController {
                     poker_arr.append(p)
                 }
             }
-            player.pokers.append(contentsOf: poker_arr)
+            player.getPoker(poker_arr)
             pokerScrollView?.appendPoker(pokers: poker_arr)
             
         case .discard:
@@ -83,25 +83,7 @@ class MXSPVPCustomerController: MXSPVPController {
     }
     
     //MARK:- hero
-    public override func someoneHeroTaped(_ heroView: MXSHeroView) {
-        print("controller action hero")
-        if player.signStatus != .active {
-            return
-        }
-        guard let hero = heroView.belong else {
-            return
-        }
-        
-        if hero.signStatus == .selected {
-            hero.signStatus = .blank
-            MXSJudge.cmd.removePassive(hero)
-        }
-        else {
-            hero.signStatus = .selected
-            MXSJudge.cmd.addPassive(hero)
-        }
-        checkCanCertainAction()
-    }
+    
     
     //MARK:- poker
     @objc public override func someonePokerTaped(_ pokerView: MXSPokerView) {

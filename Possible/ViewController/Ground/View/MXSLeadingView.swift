@@ -84,8 +84,8 @@ class MXSLeadingView: MXSBaseView {
             m.left.equalTo(certainBtn!.snp.right).offset(30)
             m.size.equalTo(certainBtn!)
         }
+        self.state = .attackUnPick
     }
-
     
     //MARK: actions
     @objc func didCertainBtnClick () {
@@ -106,7 +106,7 @@ class MXSLeadingView: MXSBaseView {
         }
         else if self.state == LeadingState.attackPicked || self.state == LeadingState.attackReadyOn{
             print("cancel Pickes")
-            self.belong?.cancelPickes()
+            self.belong?.cancelForAttack()
             self.state = LeadingState.attackUnPick
         }
             
