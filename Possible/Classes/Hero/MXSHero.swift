@@ -149,10 +149,10 @@ class MXSHero {
     func transTheAction() {
         if pickes.count > 0 {
             let pok = pickes.first!
-            currentAction?.action = pok.actionGuise
+            holdAction?.action = pok.actionGuise
         }
         else {
-            currentAction?.reset()
+            holdAction?.reset()
         }
     }
     func losePoker(_ pokers:Array<MXSPoker>) {
@@ -167,25 +167,28 @@ class MXSHero {
             poker.state = .handOn
         }
     }
-    func discardPoker() {
-        print(self.pokers)
-        for poker in self.pickes {
-            self.pokers.removeAll(where: { $0 === poker })
-            poker.state = .pass
-        }
-        self.pickes.removeAll()
-        print(self.pokers)
+    func discardPoker(reBlock:(_ type:DiscardPokerType, _ poker:[MXSPoker]) -> Void) {
+        MXSJudge.cmd.markDiscardedOnAction()
+        let pick_note = self.pickes
         
-        if currentAction?.type == .active {
+        losePoker(self.pickes)
+        self.pickes.removeAll()
+        if holdAction?.action == .give {
+            reBlock(.handover, pick_note)
+        }
+        else {
+            reBlock(.passed, pick_note)
             
-            let action = self.currentAction?.action
-            if action == .attack {
+            let action = holdAction?.action
+            let act_type = holdAction?.type
+            if action == .attack && act_type == .active {
                 attackCount+=1
             }
-            else if action == .warFire || action == .arrowes {
-                MXSJudge.cmd.selectAllElseSelf()
-            }
+//            else if action == .warFire || action == .arrowes {
+//                MXSJudge.cmd.selectAllElseSelf()
+//            }
         }
+            
     }
     
     func rollRandomPoker() -> MXSPoker {
@@ -202,9 +205,9 @@ class MXSHero {
     
     // MARK: - hero action
     var lastStep:MXSOneAction?
-    var currentAction:MXSOneAction?
+    var holdAction:MXSOneAction?
     func makeOneReplyAction() {
-        currentAction = MXSOneAction(axle: self, type: .reply)
+        holdAction = MXSOneAction(axle: self, type: .reply)
     }
     
     /*--------------------------------------------*/
@@ -213,6 +216,14 @@ class MXSHero {
         MXSJudge.cmd.subject.append(self)
     }
     func takeOrDisAimAtHero(_ hero:MXSHero) {
+        if let idx = holdAction?.aim.firstIndex(where: { hero_one in
+            hero_one === hero
+        }) {
+            holdAction?.aim.remove(at: idx)
+        }
+        else {
+            holdAction?.aim.append(hero)
+        }
         MXSJudge.cmd.appendOrRemoveResponder(hero)
     }
 }

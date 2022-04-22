@@ -90,28 +90,28 @@ class MXSLeadingView: MXSBaseView {
     //MARK: actions
     @objc func didCertainBtnClick () {
         if self.state == LeadingState.attackReadyOn {
-            print("certainAttackAction")
+            MXSLog("certainAttackAction")
             self.belong?.certainForAttack()
         }
         else if self.state == LeadingState.defenseReadyOn {
-            print("respondAttack")
+            MXSLog("respondAttack")
             self.belong?.certainForDefense()
         }
     }
         
     @objc func didCancelBtnClick (btn:UIButton) {
         if self.state == LeadingState.attackUnPick {
-            print("endActiveAction")
+            MXSLog("endActiveAction")
             self.belong?.endActive()
         }
         else if self.state == LeadingState.attackPicked || self.state == LeadingState.attackReadyOn{
-            print("cancel Pickes")
+            MXSLog("cancel Pickes")
             self.belong?.cancelForAttack()
             self.state = LeadingState.attackUnPick
         }
             
         else if self.state == LeadingState.defenseUnPick || self.state == LeadingState.defensePicked || self.state == LeadingState.defenseReadyOn{
-            print("unRespond Attack")
+            MXSLog("unRespond Attack")
             self.belong?.cancelForDefense()
         }
     }

@@ -33,7 +33,7 @@ class MXSPVPServiceController: MXSPVPController {
         if MXSPokerCmd.shared.shuffle() {
             let pokers = MXSPokerCmd.shared.push(6)
             player.getPoker(pokers)
-            pokerScrollView!.appendPoker(pokers: pokers)
+            graspPokerView!.appendPoker(pokers: pokers)
             
             let arr_p = MXSPokerCmd.shared.push(6)
             opponter.getPoker(arr_p)
@@ -54,7 +54,7 @@ class MXSPVPServiceController: MXSPVPController {
         let type:MessageType = MessageType.init(rawValue: dict[kMessageType] as! Int)!
         switch type {
         case .joined:
-            print("some one joined game")
+            MXSLog("some one joined game")
             var div_hero:Array<String> = Array<String>()
             for h in pickHeroView.heroData! {
                 div_hero.append(h.photo)
@@ -78,7 +78,7 @@ class MXSPVPServiceController: MXSPVPController {
             for p in poker_arr {
                 p.state = .pass
             }
-            passedView.collectPoker(pokers: poker_arr)
+            passedView.collectPoker(poker_arr)
             leadingView.state = .defenseUnPick
             
         case .turnOver:
@@ -100,7 +100,7 @@ class MXSPVPServiceController: MXSPVPController {
     //MARK:- poker
     @objc public override func someonePokerTaped(_ pokerView: MXSPokerView) {
         if let index = player.pokers.firstIndex(where: {$0 === pokerView.belong}) {
-            print("controller action pok at " + "\(index)")
+            MXSLog("controller action pok at " + "\(index)")
         }
         
         pokerView.isUp = !pokerView.isUp

@@ -7,8 +7,9 @@
 //
 
 import UIKit
+import Foundation
 
-class MXSPoker {
+class MXSPoker : NSObject {
     var uid: Int = 0
     var state: PokerState = .unknown
     var number: Int = 0
@@ -68,8 +69,8 @@ class MXSPokerCmd {
     static let shared : MXSPokerCmd = {
         let single = MXSPokerCmd.init()
         let color:Array<PokerColor> = [.heart, .spade, .club, .diamond]
-        let action:Array<PokerAction> = [.duel, .recover, .attack, .attack, .attack, .defense, .defense, .defense, .steal, .steal, .destroy, .recover, .detect,
-                                         .duel, .warFire, .warFire, .arrowes, .arrowes, .attack, .attack, .defense, .steal, .steal, .destroy, .recover, .detect]
+        let action:Array<PokerAction> = [.duel, .remedy, .attack, .attack, .attack, .defense, .defense, .defense, .steal, .steal, .destroy, .remedy, .detect,
+                                         .duel, .warFire, .warFire, .arrowes, .arrowes, .attack, .attack, .defense, .steal, .steal, .destroy, .remedy, .detect]
         
         for index in 0..<13*2 {
             let index_trans = index%13
@@ -83,13 +84,14 @@ class MXSPokerCmd {
     
     public func push(_ count: Int) -> Array<MXSPoker> {
         var tmp = Array<MXSPoker>()
-        for _ in 0..<count {
+        for idx in 0..<count {
             if pokers_ready!.isEmpty {
                 if !shuffle() { //丧尽天良刷牌机
                     return tmp
                 }
             }
             let last = pokers_ready!.removeLast()
+            MXSLog(last, "poker_"+"\(idx)")
             last.state = .handOn
             tmp.append(last)
         }

@@ -80,7 +80,7 @@ class MXSSkillCmd {
             single.skillData = dict
             
         } catch let error as Error? {
-            print("读取本地数据出现错误!",error as Any)
+            MXSLog(error as Any, "读取本地数据出现错误!")
         }
         
         return single

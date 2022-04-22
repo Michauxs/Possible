@@ -59,7 +59,7 @@ class MXSPVPCustomerController: MXSPVPController {
                 }
             }
             player.getPoker(poker_arr)
-            pokerScrollView?.appendPoker(pokers: poker_arr)
+            graspPokerView?.appendPoker(pokers: poker_arr)
             
         case .discard:
             let poker_uid_arr = dict[kMessageValue] as! Array<Int>
@@ -67,7 +67,7 @@ class MXSPVPCustomerController: MXSPVPController {
             for p in poker_arr {
                 p.state = .pass
             }
-            passedView.collectPoker(pokers: poker_arr)
+            passedView.collectPoker(poker_arr)
             leadingView.state = .defenseUnPick
             
         case .turnOver:
@@ -88,7 +88,7 @@ class MXSPVPCustomerController: MXSPVPController {
     //MARK:- poker
     @objc public override func someonePokerTaped(_ pokerView: MXSPokerView) {
         if let index = player.pokers.firstIndex(where: {$0 === pokerView.belong}) {
-            print("controller action pok at " + "\(index)")
+            MXSLog("controller action pok at " + "\(index)")
         }
         
         pokerView.isUp = !pokerView.isUp

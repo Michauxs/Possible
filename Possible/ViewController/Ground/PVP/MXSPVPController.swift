@@ -45,7 +45,7 @@ class MXSPVPController: MXSGroundController {
         let type:MessageType = MessageType.init(rawValue: dict[kMessageType] as! Int)!
         switch type {
         case .joined:
-            print("some one joined game")
+            MXSLog("some one joined game")
             var div_hero:Array<String> = Array<String>()
             for h in pickHeroView.heroData! {
                 div_hero.append(h.photo)
@@ -68,7 +68,7 @@ class MXSPVPController: MXSGroundController {
             for p in poker_arr {
                 p.state = .pass
             }
-            passedView.collectPoker(pokers: poker_arr)
+            passedView.collectPoker(poker_arr)
             leadingView.state = .defenseUnPick
             
         case .turnOver:
@@ -86,7 +86,7 @@ class MXSPVPController: MXSGroundController {
     
     //MARK:- hero
     public override func someoneHeroTaped(_ heroView: MXSHeroView) {
-        print("controller action hero")
+        MXSLog("controller action hero")
         if player.signStatus != .active {
             return
         }
@@ -108,7 +108,7 @@ class MXSPVPController: MXSGroundController {
     //MARK:- poker
     @objc public override func someonePokerTaped(_ pokerView: MXSPokerView) {
         if let index = player.pokers.firstIndex(where: {$0 === pokerView.belong}) {
-            print("controller action pok at " + "\(index)")
+            MXSLog("controller action pok at " + "\(index)")
         }
         
         pokerView.isUp = !pokerView.isUp

@@ -16,6 +16,11 @@ enum ActionType {
     case active
     case reply
 }
+enum ActionCategy {
+    case single
+    case group
+    case oneself
+}
 
 enum EffectType {
     case unknown
@@ -48,14 +53,18 @@ class MXSOneAction {
     
     var cycleSign:CycleType = .start
     
-    weak var hero:MXSHero?
+    weak var belong:MXSHero?
     var type:ActionType = .active
+    var categy:ActionCategy = .single
     var skill:MXSSkill?
     var action:PokerAction = .unknown {
         didSet {
             switch action {
-            case .unknown, .defense, .steal, .destroy, .detect, .recover:
+            case .unknown, .defense, .detect, .recover, .gain:
                 reply.reset()
+            case .steal, .destroy:
+                reply.count = 1
+                reply.act = .detect
             case .attack:
                 reply.count = 1
                 reply.act = .defense
@@ -68,10 +77,18 @@ class MXSOneAction {
             case .duel:
                 reply.count = 1
                 reply.act = .attack
+            case .remedy:
+                reply.count = 0
+                reply.act = .recover
             case .give:
-                reply.count = -1
-                reply.act = .unknown
+                reply.count = 0
+                reply.act = .gain
             }
+            
+            if action == .warFire || action == .arrowes {
+                categy = .group
+            }
+            else { categy = .single }
         }
     }
     lazy var pokers:Array<MXSPoker> = Array<MXSPoker>()
@@ -91,33 +108,9 @@ class MXSOneAction {
         
     }
     init(axle:MXSHero, type:ActionType) {
-        self.hero = axle
+        self.belong = axle
         self.type = type
     }
     
-    init(someone:MXSHero, act:PokerAction, pok:Array<MXSPoker>, to:Array<MXSHero>) {
-        hero = someone
-        action = act
-        pokers = pok
-        aim = to
-    }
-    
-    init(someone:MXSHero, act:PokerAction, pok:Array<MXSPoker>) {
-        hero = someone
-        action = act
-        pokers = pok
-    }
-    
-    init(someone:MXSHero, HPChange:Int) {
-        hero = someone
-    }
-    
-    /** cycle:
-     *0 - start
-     *1 - end     */
-    init(someone:MXSHero, cycle:CycleType) {
-        hero = someone
-        cycleSign = cycle
-    }
     
 }

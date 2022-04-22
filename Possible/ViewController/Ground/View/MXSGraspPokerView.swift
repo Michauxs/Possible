@@ -31,7 +31,7 @@ class MXSGraspPokerView: UIScrollView  {
         layoutPokerView()
     }
     
-    public func removePoker(pokers:Array<MXSPoker>) {
+    public func removePoker(_ pokers:Array<MXSPoker>) {
         if pokers.count < 1 { return }
         
         for poker in pokers {

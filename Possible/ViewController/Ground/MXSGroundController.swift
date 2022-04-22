@@ -16,17 +16,14 @@ class MXSGroundController: MXSViewController {
     var player: MXSHero = MXSHeroCmd.shared.getNewBlankHero()
     var opponter: MXSHero = MXSHeroCmd.shared.getNewBlankHero()
     
-    var pokerScrollView: MXSGraspPokerView?
-    
-    /**pokerScrollView.subviews中的pokerview**/
-    var graspPokerViewes: Array<MXSPokerView> = Array<MXSPokerView>()
+    var graspPokerView: MXSGraspPokerView?
     
     var skillScrollView: UIScrollView = UIScrollView.init()
     let pickHeroView = MXSPickHeroView.init(frame: CGRect.init(x: 0, y: 0, width: MXSSize.Sw, height: MXSSize.Sh))
     
     lazy var leadingView: MXSLeadingView = {
         let leader = MXSLeadingView.init()
-        let pokerViewFrame = pokerScrollView!.frame
+        let pokerViewFrame = graspPokerView!.frame
         leader.frame = CGRect(x: pokerViewFrame.minX, y: pokerViewFrame.minY - 44, width: pokerViewFrame.width, height: 44)
         view.addSubview(leader)
         leader.belong = self
@@ -119,12 +116,12 @@ class MXSGroundController: MXSViewController {
         view.addSubview(skillScrollView)
         
         /*--------------------------------------------*/
-        pokerScrollView = MXSGraspPokerView.init(frame: CGRect.init(x: playerView.frame.maxX+10,
+        graspPokerView = MXSGraspPokerView.init(frame: CGRect.init(x: playerView.frame.maxX+10,
                                                                     y: MXSSize.Sh - (MXSSize.Ph + PPedMargin),
                                                                     width: MXSSize.Sw - 10 - MXSSize.Hw - 10 - 10 - MXSSize.Hw,
                                                                     height: MXSSize.Ph + PPedMargin),
                                                  controller: self)
-        view.addSubview(pokerScrollView!)
+        view.addSubview(graspPokerView!)
         /*--------------------------------------------*/
         pickHeroView.frame = self.view.bounds
         view.addSubview(pickHeroView)
@@ -145,13 +142,19 @@ class MXSGroundController: MXSViewController {
     public func certainForAttack() {
         leadingView.isHidden = true
         
-        pokerScrollView!.removePoker(pokers: player.pickes)
-        passedView.collectPoker(pokers: player.pickes)
-        MXSJudge.cmd.leader?.discardPoker()
+        MXSJudge.cmd.leader?.discardPoker(reBlock: { type, poker in
+            if type == .passed {
+                graspPokerView!.removePoker(poker)
+                passedView.collectPoker(poker)
+            }
+            else if type == .handover {
+                //MXSJudge.cmd.responder.first?.getPoker(poker)
+            }
+        })
         
-        self.updateViewsWaitOpponterRespon()
+        self.waitingResponerReply()
     }
-    public func updateViewsWaitOpponterRespon() {
+    public func waitingResponerReply() {
         //sub object
     }
     
@@ -188,7 +191,7 @@ class MXSGroundController: MXSViewController {
         
         MXSJudge.cmd.responderSufferConsequence { spoils, pokers in
             if spoils == .destroy || spoils == .wrest {
-                pokerScrollView!.removePoker(pokers: pokers!)
+                graspPokerView!.removePoker(pokers!)
             }
         }
         
@@ -209,7 +212,7 @@ class MXSGroundController: MXSViewController {
     //MARK: - poker
     @objc public func someonePokerTaped(_ pokerView: MXSPokerView) {
         if let index = player.pokers.firstIndex(where: {$0 === pokerView.belong}) {
-            print("controller action pok at " + "\(index)")
+            MXSLog("controller action pok at " + "\(index)")
         }
         
         pokerView.isUp = !pokerView.isUp
@@ -225,7 +228,7 @@ class MXSGroundController: MXSViewController {
     
     //MARK: - hero
     public override func someoneHeroTaped(_ heroView: MXSHeroView) {
-        print("controller action hero")
+        MXSLog("controller action hero")
         /**被动响应 无需选择*/
         if leadingView.state == LeadingState.defenseUnPick { return }
         
@@ -236,8 +239,8 @@ class MXSGroundController: MXSViewController {
     //MARK: - check every one step action
     func checkCanCertainAction() {
         if player.signStatus == .focus {
-            MXSJudge.cmd.responderReplyAction { can, pokers in
-                if can {
+            MXSJudge.cmd.responderReplyAction { type, pokers in
+                if type == .success {
                     leadingView.state = .defenseReadyOn
                 }
                 else {

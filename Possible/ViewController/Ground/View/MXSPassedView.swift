@@ -21,7 +21,7 @@ class MXSPassedView: MXSBaseView {
         self.clipsToBounds = true
     }
     
-    public func collectPoker(pokers:Array<MXSPoker>) {
+    public func collectPoker( _ pokers:Array<MXSPoker>) {
         if pokers.count == 0 { return }
         
         /**计算已有pok*/

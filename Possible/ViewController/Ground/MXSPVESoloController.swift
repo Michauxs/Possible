@@ -36,8 +36,13 @@ class MXSPVESoloController: MXSGroundController {
     func allHeroReady() {
         if MXSPokerCmd.shared.shuffle() {
             let pokers = MXSPokerCmd.shared.push(6)
+            
+//            printPointer(ptr: &pokers.first, "pokers.0")
+//            MXSLog(Unmanaged.passRetained(pokers.first as AnyObject), "pokers.0")
+            MXSLog(pokers)
+            
             player.getPoker(pokers)
-            pokerScrollView!.appendPoker(pokers: pokers)
+            graspPokerView!.appendPoker(pokers: pokers)
             
             let pokers_o = MXSPokerCmd.shared.push(6)
             opponter.getPoker(pokers_o)
@@ -50,7 +55,7 @@ class MXSPVESoloController: MXSGroundController {
     // MARK: - Skill
     @objc override func didSkillBtnClick(btn:MXSSkillBtn) {
 //        btn.isSelected = !btn.isSelected
-        print(btn.power as Any)
+        MXSLog(btn.power as Any)
         if btn.isSelected {
             player.stopSkill(btn.belong!)
         } else {
@@ -60,28 +65,28 @@ class MXSPVESoloController: MXSGroundController {
     }
     
     // MARK: - leadingView
-    override func updateViewsWaitOpponterRespon() {
-        MXSJudge.cmd.responderReplyAction { can, pokers in
-            if !can {
+    override func waitingResponerReply() {
+        MXSJudge.cmd.responderReplyAction { type, pokers in
+            if type == .failed {
                 MXSJudge.cmd.responderSufferConsequence { spoils, pokers in
                     if spoils == .destroy {
-                        passedView.collectPoker(pokers: pokers!)
+                        passedView.collectPoker(pokers!)
                     }
                     else if spoils == .wrest {
-                        pokerScrollView!.appendPoker(pokers: pokers!)
+                        graspPokerView!.appendPoker(pokers: pokers!)
                     }
-                    print("step done")
+                    MXSLog("step done")
                 }
             }
-            else {
-                opponter.losePoker(pokers!)
-                passedView.collectPoker(pokers: pokers!)
+            else if type == .success {
+                passedView.collectPoker(pokers!)
             }
             
             MXSJudge.cmd.leaderReactive()
+            
             leadingView.isHidden = false
             leadingView.state = .attackUnPick
-            print("opponter done -> goon")
+            MXSLog("opponter done -> goon")
         }
     }
     
@@ -91,23 +96,36 @@ class MXSPVESoloController: MXSGroundController {
     
     override func responderReply() {
         
-        pokerScrollView!.removePoker(pokers: player.pickes)
-        passedView.collectPoker(pokers: player.pickes)
         let responder = MXSJudge.cmd.responder.first
-        responder?.discardPoker()
+        responder?.discardPoker(reBlock: { type, poker in
+            graspPokerView!.removePoker(poker)
+            if type == .passed {
+                passedView.collectPoker(poker)
+            }
+            else if type == .handover {
+//                MXSJudge.cmd.responder.first?.getPoker(poker)
+            }
+        })
         
         MXSJudge.cmd.leaderReactive()
         afterLeaderReactive()
     }
     func afterLeaderReactive() {
+        //opponter lead
         let hero = MXSJudge.cmd.leader!
         hero.choiceResponder()
         hero.hasPokerDoAttack { has, pokers, skill in
             if has {
                 hero.pickPoker(pokers!.first!)
-                
-                passedView.collectPoker(pokers: pokers!)
-                MXSJudge.cmd.leader?.discardPoker()
+                hero.discardPoker(reBlock: { type, poker in
+                    if type == .passed {
+                        passedView.collectPoker(poker)
+                    }
+                    else if type == .handover {
+                        MXSJudge.cmd.responder.first?.getPoker(poker)
+                        graspPokerView?.appendPoker(pokers: poker)
+                    }
+                })
                 
                 leadingView.isHidden = false
                 leadingView.state = .defenseUnPick
@@ -121,7 +139,7 @@ class MXSPVESoloController: MXSGroundController {
                 
                 let pokers = MXSPokerCmd.shared.push(MXSJudge.cmd.leader!.collectNumb)
                 MXSJudge.cmd.leader!.getPoker(pokers)
-                pokerScrollView!.appendPoker(pokers: pokers)
+                graspPokerView!.appendPoker(pokers: pokers)
                 
                 leadingView.isHidden = false
                 leadingView.state = .attackUnPick

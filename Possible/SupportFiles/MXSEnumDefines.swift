@@ -13,6 +13,10 @@ func MXSLog(_ args:Any, _ sign:String = "MXSSwift") {
         print(Date.init(), sign, ":", args)
     #endif
 }
+func printPointer<T>(ptr: UnsafePointer<T>, _ sign:String="Possible") {
+    print(sign)
+    print(ptr)
+}
 
 let kMessageType: String = "develop_message_type"
 let kMessageValue: String = "develop_message_value"
@@ -87,16 +91,12 @@ enum PokerAction : Int {
     case steal
     case destroy
     case detect
+    case remedy
     case recover
     case give
+    case gain
 }
 
-enum ActionReplyResult : Int {
-    case unknown = 0
-    case complete = 1
-    case bear
-    case NA
-}
 //MARK:- Skill
 enum SkillPower : Int {
     case unKnown = 0
@@ -159,6 +159,17 @@ enum SpoilsType {
     case nothing
     case destroy
     case wrest
+    case gain
+}
+
+enum DiscardPokerType : Int {
+    case passed = 0
+    case handover
+}
+enum ReplyResultType : Int {
+    case nothing = 0
+    case success
+    case failed
     case gain
 }
 

@@ -17,7 +17,7 @@ class MXSPokerView: MXSBaseView {
                                                       .warFire:"战火",
                                                       .arrowes:"箭雨",
                                                       .duel:"暗器",
-                                                      .recover:"恢复",
+                                                      .remedy:"恢复",
                                                       .detect:"侦察"]
     
     var contentView: UIView = UIView()
@@ -69,7 +69,7 @@ class MXSPokerView: MXSBaseView {
         }
     }
     @objc func didTapedSelf() {
-        print("poker did taped")
+        MXSLog("poker did taped")
         self.controller?.perform(#selector(MXSGroundController.someonePokerTaped(_:)), with: self)
 //        self.controller?.perform(#selector(someonePokerTapedWithPokerView:), with: self)
 //        let _ = self.controller?.perform(Selector(("someonePokerTaped:")), with: self)?.takeUnretainedValue()

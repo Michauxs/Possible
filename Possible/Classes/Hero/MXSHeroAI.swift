@@ -15,7 +15,7 @@ extension MXSHero {
     func replyAttack() -> MXSPoker? {
         if isAxle { return nil }
         
-        let action_attck = MXSJudge.cmd.leader?.currentAction?.action
+        let action_attck = MXSJudge.cmd.leader?.holdAction?.action
         switch action_attck {
         case .attack:
             return minsHPOrDefenseWithAction(.defense)

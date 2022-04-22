@@ -37,10 +37,34 @@ class AppDelegate: UIResponder, UIApplicationDelegate, NetServiceDelegate, Strea
     
     var window: UIWindow?
     
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
-        NSLog("HomeDirectory: %@", NSHomeDirectory())
-        
+    func testSomething() {
+//        if MXSPokerCmd.shared.shuffle() {
+//            let pokers = MXSPokerCmd.shared.push(1)
+//            MXSLog(pokers, "pokers")
+//            
+//            var pokers2 = [MXSPoker]() //var
+//            pokers2.append(pokers.first!)
+//            pokers2.append(pokers.first!)
+//            pokers2.append(pokers.first!)
+//            MXSLog(pokers2, "pokers2 ")//[<Possible.MXSPoker: 0x280ecef40>, <Possible.MXSPoker: 0x280ecef40>, <Possible.MXSPoker: 0x280ecef40>]
+//        }
+//        if MXSPokerCmd.shared.shuffle() {
+//            var pokers = MXSPokerCmd.shared.push(3)
+//            let pokers2 = pokers //var
+//            pokers.removeAll()
+//            MXSLog(pokers, "pokers ")//[]
+//            MXSLog(pokers2, "pokers2 ")//[p,p,p]
+//        }
+//
+//        var arr = [[1],[2],[3]]
+//        MXSLog(Unmanaged.passRetained(arr.first as AnyObject), "arr.0")
+//        let arr2 = arr
+//        arr.removeAll()
+//        MXSLog(arr, "arr")//[]
+//        MXSLog(arr2, "arr2")//[1,2,3]
+//        //        MXSLog(Unmanaged.passRetained(arr2.first as AnyObject), "arr2.0")
+//        MXSLog(String(format: "%p", arr2.first!), "arr2.0")
+//
 //        NSLog("----------------")
 //        for item in UIFont.familyNames {
 //
@@ -53,6 +77,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, NetServiceDelegate, Strea
 //            }
 //            NSLog("----------------")
 //        }
+        
+    }
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        // Override point for customization after application launch.
+        NSLog("HomeDirectory: %@", NSHomeDirectory())
+        testSomething()
         
         /*----------------------*/
         let root_vc = MXSLobbyController()
@@ -81,7 +111,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, NetServiceDelegate, Strea
     }
     
     func applicationDidEnterBackground(_ application: UIApplication) {
-        print("applicationDidEnterBackground")
+        MXSLog("applicationDidEnterBackground")
 //        MXSNetServ.shared.belong?.deviceOffLine()
     }
     
