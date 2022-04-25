@@ -42,10 +42,14 @@ class MXSHero {
     var HPCurrent: Int = 4 {
         didSet {
             concreteView?.HPCurrent = HPCurrent
+            MXSLog(HPCurrent, self.name + "'hp ")
             if HPCurrent == 0 {
                 self.concreteView?.controller?.someHeroHPZero(self)
             }
         }
+    }
+    func canRecover() -> Bool {
+        return HPCurrent < HPSum
     }
     public func minsHP (_ hp:Int = 1) {
         self.HPCurrent = HPCurrent - hp
@@ -65,7 +69,7 @@ class MXSHero {
     }
     
     
-    // MARK: - method
+    // MARK: - View
     init(_ attr:Dictionary<String,Any>) { /**name photo hp skills desc*/
         attribute = attr
         
@@ -91,6 +95,11 @@ class MXSHero {
         desc = attr[kStringDesc] as? String
     }
     
+    var pokersView: MXSGraspPokerView? {
+        didSet {
+            pokersView?.belong = self
+        }
+    }
     var concreteView: MXSHeroView? {
         didSet {
             concreteView?.belong = self
@@ -102,6 +111,100 @@ class MXSHero {
     }
     
     
+    //MARK: - Pokers
+    var holdPokers: Array<MXSPoker> = []
+    lazy var picked: Array<MXSPoker> = Array<MXSPoker>()
+    func pickPoker(_ poker:MXSPoker) {
+        picked.append(poker)
+        self.transTheAction()
+    }
+    func freePoker(_ poker:MXSPoker) {
+        picked.removeAll(where: { $0 === poker })
+        self.transTheAction()
+    }
+    func transTheAction() {
+        if picked.count > 0 {
+            let pok = picked.first!
+            holdAction?.action = pok.actionGuise
+        }
+        else {
+            holdAction?.reset()
+        }
+    }
+    func losePokers(_ pokers:Array<MXSPoker>) {
+        for poker in pokers {
+            holdPokers.removeAll(where: { $0 === poker })
+            poker.state = .pass
+        }
+        pokersView?.layoutPokerView()
+        concreteView?.pokerCount = holdPokers.count
+    }
+    func getPokers(_ pokers:Array<MXSPoker>) {
+        holdPokers.append(contentsOf: pokers)
+        for poker in pokers {
+            poker.state = .handOn
+        }
+        pokersView?.layoutPokerView()
+        concreteView?.pokerCount = holdPokers.count
+    }
+    
+    func discardPoker(reBlock:(_ type:DiscardPokerType, _ poker:[MXSPoker]) -> Void) -> Bool {
+        MXSJudge.cmd.markDiscardedOnAction()
+        
+        losePokers(self.picked)
+        self.picked.removeAll()
+        //note onestep active action
+        
+        MXSJudge.cmd.diary.append(holdAction!)
+        
+        if holdAction?.action == .give {
+            reBlock(.handover, holdAction!.pokers)
+        }
+        else {
+            reBlock(.passed, holdAction!.pokers)
+        }
+        
+        if holdAction?.type == .active {
+            lastActiveAction = holdAction
+            
+            let action = holdAction?.action
+            if action == .attack {
+                attackCount+=1
+            }
+            else if action == .remedy {
+                let _ = plusHP()
+                return false
+            }
+            
+        }
+        else {//.reply
+            
+        }
+        
+        return true
+    }
+    
+    func rollRandomPoker() -> MXSPoker {
+        let index = Int(arc4random_uniform(UInt32(holdPokers.count)))
+        MXSLog(holdPokers.count, "Poker count")
+        MXSLog(index, "random idx")
+        return holdPokers.remove(at: index)
+    }
+    
+    func endActiveByClearStatus () {
+        stopAllSkill(.enable)
+        signStatus = .blank
+        lastActiveAction = nil
+        attackCount = 0
+    }
+    
+    // MARK: - hero action
+    var lastActiveAction:MXSOneAction?
+    var holdAction:MXSOneAction?
+    func makeOneReplyAction() {
+        holdAction = MXSOneAction(axle: self, type: .reply)
+    }
+    
     //MARK: - skill
     func stopAllSkill(_ state:SkillState) {
         for skill in skillSet.filter({$0.state == state}) {
@@ -110,13 +213,13 @@ class MXSHero {
     }
     func startingSkill(_ skill:MXSSkill) {
         skill.state = .enable
-        if let poker = pickes.first {
+        if let poker = picked.first {
             let _ = skill.disguisePoker(poker)
         }
     }
     func stopSkill(_ skill:MXSSkill) {
         skill.state = .unable
-        for poker in self.pickes {
+        for poker in self.picked {
             poker.actionGuise = poker.actionFate
             poker.colorGuise = poker.color
         }
@@ -135,81 +238,6 @@ class MXSHero {
         skillSet.append(contentsOf: skillExp)
     }
     
-    //MARK:- pokers
-    var pokers: Array<MXSPoker> = []
-    lazy var pickes: Array<MXSPoker> = Array<MXSPoker>()
-    func pickPoker(_ poker:MXSPoker) {
-        pickes.append(poker)
-        self.transTheAction()
-    }
-    func freePoker(_ poker:MXSPoker) {
-        pickes.removeAll(where: { $0 === poker })
-        self.transTheAction()
-    }
-    func transTheAction() {
-        if pickes.count > 0 {
-            let pok = pickes.first!
-            holdAction?.action = pok.actionGuise
-        }
-        else {
-            holdAction?.reset()
-        }
-    }
-    func losePoker(_ pokers:Array<MXSPoker>) {
-        for poker in pokers {
-            self.pokers.removeAll(where: { $0 === poker })
-            poker.state = .pass
-        }
-    }
-    func getPoker(_ pokers:Array<MXSPoker>) {
-        self.pokers.append(contentsOf: pokers)
-        for poker in pokers {
-            poker.state = .handOn
-        }
-    }
-    func discardPoker(reBlock:(_ type:DiscardPokerType, _ poker:[MXSPoker]) -> Void) {
-        MXSJudge.cmd.markDiscardedOnAction()
-        let pick_note = self.pickes
-        
-        losePoker(self.pickes)
-        self.pickes.removeAll()
-        if holdAction?.action == .give {
-            reBlock(.handover, pick_note)
-        }
-        else {
-            reBlock(.passed, pick_note)
-            
-            let action = holdAction?.action
-            let act_type = holdAction?.type
-            if action == .attack && act_type == .active {
-                attackCount+=1
-            }
-//            else if action == .warFire || action == .arrowes {
-//                MXSJudge.cmd.selectAllElseSelf()
-//            }
-        }
-            
-    }
-    
-    func rollRandomPoker() -> MXSPoker {
-        let index = Int(arc4random_uniform(UInt32(self.pokers.count)))
-        return self.pokers.remove(at: index)
-    }
-    
-    func endActiveAndClearHistory () {
-        stopAllSkill(.enable)
-        signStatus = .blank
-        lastStep = nil
-        attackCount = 0
-    }
-    
-    // MARK: - hero action
-    var lastStep:MXSOneAction?
-    var holdAction:MXSOneAction?
-    func makeOneReplyAction() {
-        holdAction = MXSOneAction(axle: self, type: .reply)
-    }
-    
     /*--------------------------------------------*/
     //MARK: - hero->Judge
     func joingame(){
@@ -225,5 +253,9 @@ class MXSHero {
             holdAction?.aim.append(hero)
         }
         MXSJudge.cmd.appendOrRemoveResponder(hero)
+    }
+    
+    func distakeAllAim() {
+        holdAction?.aim.removeAll()
     }
 }

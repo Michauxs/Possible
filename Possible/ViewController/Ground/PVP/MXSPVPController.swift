@@ -107,7 +107,7 @@ class MXSPVPController: MXSGroundController {
     
     //MARK:- poker
     @objc public override func someonePokerTaped(_ pokerView: MXSPokerView) {
-        if let index = player.pokers.firstIndex(where: {$0 === pokerView.belong}) {
+        if let index = player.holdPokers.firstIndex(where: {$0 === pokerView.belong}) {
             MXSLog("controller action pok at " + "\(index)")
         }
         
@@ -128,22 +128,21 @@ class MXSPVPController: MXSGroundController {
     
     //MARK:- leadingView
     public override func certainForAttack() {
-        let poker = player.pickes.first!
+        let poker = player.picked.first!
         var div_p:Array<Int> = Array<Int>()
-        for p in player.pickes {
+        for p in player.picked {
             div_p.append(p.uid)
         }
         MXSNetServ.shared.send([kMessageType:MessageType.discard.rawValue, kMessageValue:div_p])
         
-        player.pokers.removeAll(where: {$0 === poker})
+        player.holdPokers.removeAll(where: {$0 === poker})
         poker.state = .pass
         
-        leadingView.isHidden = true
-        
+        leadingView.hide()
     }
     
     public override func endActive() {
-        leadingView.isHidden = true
+        leadingView.hide()
         leadingView.state = .defenseUnPick
         passedView.fadeout()
         
@@ -152,7 +151,7 @@ class MXSPVPController: MXSGroundController {
     }
     public override func certainForDefense() {
         MXSJudge.cmd.leaderReactive()
-        leadingView.isHidden = true
+        leadingView.hide()
     }
     
     

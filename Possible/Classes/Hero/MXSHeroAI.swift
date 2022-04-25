@@ -37,8 +37,8 @@ extension MXSHero {
             popCard(poker)
             return poker
         } else {
-            let index = Int(arc4random_uniform(UInt32(self.pokers.count)))
-            let pok_random = self.pokers.remove(at: index)
+            let index = Int(arc4random_uniform(UInt32(self.holdPokers.count)))
+            let pok_random = self.holdPokers.remove(at: index)
             pok_random.state = state
             return pok_random
         }
@@ -54,14 +54,14 @@ extension MXSHero {
         }
     }
     func hasPokerWithAction(_ action:PokerAction) -> MXSPoker? {
-        if let index = self.pokers.firstIndex(where: { (item) -> Bool in item.actionGuise == action }) {
-            return self.pokers[index]
+        if let index = self.holdPokers.firstIndex(where: { (item) -> Bool in item.actionGuise == action }) {
+            return self.holdPokers[index]
         }
         else { return nil }
     }
     
     public func popCard(_ poker:MXSPoker) {
-        self.pokers.removeAll(where: {$0 === poker})
+        self.holdPokers.removeAll(where: {$0 === poker})
         poker.state = .pass
         if poker.actionGuise == PokerAction.attack {
             attackCount += 1
@@ -69,31 +69,59 @@ extension MXSHero {
     }
     
     //MARK: - AI leader
-    func choiceResponder() {
-        self.takeOrDisAimAtHero(MXSJudge.cmd.returnMinHero())
-    }
-    
     public func hasPokerDoAttack(reBlock:(_ has :Bool, _ pokers :Array<MXSPoker>?, _ skill:MXSSkill?) -> Void) {
-        if MXSJudge.cmd.responder.count == 0 || self.pokers.count == 0 {
+        if self.holdPokers.count == 0 {
             reBlock(false, nil, nil)
+            return
         }
         
         var hasPoker:Bool = false
         for action in MXSPokerCmd.shared.priority {
-            if let index = self.pokers.firstIndex(where: { (item) -> Bool in item.actionGuise == action }) {
-                let poker = self.pokers[index]
-                /**attack yet , check next action*/
-                if (action == PokerAction.attack ) && self.attackCount != 0 { continue }
-                /**aim no anyone poker , check next action*/
-                if (action == PokerAction.steal || action == PokerAction.destroy) && MXSJudge.cmd.aimHavingPoker() { continue }
+            if let index = self.holdPokers.firstIndex(where: { (item) -> Bool in item.actionGuise == action }) {
+                let poker = self.holdPokers[index]
+                switch action {
+                case .unknown, .defense, .detect, .recover, .gain:
+                    hasPoker = false
+                case .steal, .destroy:
+                    if let target = MXSJudge.cmd.returnMinHero() {
+                        self.takeOrDisAimAtHero(target)
+                        hasPoker = MXSJudge.cmd.aimHavingPoker()
+                    }
+                case .attack:
+                    if let target = MXSJudge.cmd.returnMinHero() {
+                        self.takeOrDisAimAtHero(target)
+                        hasPoker = attackCount < attackLimit
+                    }
+                case .warFire:
+                    hasPoker = true
+                case .arrowes:
+                    hasPoker = true
+                case .duel:
+                    if let target = MXSJudge.cmd.returnMinHero() {
+                        self.takeOrDisAimAtHero(target)
+                        hasPoker = true
+                    }
+                case .remedy:
+                    if let target = MXSJudge.cmd.returnMinHero() {
+                        self.takeOrDisAimAtHero(target)
+                        hasPoker = target.canRecover()
+                    }
+                    else { hasPoker = self.canRecover() }
+                case .give:
+                    hasPoker = false
+                default:
+                    break
+                }
                 
-                hasPoker = true
-                reBlock(hasPoker, [poker], nil)
-                return
-            }
+                if hasPoker {
+                    reBlock(hasPoker, [poker], nil)
+                    return
+                }
+            }//
+                
         }
         
-        reBlock(false, nil, nil)
+        reBlock(hasPoker, nil, nil)
     }
     
 }

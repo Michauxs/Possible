@@ -164,7 +164,7 @@ enum SpoilsType {
 
 enum DiscardPokerType : Int {
     case passed = 0
-    case handover
+    case handover // = active give + responder gain
 }
 enum ReplyResultType : Int {
     case nothing = 0

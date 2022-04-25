@@ -20,6 +20,7 @@ enum ActionCategy {
     case single
     case group
     case oneself
+    case endLead
 }
 
 enum EffectType {

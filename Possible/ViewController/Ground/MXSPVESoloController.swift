@@ -30,26 +30,24 @@ class MXSPVESoloController: MXSGroundController {
             player = hero
             player.joingame()
             player.isAxle = true
+            
             player.concreteView = playerView
+            player.pokersView = graspPokerView;
+//            graspPokerView?.belong = player
         }
     }
     func allHeroReady() {
         if MXSPokerCmd.shared.shuffle() {
-            let pokers = MXSPokerCmd.shared.push(6)
             
-//            printPointer(ptr: &pokers.first, "pokers.0")
-//            MXSLog(Unmanaged.passRetained(pokers.first as AnyObject), "pokers.0")
-            MXSLog(pokers)
-            
-            player.getPoker(pokers)
-            graspPokerView!.appendPoker(pokers: pokers)
-            
-            let pokers_o = MXSPokerCmd.shared.push(6)
-            opponter.getPoker(pokers_o)
+            MXSJudge.cmd.dealcardForGameStart()
+            MXSJudge.cmd.dealcardForNextLeader { hero, pokers in
+                
+            }
+            leadingView.state = .attackUnPick
         }
-        
-        MXSJudge.cmd.leader = player
-        leadingView.isHidden = false
+        else {
+            didCloseGameBtnClick()
+        }
     }
 
     // MARK: - Skill
@@ -66,14 +64,14 @@ class MXSPVESoloController: MXSGroundController {
     
     // MARK: - leadingView
     override func waitingResponerReply() {
-        MXSJudge.cmd.responderReplyAction { type, pokers in
+        MXSJudge.cmd.AIReplyAsResponder { type, pokers in
             if type == .failed {
                 MXSJudge.cmd.responderSufferConsequence { spoils, pokers in
                     if spoils == .destroy {
                         passedView.collectPoker(pokers!)
                     }
                     else if spoils == .wrest {
-                        graspPokerView!.appendPoker(pokers: pokers!)
+                        
                     }
                     MXSLog("step done")
                 }
@@ -84,71 +82,83 @@ class MXSPVESoloController: MXSGroundController {
             
             MXSJudge.cmd.leaderReactive()
             
-            leadingView.isHidden = false
             leadingView.state = .attackUnPick
             MXSLog("opponter done -> goon")
         }
     }
     
     override func endLeaderCycle() {
-        afterLeaderReactive()
+        MXSJudge.cmd.dealcardForNextLeader { hero, pokers in
+            
+        }
+        waitingAIAttack()
     }
     
-    override func responderReply() {
+    override func playerReplyAsResponder() {
         
         let responder = MXSJudge.cmd.responder.first
-        responder?.discardPoker(reBlock: { type, poker in
-            graspPokerView!.removePoker(poker)
+        let _ = responder?.discardPoker(reBlock: { type, poker in
             if type == .passed {
+                MXSLog(poker, "player discard poker")
+                
                 passedView.collectPoker(poker)
             }
-            else if type == .handover {
-//                MXSJudge.cmd.responder.first?.getPoker(poker)
+            else if type == .handover {// = active give + responder gain
+                
+                //TODO: animate P->P
             }
         })
         
         MXSJudge.cmd.leaderReactive()
-        afterLeaderReactive()
+        waitingAIAttack()
     }
-    func afterLeaderReactive() {
+    func waitingAIAttack() {
         //opponter lead
-        let hero = MXSJudge.cmd.leader!
-        hero.choiceResponder()
-        hero.hasPokerDoAttack { has, pokers, skill in
+        let leader = MXSJudge.cmd.leader!
+        leader.hasPokerDoAttack { has, pokers, skill in
             if has {
-                hero.pickPoker(pokers!.first!)
-                hero.discardPoker(reBlock: { type, poker in
+                leader.pickPoker(pokers!.first!)
+                let waiting = leader.discardPoker(reBlock: { type, poker in
+                    if leader.holdAction?.action == .warFire || leader.holdAction?.action == .arrowes {
+                        MXSJudge.cmd.selectAllElseSelf()
+                    }
                     if type == .passed {
                         passedView.collectPoker(poker)
                     }
                     else if type == .handover {
-                        MXSJudge.cmd.responder.first?.getPoker(poker)
-                        graspPokerView?.appendPoker(pokers: poker)
+                        MXSJudge.cmd.responder.first?.getPokers(poker)
+                        
                     }
                 })
                 
-                leadingView.isHidden = false
-                leadingView.state = .defenseUnPick
-                
-                let responder = MXSJudge.cmd.responder.first
-                responder?.makeOneReplyAction()
+                if waiting {
+                    leadingView.state = .defenseUnPick
+                    //reply action
+                    let responder = MXSJudge.cmd.responder.first
+                    responder?.makeOneReplyAction()
+                }
+                else {
+                    waitingAIAttack()
+                }
+                    
             }
             else {
-                passedView.fadeout()
-                MXSJudge.cmd.next()
-                
-                let pokers = MXSPokerCmd.shared.push(MXSJudge.cmd.leader!.collectNumb)
-                MXSJudge.cmd.leader!.getPoker(pokers)
-                graspPokerView!.appendPoker(pokers: pokers)
-                
-                leadingView.isHidden = false
-                leadingView.state = .attackUnPick
+                AICantAttack()
             }
+        } //block
+    }
+    func AICantAttack() {
+        MXSLog("AI cant attack")
+        passedView.fadeout()
+        leadingView.state = .attackUnPick
+        
+        MXSJudge.cmd.dealcardForNextLeader { hero, pokers in
+            
         }
     }
     
     override func responderCantReply() {
-        afterLeaderReactive()
+        waitingAIAttack()
     }
     
     

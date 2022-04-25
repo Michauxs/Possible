@@ -32,11 +32,11 @@ class MXSPVPServiceController: MXSPVPController {
         }
         if MXSPokerCmd.shared.shuffle() {
             let pokers = MXSPokerCmd.shared.push(6)
-            player.getPoker(pokers)
-            graspPokerView!.appendPoker(pokers: pokers)
+            player.getPokers(pokers)
+            
             
             let arr_p = MXSPokerCmd.shared.push(6)
-            opponter.getPoker(arr_p)
+            opponter.getPokers(arr_p)
             var poker_uid_arr:Array<Int> = Array<Int>()
             for poker in arr_p {
                 poker_uid_arr.append(poker.uid)
@@ -99,7 +99,7 @@ class MXSPVPServiceController: MXSPVPController {
     
     //MARK:- poker
     @objc public override func someonePokerTaped(_ pokerView: MXSPokerView) {
-        if let index = player.pokers.firstIndex(where: {$0 === pokerView.belong}) {
+        if let index = player.holdPokers.firstIndex(where: {$0 === pokerView.belong}) {
             MXSLog("controller action pok at " + "\(index)")
         }
         

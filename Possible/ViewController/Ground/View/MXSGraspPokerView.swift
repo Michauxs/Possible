@@ -11,7 +11,9 @@ import UIKit
 class MXSGraspPokerView: UIScrollView  {
     
     weak var controller:MXSGroundController?
-    var graspPokeres: Array<MXSPoker> = Array<MXSPoker>()
+    weak var belong:MXSHero?
+    
+//    var graspPokers: Array<MXSPoker> = Array<MXSPoker>()
     let PPedMargin: CGFloat = 5.0
     
     init(frame:CGRect, controller:MXSGroundController) {
@@ -25,24 +27,24 @@ class MXSGraspPokerView: UIScrollView  {
         fatalError("init(coder:) has not been implemented")
     }
     
-    public func appendPoker(pokers:Array<MXSPoker>) {
-        graspPokeres.append(contentsOf: pokers)
-        
-        layoutPokerView()
-    }
-    
-    public func removePoker(_ pokers:Array<MXSPoker>) {
-        if pokers.count < 1 { return }
-        
-        for poker in pokers {
-            graspPokeres.removeAll(where: {$0 === poker})
-        }
-        
-        layoutPokerView()
-    }
+//    public func appendPoker(pokers:Array<MXSPoker>) {
+//        graspPokers.append(contentsOf: pokers)
+//
+//        layoutPokerView()
+//    }
+//
+//    public func removePoker(_ pokers:Array<MXSPoker>) {
+//        if pokers.count < 1 { return }
+//
+//        for poker in pokers {
+//            graspPokers.removeAll(where: {$0 === poker})
+//        }
+//
+//        layoutPokerView()
+//    }
     
     func layoutPokerView() {
-        let count = graspPokeres.count
+        let count = belong?.holdPokers.count ?? 0
         let need_width = MXSSize.Pw * CGFloat(count)
         let box_width = self.bounds.size.width
         
@@ -55,16 +57,16 @@ class MXSGraspPokerView: UIScrollView  {
         self.contentSize = CGSize.init(width: margin_base*CGFloat(count-1) + MXSSize.Pw, height: 0)
         /*--------------------------*/
         
-        for index in 0..<graspPokeres.count {
-            let pok = graspPokeres[index]
-            if pok.concreteView == nil {
-                pok.concreteView = MXSPokerView.init() }
+        for index in 0..<count {
+            let pok = belong!.holdPokers[index]
+            if pok.concreteView == nil { pok.concreteView = MXSPokerView.init() }
             else { pok.concreteView!.removeFromSuperview() }//
             pok.concreteView!.controller = self.controller
             UIView.animate(withDuration: 0.25) {
                 pok.concreteView!.frame = CGRect(x: margin_base * CGFloat(index), y: self.PPedMargin, width: MXSSize.Pw, height: MXSSize.Ph) }
             self.addSubview(pok.concreteView!)
-            pok.concreteView?.showWidth = pok === graspPokeres.last ? MXSSize.Pw : margin_base
+            
+            pok.concreteView?.showWidth = pok === belong?.holdPokers.last ? MXSSize.Pw : margin_base
         }
     }
     

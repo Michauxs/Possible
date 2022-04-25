@@ -87,7 +87,12 @@ class MXSLeadingView: MXSBaseView {
         self.state = .attackUnPick
     }
     
-    //MARK: actions
+    //MARK: - method
+    func hide() {
+        self.isHidden = true
+    }
+    
+    //MARK: - actions
     @objc func didCertainBtnClick () {
         if self.state == LeadingState.attackReadyOn {
             MXSLog("certainAttackAction")
@@ -100,17 +105,17 @@ class MXSLeadingView: MXSBaseView {
     }
         
     @objc func didCancelBtnClick (btn:UIButton) {
-        if self.state == LeadingState.attackUnPick {
+        if self.state == .attackUnPick {
             MXSLog("endActiveAction")
             self.belong?.endActive()
         }
-        else if self.state == LeadingState.attackPicked || self.state == LeadingState.attackReadyOn{
+        else if self.state == .attackPicked || self.state == .attackReadyOn {
             MXSLog("cancel Pickes")
+            self.state = .attackUnPick
             self.belong?.cancelForAttack()
-            self.state = LeadingState.attackUnPick
         }
             
-        else if self.state == LeadingState.defenseUnPick || self.state == LeadingState.defensePicked || self.state == LeadingState.defenseReadyOn{
+        else if self.state == .defenseUnPick || self.state == .defensePicked || self.state == .defenseReadyOn {
             MXSLog("unRespond Attack")
             self.belong?.cancelForDefense()
         }

@@ -17,6 +17,7 @@ class MXSHeroView: MXSBaseView {
     
     var portraitImage : UIImageView = UIImageView()
     let nameLabel: UILabel = UILabel.init(text: "", fontSize: 610, textColor: .darkText, align: .center)
+    let pokerCountLabel: UILabel = UILabel.init(text: "0", fontSize: 612, textColor: .dullWhite, align: .center)
     var skillImages : Array<UIImageView> = Array<UIImageView>.init()
     var HPBottle : Array<UIView> = Array<UIView>()
     
@@ -35,7 +36,7 @@ class MXSHeroView: MXSBaseView {
         }
     }
     
-    weak var controller: MXSViewController? {
+    weak var controller: MXSGroundController? {
         didSet {
             self.isUserInteractionEnabled = true
             self.addGestureRecognizer(UITapGestureRecognizer.init(target: self, action: #selector(didTapedSelf)))
@@ -79,6 +80,12 @@ class MXSHeroView: MXSBaseView {
         }
     }
     
+    var pokerCount:Int = 0 {
+        didSet {
+            pokerCountLabel.text = String.init(format: "%d", pokerCount)
+        }
+    }
+    
     var skillsExp: Array<MXSSkill>? {
         didSet {
             for index in 0..<skillsExp!.count {
@@ -96,7 +103,7 @@ class MXSHeroView: MXSBaseView {
         lightSign.backgroundColor = .clear
         self.addSubview(lightSign)
         
-        let padding :CGFloat = 2.0
+        let padding :CGFloat = 1.0
         let content_width :CGFloat = self.bounds.size.width - padding*2
         let content_height :CGFloat = self.bounds.size.height - padding*2
         contentView.frame = CGRect(x: padding, y: padding, width: content_width, height: content_height)
@@ -121,8 +128,11 @@ class MXSHeroView: MXSBaseView {
         }
         
         contentView.addSubview(nameLabel)
-        nameLabel.frame = CGRect(x: 0, y: 5, width: 14, height: content_height-item_width)
+        nameLabel.frame = CGRect(x: 0, y: 5, width: 10, height: content_height-item_width)
         
+        contentView.addSubview(pokerCountLabel)
+        pokerCountLabel.backgroundColor = .black
+        pokerCountLabel.frame = CGRect(x: 0, y: 0, width: 22, height: 20)
     }
     
     

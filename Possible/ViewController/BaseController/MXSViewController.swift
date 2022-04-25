@@ -43,9 +43,6 @@ class MXSViewController: UIViewController {
     public func playerCollectPoker(_ poker:MXSPoker) {
         
     }
-    public func someHeroHPZero(_ hero:MXSHero) {
-        
-    }
     
     
     // MARK: - NetServ

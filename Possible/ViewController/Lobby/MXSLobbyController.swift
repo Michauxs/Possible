@@ -119,8 +119,10 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate
         
         setupForNewGame()
         
-        let assemBtn = UIButton.init(frame: CGRect.init(x: 10, y: MXSSize.ScreenSize.height - 44, width: 96, height: 44))
-        assemBtn.setTitle("SkillAssem", for: .normal)
+        let assemBtn = UIButton("Skill", fontSize: 614, textColor: .dullLine)
+        assemBtn.frame = CGRect.init(x: 10, y: MXSSize.ScreenSize.height - 44, width: 96, height: 44)
+        assemBtn.layer.borderWidth = 1.0
+        assemBtn.layer.borderColor = UIColor.dullLine.cgColor
         view.addSubview(assemBtn)
         assemBtn.addTarget(self, action: #selector(assemBtnClick), for: .touchUpInside)
         

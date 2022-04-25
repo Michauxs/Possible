@@ -50,8 +50,8 @@ class MXSGroundController: MXSViewController {
     }
     
     @objc func didCloseGameBtnClick() {
-        player.pokers.removeAll()
-        opponter.pokers.removeAll()
+        player.holdPokers.removeAll()
+        opponter.holdPokers.removeAll()
         MXSPokerCmd.shared.packagePoker()
         self.navigationController?.popViewController(animated: true)
     }
@@ -86,6 +86,9 @@ class MXSGroundController: MXSViewController {
         super.viewDidLoad()
         /** self.backgroundColor = UIColor(patternImage: UIImage(named:"recentExam_bgimg")!) //平铺  */
         /*self.view.layer.contents = UIImage.init(named: "play_bg")?.cgImage  // 拉伸*/
+        
+        MXSJudge.cmd.desktop = self;
+        
         self.initionalSubViewes()
         /*--------------------------------------------*/
         self.readyModelForView()
@@ -105,6 +108,7 @@ class MXSGroundController: MXSViewController {
         /*--------------------------------------------*/
         self.view.addSubview(playerView)
         playerView.frame = CGRect.init(x: 10, y: MXSSize.Sh - MXSSize.Hh, width: MXSSize.Hw, height: MXSSize.Hh)
+        oppontView.controller = self
         /*--------------------------------------------*/
         
         self.view.addSubview(oppontView)
@@ -122,6 +126,7 @@ class MXSGroundController: MXSViewController {
                                                                     height: MXSSize.Ph + PPedMargin),
                                                  controller: self)
         view.addSubview(graspPokerView!)
+        
         /*--------------------------------------------*/
         pickHeroView.frame = self.view.bounds
         view.addSubview(pickHeroView)
@@ -140,70 +145,75 @@ class MXSGroundController: MXSViewController {
     
     //MARK: - leadingView
     public func certainForAttack() {
-        leadingView.isHidden = true
+        leadingView.hide()
         
-        MXSJudge.cmd.leader?.discardPoker(reBlock: { type, poker in
+        let waiting = MXSJudge.cmd.leader?.discardPoker(reBlock: { type, poker in
             if type == .passed {
-                graspPokerView!.removePoker(poker)
                 passedView.collectPoker(poker)
             }
-            else if type == .handover {
-                //MXSJudge.cmd.responder.first?.getPoker(poker)
+            else if type == .handover {//= active give + responder gain
+                
             }
         })
         
-        self.waitingResponerReply()
+        if waiting! { self.waitingResponerReply() }
+        else {
+            MXSJudge.cmd.leaderReactive()
+        }
     }
-    public func waitingResponerReply() {
-        //sub object
+    public func waitingResponerReply() { //sub object
+        
     }
     
     public func cancelForAttack() {
-        for poker in player.pickes { poker.concreteView?.isUp = false }
-        player.pickes.removeAll()
+        for poker in player.picked { poker.concreteView?.isUp = false }
+        player.picked.removeAll()
         MXSJudge.cmd.clearResponder()
     }
         
     public func endActive() {
-        leadingView.isHidden = true
+        leadingView.hide()
         
         passedView.fadeout()
-        MXSJudge.cmd.next()
-        
         endLeaderCycle()
     }
-    func endLeaderCycle() {
-        
+    func endLeaderCycle() { //sub object
+        MXSJudge.cmd.dealcardForNextLeader { hero, pokers in
+            
+        }
     }
     
     public func certainForDefense() {
-        leadingView.isHidden = true
+        leadingView.hide()
+        playerReplyAsResponder()
         
-        responderReply()
+//        MXSJudge.cmd.
     }
-    func responderReply() {
+    func playerReplyAsResponder() { //sub object
+        let _ = player.discardPoker { type, poker in
+            
+        }
         MXSJudge.cmd.leaderReactive()
-        //sub object
     }
         
     public func cancelForDefense() {
-        leadingView.isHidden = true
+        leadingView.hide()
         
         MXSJudge.cmd.responderSufferConsequence { spoils, pokers in
             if spoils == .destroy || spoils == .wrest {
-                graspPokerView!.removePoker(pokers!)
+                
             }
         }
         
         MXSJudge.cmd.leaderReactive()
         responderCantReply()
     }
-    func responderCantReply() {
-        //sub object
+    func responderCantReply() { //sub object
+        
     }
         
     override func playerCollectPoker(_ poker: MXSPoker) {
-        player.getPoker([poker])
+        player.getPokers([poker])
         poker.state = .handOn
 //        newAndGraspMoreViews([poker])
     }
@@ -211,7 +221,12 @@ class MXSGroundController: MXSViewController {
     
     //MARK: - poker
     @objc public func someonePokerTaped(_ pokerView: MXSPokerView) {
-        if let index = player.pokers.firstIndex(where: {$0 === pokerView.belong}) {
+        //no action
+        if player.holdAction == nil {
+            MXSLog("player haven't action")
+            return }
+        
+        if let index = player.holdPokers.firstIndex(where: {$0 === pokerView.belong}) {
             MXSLog("controller action pok at " + "\(index)")
         }
         
@@ -229,8 +244,8 @@ class MXSGroundController: MXSViewController {
     //MARK: - hero
     public override func someoneHeroTaped(_ heroView: MXSHeroView) {
         MXSLog("controller action hero")
-        /**被动响应 无需选择*/
-        if leadingView.state == LeadingState.defenseUnPick { return }
+        //no action
+        if player.holdAction == nil { return }
         
         MXSJudge.cmd.leader?.takeOrDisAimAtHero(heroView.belong!)
         checkCanCertainAction()
@@ -238,28 +253,37 @@ class MXSGroundController: MXSViewController {
     
     //MARK: - check every one step action
     func checkCanCertainAction() {
-        if player.signStatus == .focus {
-            MXSJudge.cmd.responderReplyAction { type, pokers in
-                if type == .success {
-                    leadingView.state = .defenseReadyOn
-                }
-                else {
-                    leadingView.state = .defenseUnPick
-                }
-            }//
+        if player.signStatus == .selected {
+            if MXSJudge.cmd.canDefence() {
+                leadingView.state = .defenseReadyOn
+            }
+            else {
+                leadingView.state = .defenseUnPick
+            }
         }
         else {
-            if MXSJudge.cmd.leaderCanAttack() {
+            if MXSJudge.cmd.playerCanAttack() {
                 leadingView.state = .attackReadyOn
             }
             else {
-                if player.pickes.count > 0 {
+                if player.picked.count > 0 {
                     leadingView.state = .attackPicked
                 }
                 else { leadingView.state = .attackUnPick }
             }
         }
         
+    }
+    
+    
+    public func someHeroHPZero(_ hero:MXSHero) {
+        MXSLog(hero.name, "Hero defalt")
+        
+        let alert = UIAlertController.init(title: "GameOver", message: "", preferredStyle: .alert)
+        alert.addAction(UIAlertAction.init(title: "get", style: .cancel, handler: { (act) in
+            self.didCloseGameBtnClick()
+        }))
+        self.present(alert, animated: true, completion: nil)
     }
     
     //MARK: - application
