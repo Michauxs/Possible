@@ -44,6 +44,10 @@ class MXSGraspPokerView: UIScrollView  {
 //    }
     
     func layoutPokerView() {
+        let _ = self.subviews.map { subv in
+            subv.removeFromSuperview()
+        }
+        
         let count = belong?.holdPokers.count ?? 0
         let need_width = MXSSize.Pw * CGFloat(count)
         let box_width = self.bounds.size.width

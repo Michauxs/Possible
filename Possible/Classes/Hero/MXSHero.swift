@@ -43,9 +43,6 @@ class MXSHero {
         didSet {
             concreteView?.HPCurrent = HPCurrent
             MXSLog(HPCurrent, self.name + "'hp ")
-            if HPCurrent == 0 {
-                self.concreteView?.controller?.someHeroHPZero(self)
-            }
         }
     }
     func canRecover() -> Bool {
@@ -135,6 +132,7 @@ class MXSHero {
         for poker in pokers {
             holdPokers.removeAll(where: { $0 === poker })
             poker.state = .pass
+            MXSLog(poker, name+" -lose poker")
         }
         pokersView?.layoutPokerView()
         concreteView?.pokerCount = holdPokers.count
@@ -143,28 +141,29 @@ class MXSHero {
         holdPokers.append(contentsOf: pokers)
         for poker in pokers {
             poker.state = .handOn
+            MXSLog(poker, name+" +get poker")
         }
         pokersView?.layoutPokerView()
         concreteView?.pokerCount = holdPokers.count
     }
-    
+    /**return is need reply*/
     func discardPoker(reBlock:(_ type:DiscardPokerType, _ poker:[MXSPoker]) -> Void) -> Bool {
-        MXSJudge.cmd.markDiscardedOnAction()
         
         losePokers(self.picked)
-        self.picked.removeAll()
-        //note onestep active action
-        
         MXSJudge.cmd.diary.append(holdAction!)
         
         if holdAction?.action == .give {
-            reBlock(.handover, holdAction!.pokers)
+            reBlock(.handover, picked)
         }
         else {
-            reBlock(.passed, holdAction!.pokers)
+            reBlock(.passed, picked)
         }
         
+        var need_wait_reply = true
         if holdAction?.type == .active {
+            
+            MXSJudge.cmd.markDiscardedOnAction()
+            //note onestep active action
             lastActiveAction = holdAction
             
             let action = holdAction?.action
@@ -173,21 +172,24 @@ class MXSHero {
             }
             else if action == .remedy {
                 let _ = plusHP()
-                return false
+                need_wait_reply = false
             }
             
+            MXSLog(picked, name+" Active with pokers")
         }
         else {//.reply
-            
+            MXSLog(picked, name+" Reply with pokers")
         }
         
-        return true
+        self.picked.removeAll()// giveup
+        if holdAction?.type == .active { MXSLog(holdAction?.pokers as Any, "after ActivePicked be remove, the markAction'pokers") }
+        
+        return need_wait_reply
     }
     
     func rollRandomPoker() -> MXSPoker {
         let index = Int(arc4random_uniform(UInt32(holdPokers.count)))
-        MXSLog(holdPokers.count, "Poker count")
-        MXSLog(index, "random idx")
+        MXSLog("\(holdPokers.count)" + "  =>  random idx:" + "\(index)", "Poker count")
         return holdPokers.remove(at: index)
     }
     

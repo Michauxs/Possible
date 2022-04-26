@@ -77,6 +77,9 @@ class MXSHeroView: MXSBaseView {
                     hp.backgroundColor = .gray
                 }
             }
+            if HPCurrent == 0 {
+                self.controller?.someHeroHPZero(self.belong!)
+            }
         }
     }
     

@@ -66,15 +66,21 @@ class MXSJudge {
     var flowNote:Int = -1
     var leader:MXSHero? {
         didSet {
-            leader!.holdAction = MXSOneAction(axle: leader!, type: .active)
-            leader!.signStatus = .active
-            leader!.cycleState = .leader
+            leader?.holdAction = MXSOneAction(axle: leader!, type: .active)
+            leader?.signStatus = .active
+            leader?.cycleState = .leader
         }
     }
     func dealcardForGameStart() {
         for hero in subject {
             hero.getPokers(MXSPokerCmd.shared.push(4))
         }
+    }
+    func gameOver() {
+        leader = nil
+        flowNote = -1
+        diary.removeAll()
+        subject.removeAll()
     }
     
     func dealcardForNextLeader(reBlock:(_ hero :MXSHero, _ pokers :[MXSPoker]?) -> Void) {
@@ -218,6 +224,7 @@ class MXSJudge {
 //    }
     
     func responderSufferConsequence(reBlock:(_ spoils :SpoilsType, _ pokers :Array<MXSPoker>?) -> Void) {
+        //let conseq = leader?.holdAction?.consequence
         let hero:MXSHero = responder.first!
         let action = MXSJudge.cmd.leader?.holdAction?.action
         switch action {
@@ -228,6 +235,7 @@ class MXSJudge {
             reBlock(.nothing, nil)
         case .steal:
             let random = hero.rollRandomPoker()
+            MXSLog(random, "The poker will handover")
             hero.losePokers([random])
             MXSJudge.cmd.leader?.getPokers([random])
             reBlock(.wrest, [random])
@@ -264,7 +272,7 @@ class MXSJudge {
 //            hero.cycleState == .blank
 //        }
 //        return others.first!
-        MXSLog("Judge.subject: " + "\(self.subject)")
+        MXSLog("Judge.subject: " + "\(self.subject)", "choose aim at")
         let hero = self.subject.first { hero in
             hero.cycleState == .blank
         }

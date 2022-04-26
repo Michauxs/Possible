@@ -29,6 +29,13 @@ enum EffectType {
     case poker
 //    case attackCount
 }
+enum ConsequenceType {
+    case unknown
+    case none
+    case buff
+    case hp
+    case poker
+}
 
 class MXSOneAction {
     
@@ -45,11 +52,19 @@ class MXSOneAction {
     }
     class ActionEffect {
         var type:EffectType = .unknown
-        var numb:Int = 0
         var count:Int = 0
+        
+        func reset() {
+            type = .unknown; count = 0;
+        }
     }
     class ActionConsequence {
+        var type:ConsequenceType = .unknown
+        var count:Int = 0
         
+        func reset() {
+            type = .unknown; count = 0;
+        }
     }
     
     var cycleSign:CycleType = .start
@@ -63,6 +78,8 @@ class MXSOneAction {
             switch action {
             case .unknown, .defense, .detect, .recover, .gain:
                 reply.reset()
+                consequence.reset()
+                effect.reset()
             case .steal, .destroy:
                 reply.count = 1
                 reply.act = .detect
@@ -100,6 +117,8 @@ class MXSOneAction {
     
     func reset() {
         reply.reset()
+        consequence.reset()
+        effect.reset()
         action = .unknown
         pokers.removeAll()
     }

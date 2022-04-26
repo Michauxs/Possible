@@ -50,9 +50,8 @@ class MXSGroundController: MXSViewController {
     }
     
     @objc func didCloseGameBtnClick() {
-        player.holdPokers.removeAll()
-        opponter.holdPokers.removeAll()
         MXSPokerCmd.shared.packagePoker()
+        MXSJudge.cmd.gameOver()
         self.navigationController?.popViewController(animated: true)
     }
     
@@ -108,7 +107,7 @@ class MXSGroundController: MXSViewController {
         /*--------------------------------------------*/
         self.view.addSubview(playerView)
         playerView.frame = CGRect.init(x: 10, y: MXSSize.Sh - MXSSize.Hh, width: MXSSize.Hw, height: MXSSize.Hh)
-        oppontView.controller = self
+        playerView.controller = self
         /*--------------------------------------------*/
         
         self.view.addSubview(oppontView)
@@ -159,6 +158,7 @@ class MXSGroundController: MXSViewController {
         if waiting! { self.waitingResponerReply() }
         else {
             MXSJudge.cmd.leaderReactive()
+            leadingView.state = .attackUnPick
         }
     }
     public func waitingResponerReply() { //sub object
@@ -190,25 +190,14 @@ class MXSGroundController: MXSViewController {
 //        MXSJudge.cmd.
     }
     func playerReplyAsResponder() { //sub object
-        let _ = player.discardPoker { type, poker in
-            
-        }
-        MXSJudge.cmd.leaderReactive()
+        
     }
         
     public func cancelForDefense() {
         leadingView.hide()
-        
-        MXSJudge.cmd.responderSufferConsequence { spoils, pokers in
-            if spoils == .destroy || spoils == .wrest {
-                
-            }
-        }
-        
-        MXSJudge.cmd.leaderReactive()
-        responderCantReply()
+        playerDidntReply()
     }
-    func responderCantReply() { //sub object
+    func playerDidntReply() { //sub object
         
     }
         

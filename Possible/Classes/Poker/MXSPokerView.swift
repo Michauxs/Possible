@@ -20,6 +20,7 @@ class MXSPokerView: MXSBaseView {
                                                       .remedy:"恢复",
                                                       .detect:"侦察"]
     
+    var reverseView: UIImageView = UIImageView()
     var contentView: UIView = UIView()
     var colorSign: UIImageView = UIImageView()
     var numberLabel: UILabel = UILabel.init(text: "0", fontSize: 614, textColor: .black, align: .center)
@@ -171,6 +172,14 @@ class MXSPokerView: MXSBaseView {
             m.height.equalTo(20)
         })
         actionGuiseLabel.isHidden = true
+        
+        reverseView.frame = self.bounds
+        reverseView.image = UIImage(named: "poker_reverse")
+        reverseView.contentMode = .scaleAspectFill
+        //reverseView.backgroundColor = UIColor(patternImage: UIImage(named:"recentExam_bgimg")!) //平铺
+        /*self.view.layer.contents = UIImage.init(named: "play_bg")?.cgImage  // 拉伸*/
+        addSubview(reverseView)
+        reverseView.isHidden = true
     }
     
 

@@ -84,17 +84,17 @@ class MXSPokerCmd {
     
     public func push(_ count: Int) -> Array<MXSPoker> {
         var tmp = Array<MXSPoker>()
-        for idx in 0..<count {
+        for _ in 0..<count {
             if pokers_ready!.isEmpty {
                 if !shuffle() { //丧尽天良刷牌机
                     return tmp
                 }
             }
             let last = pokers_ready!.removeLast()
-            MXSLog(last, "poker_"+"\(idx)")
             last.state = .handOn
             tmp.append(last)
         }
+        MXSLog(tmp, "dealcard")
         return tmp
     }
     

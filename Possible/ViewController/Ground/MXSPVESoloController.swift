@@ -10,8 +10,15 @@ import UIKit
 
 class MXSPVESoloController: MXSGroundController {
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    override func initionalSubViewes() {
+        super.initionalSubViewes()
+        
+        self.view.layer.contents = UIImage.init(named: "play_bg")?.cgImage
+        let mask = UIView();
+        mask.frame = self.view.bounds
+        mask.backgroundColor = .alphaBlack
+        self.view.addSubview(mask)
+        self.view.sendSubview(toBack: mask)
     }
     
     override func readyModelForView() {
@@ -95,17 +102,14 @@ class MXSPVESoloController: MXSGroundController {
     }
     
     override func playerReplyAsResponder() {
-        
         let responder = MXSJudge.cmd.responder.first
         let _ = responder?.discardPoker(reBlock: { type, poker in
             if type == .passed {
                 MXSLog(poker, "player discard poker")
-                
                 passedView.collectPoker(poker)
             }
             else if type == .handover {// = active give + responder gain
-                
-                //TODO: animate P->P
+                //TODO: - animate P->P
             }
         })
         
@@ -126,8 +130,7 @@ class MXSPVESoloController: MXSGroundController {
                         passedView.collectPoker(poker)
                     }
                     else if type == .handover {
-                        MXSJudge.cmd.responder.first?.getPokers(poker)
-                        
+                        //TODO: - animate P->P
                     }
                 })
                 
@@ -157,7 +160,18 @@ class MXSPVESoloController: MXSGroundController {
         }
     }
     
-    override func responderCantReply() {
+    override func playerDidntReply() {
+        
+        MXSJudge.cmd.responderSufferConsequence { spoils, pokers in
+            if spoils == .destroy {
+                passedView.collectPoker(pokers!)
+            }
+            else if spoils == .wrest {
+                
+            }
+        }
+        
+        MXSJudge.cmd.leaderReactive()
         waitingAIAttack()
     }
     

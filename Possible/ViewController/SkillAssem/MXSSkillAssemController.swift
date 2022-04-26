@@ -133,7 +133,7 @@ class MXSSkillAssemController: MXSViewController {
             skillViewes.append(sk_view)
         }
         /*--------------------------------------*/
-        let img_width:CGFloat = 260.0
+        let img_width:CGFloat = 300.0
         let margin:CGFloat = (MXSSize.Sw - img_width) * 0.5
         assemScrollView.frame = CGRect.init(x: margin, y: 0, width: img_width, height: MXSSize.Sh)
         assemScrollView.showsHorizontalScrollIndicator = false
