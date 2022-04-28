@@ -8,8 +8,11 @@
 
 import UIKit
 
-class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate
-{
+class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate {
+    
+    
+    var onLineBtn:UIButton = UIButton("OFF", fontSize: 313, textColor: .dullLine)
+    var publishBtn:UIButton = UIButton("Publish", fontSize: 614, textColor: .lightGray)
     
     /*---------------------------------------------*/
     @objc func tableDidSelectedRow(args:Array<Any>) {
@@ -18,7 +21,7 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate
         if MXSNetServ.shared.connectToService(server) {
 //            stopBrowser()
             
-            MXSNetServ.shared.send([kMessageType:MessageType.request.rawValue, kMessageValue:"请求接连，来自：" + MXSNetServ.shared.name])
+            MXSNetServ.shared.sendMsg([kMessageType:MessageType.request.rawValue, kMessageValue:"请求接连，来自：" + MXSNetServ.shared.name])
             MXSTIPMaskCmd.shared.showMaskWithTip("Waiting...", auto: false)
         }
     }
@@ -32,10 +35,10 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate
             let name = dict[kMessageValue] as! String
             let alert = UIAlertController.init(title: "接连请求", message: name, preferredStyle: .alert)
             alert.addAction(UIAlertAction.init(title: "拒绝", style: .cancel, handler: { (act) in
-                MXSNetServ.shared.send([kMessageType:MessageType.replyRequest.rawValue, kMessageValue:0])
+                MXSNetServ.shared.sendMsg([kMessageType:MessageType.replyRequest.rawValue, kMessageValue:0])
             }))
             alert.addAction(UIAlertAction.init(title: "接受", style: .default, handler: { (act) in
-                MXSNetServ.shared.send([kMessageType:MessageType.replyRequest.rawValue, kMessageValue:1])
+                MXSNetServ.shared.sendMsg([kMessageType:MessageType.replyRequest.rawValue, kMessageValue:1])
                 let vc = MXSPVPServiceController.init()
                 self.navigationController?.pushViewController(vc, animated: true)
             }))
@@ -59,7 +62,8 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate
         }
     }
     
-    var startedBrowser:Bool = false
+    
+    var browserStatus : ServiceStatus = .unknown
     var servBrowser: NetServiceBrowser = {
         let browser = NetServiceBrowser.init()
         browser.includesPeerToPeer = true
@@ -69,18 +73,12 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate
     var services: Array<NetService> = Array<NetService>.init()
     var mainTable: MXSTableView?
     
-    let closeBtn = UIButton.init(frame: CGRect.init(x: MXSSize.Sw*0.5, y: 0, width: 60, height: 40))
-    
-    @objc func didPVEBtnClick() {
-        let vc = MXSPVESoloController.init()
-        self.navigationController?.pushViewController(vc, animated: false)
-    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         let width = MXSSize.Sw * 0.25
 //        let textSign = "情深不寿，慧极必伤"
-        let textSign = "sometimes ever，some never."
+        let textSign = "sometimes ever，\n               sometimes never."
         let textLabel = UILabel.init(text: textSign, fontSize: 1034, textColor: .darkText, align: .left)
         textLabel.sizeToFit()
         textLabel.frame = CGRect(x: 45, y: 90, width: textLabel.bounds.width, height: textLabel.bounds.height)
@@ -93,106 +91,124 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate
         let abs = NSMutableAttributedString.init(string: textSign)
         abs.addAttribute(NSAttributedStringKey.shadow, value: shadow, range: NSMakeRange(0, textSign.count))
         textLabel.attributedText = abs
+        
         /*---------------------------------------------*/
-        
         let label_height:CGFloat = 44.0
-        let deviceLabel = UILabel.init(text: "Online Device", fontSize: 615, textColor: .lightGray, align: .left)
-        deviceLabel.backgroundColor = .darkGray
-        deviceLabel.frame = CGRect.init(x: width*3, y: 0, width: width, height: label_height)
-        view.addSubview(deviceLabel)
+        let head = UIView(frame: CGRect(x: width*3, y: 0, width: width, height: label_height))
+        head.backgroundColor = .darkGray
+        view.addSubview(head)
         
-        mainTable = MXSTableView.init(frame: CGRect(x: deviceLabel.frame.minX, y: label_height, width: width, height: MXSSize.Sh-label_height*2), style: .plain)
+        let btn_width:CGFloat = 54.0
+        onLineBtn.setTitle("OLine", for: .selected)
+        onLineBtn.frame = CGRect.init(x: width-btn_width, y: 3, width: btn_width, height: 38)
+        onLineBtn.layer.borderWidth = 1.0
+        onLineBtn.layer.borderColor = UIColor.dullLine.cgColor
+        head.addSubview(onLineBtn)
+        onLineBtn.addTarget(self, action: #selector(deviceOffLine(btn:)), for: .touchUpInside)
+        
+        let deviceLabel = UILabel.init(text: "Services", fontSize: 615, textColor: .lightGray, align: .left)
+        deviceLabel.frame = CGRect.init(x: 10, y: 0, width: width-10, height: label_height)
+        head.addSubview(deviceLabel)
+        
+        mainTable = MXSTableView.init(frame: CGRect(x: head.frame.minX, y: label_height, width: width, height: MXSSize.Sh-label_height*2), style: .plain)
         mainTable?.register(cellNames: ["MXSDeviceCell"], delegate: MXSTableDlg(), vc: self)
         self.view.addSubview(mainTable!)
         mainTable?.dlg?.dlgData = services
         
+        /*---------------------------------------------*/
+        
         let pveBtn = UIButton.init("PVE", fontSize: 14, textColor: .black, backgColor: .darkGray)
-        pveBtn.frame = CGRect.init(x: deviceLabel.frame.minX, y: MXSSize.Sh-label_height, width: width, height: label_height)
+        pveBtn.frame = CGRect.init(x: mainTable!.frame.minX, y: mainTable!.frame.maxY, width: width, height: label_height)
         view.addSubview(pveBtn)
         pveBtn.addTarget(self, action: #selector(didPVEBtnClick), for: .touchUpInside)
         
         /*---------------------------------------------*/
         
-        closeBtn.setTitle("Close", for: .normal)
-        view.addSubview(closeBtn)
-        closeBtn.addTarget(self, action: #selector(closeBtnClick), for: .touchUpInside)
-        
-        setupForNewGame()
-        
         let assemBtn = UIButton("Skill", fontSize: 614, textColor: .dullLine)
-        assemBtn.frame = CGRect.init(x: 10, y: MXSSize.ScreenSize.height - 44, width: 96, height: 44)
+        assemBtn.frame = CGRect.init(x: 10, y: MXSSize.ScreenSize.height - 44, width: 96, height: 40)
         assemBtn.layer.borderWidth = 1.0
         assemBtn.layer.borderColor = UIColor.dullLine.cgColor
         view.addSubview(assemBtn)
         assemBtn.addTarget(self, action: #selector(assemBtnClick), for: .touchUpInside)
         
-        let stopBtn = UIButton.init(frame: CGRect.init(x: width*2, y: MXSSize.ScreenSize.height - 40, width: 60, height: 40))
-        stopBtn.setTitle("Offline", for: .normal)
-        view.addSubview(stopBtn)
-        stopBtn.addTarget(self, action: #selector(deviceOffLine), for: .touchUpInside)
 
-        let restartBtn = UIButton.init(frame: CGRect.init(x: stopBtn.frame.maxX+10, y: stopBtn.frame.minY, width: 60, height: 40))
-        restartBtn.setTitle("Online", for: .normal)
-        view.addSubview(restartBtn)
-        restartBtn.addTarget(self, action: #selector(restartBtnClick), for: .touchUpInside)
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
+        
+        publishBtn.setTitleColor(.theme, for: .selected)
+        publishBtn.frame = CGRect.init(x: mainTable!.frame.minX - 70, y: assemBtn.frame.minY, width: 60, height: 40)
+        view.addSubview(publishBtn)
+        publishBtn.addTarget(self, action: #selector(didPublishBtnClick), for: .touchUpInside)
+        /*---------------------------------------------*/
+        
+        browserStatus = .starting
         startBrowser()
     }
     
     
+    //MARK: - actions
+    @objc func didPVEBtnClick() {
+        let vc = MXSPVESoloController.init()
+        self.navigationController?.pushViewController(vc, animated: false)
+    }
     @objc func assemBtnClick() {
         self.navigationController?.pushViewController(MXSSkillAssemController(), animated: false)
     }
-    @objc func deviceOffLine() {
-        stopBrowser()
-        MXSNetServ.shared.offLine()
+    @objc func deviceOffLine(btn:UIButton) {
+        //
+        if browserStatus == .stoping || browserStatus == .starting { return }
+        if btn.isSelected {//online -> off
+            stopBrowser()
+        }
+        else {//off -> online
+            if browserStatus == .working { return }
+            startBrowser()
+        }
     }
-    @objc func restartBtnClick(){
-        startBrowser()
-    }
-    @objc func closeBtnClick() {
-        setupForNewGame()
-        startBrowser()
+    @objc func didPublishBtnClick() {
+        if publishBtn.isSelected {
+            MXSNetServ.shared.stopService()
+        }
+        else {
+            MXSNetServ.shared.publishOrRestart()
+        }
     }
         
     override public func startBrowser() {
-        if startedBrowser { return }
-        
-        MXSLog("startBrowser")
+        MXSLog("netBrowser starting...")
         servBrowser.delegate = self
         servBrowser.searchForServices(ofType: "_mxs._tcp", inDomain: "local")
-        startedBrowser = true
+        //servBrowser.searchForBrowsableDomains()
     }
+        
     override public func stopBrowser() {
-        MXSLog("stopBrowser")
+        MXSLog("Browser stoping...")
         servBrowser.stop()
         services.removeAll()
         mainTable?.dlg?.dlgData = services
         mainTable?.reloadData()
-        
-        startedBrowser = false
-    }
-        
-    
-    override public func setupForNewGame() {
-        
-        closeBtn.isHidden = true
-    }
-    override public func setupForConnected() {
-        
     }
     
+    //MARK: - service
+    override func servicePublished() {
+        publishBtn.isSelected = true
+    }
+    override func serviceStoped() {
+        MXSLog("controller recev service stoped")
+        publishBtn.isSelected = false
+    }
+    override func servicePublishFiled() {
+        publishBtn.isSelected = false
+    }
     
-    //MARK: delegate
+    //MARK: - delegate
     func netServiceBrowserWillSearch(_ browser: NetServiceBrowser) {
-        MXSNetServ.shared.publishOrRestart()
+        MXSLog("netServiceBrowserWillSearch")
+        onLineBtn.isSelected = true
+        browserStatus = .working
     }
-    
     func netServiceBrowserDidStopSearch(_ browser: NetServiceBrowser) {
-        
+        MXSLog("netServiceBrowserDidStopSearch")
+        onLineBtn.isSelected = false
+        browserStatus = .stop
     }
     
     func netServiceBrowser(_ browser: NetServiceBrowser, didFind service: NetService, moreComing: Bool) {

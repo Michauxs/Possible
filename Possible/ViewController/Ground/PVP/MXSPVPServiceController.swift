@@ -21,7 +21,7 @@ class MXSPVPServiceController: MXSPVPController {
         
         player.joingame()
         pickHeroView.isHidden = true
-        MXSNetServ.shared.send([kMessageType:MessageType.pickHero.rawValue, kMessageValue:hero.photo])
+        MXSNetServ.shared.sendMsg([kMessageType:MessageType.pickHero.rawValue, kMessageValue:hero.photo])
         
         self.allPlayerReady()
     }
@@ -41,7 +41,7 @@ class MXSPVPServiceController: MXSPVPController {
             for poker in arr_p {
                 poker_uid_arr.append(poker.uid)
             }
-            MXSNetServ.shared.send([kMessageType:MessageType.dealcard.rawValue, kMessageValue:poker_uid_arr])
+            MXSNetServ.shared.sendMsg([kMessageType:MessageType.dealcard.rawValue, kMessageValue:poker_uid_arr])
             
             player.signStatus = .active
             leadingView.state = .attackUnPick
@@ -60,7 +60,7 @@ class MXSPVPServiceController: MXSPVPController {
                 div_hero.append(h.photo)
             }
             //TODO：客户端加入时，主机端还没有准备好数据
-            MXSNetServ.shared.send([kMessageType:MessageType.showHero.rawValue, kMessageValue:div_hero])
+            MXSNetServ.shared.sendMsg([kMessageType:MessageType.showHero.rawValue, kMessageValue:div_hero])
             
         case .pickHero:
             let hero_name = dict[kMessageValue] as! String
@@ -92,30 +92,6 @@ class MXSPVPServiceController: MXSPVPController {
             
         default: break
         }
-    }
-    
-    //MARK:- hero
-    
-    
-    //MARK:- poker
-    @objc public override func someonePokerTaped(_ pokerView: MXSPokerView) {
-        if let index = player.holdPokers.firstIndex(where: {$0 === pokerView.belong}) {
-            MXSLog("controller action pok at " + "\(index)")
-        }
-        
-        pokerView.isUp = !pokerView.isUp
-        if player.signStatus != .active {
-            return
-        }
-        
-        let poker = pokerView.belong!
-        if pokerView.isUp {
-            player.pickPoker(poker)
-        } else {
-            player.freePoker(poker)
-        }
-        
-        checkCanCertainAction()
     }
     
     //MARK:- leadingView

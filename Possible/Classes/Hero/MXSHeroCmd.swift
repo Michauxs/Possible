@@ -50,6 +50,7 @@ class MXSHeroCmd {
         if let index = heroData.firstIndex(where: { (hero) -> Bool in hero[kStringImage] as! String == uu }) {
             let attr = heroData[index]
             let hero = MXSHero.init(attr)
+            MXSLog(hero, "New a hero")
             return hero
         }
         return nil
@@ -57,7 +58,7 @@ class MXSHeroCmd {
     
     func getNewBlankHero() ->MXSHero {
         let hero = MXSHero.init(["name": "Unknown", "image": "hero_000", "hp": 4, "skill": ["skill_010"], "desc": "unknown" ])
-        print("new a hero: " + "\(hero)")
+        MXSLog(hero, "New blank hero")
         return hero
     }
 }

@@ -12,7 +12,7 @@ class MXSPVPController: MXSGroundController {
     
     override func didCloseGameBtnClick() {
         MXSPokerCmd.shared.packagePoker()
-        MXSNetServ.shared.send([kMessageType:MessageType.endGame.rawValue, kMessageValue:1])
+        MXSNetServ.shared.sendMsg([kMessageType:MessageType.endGame.rawValue, kMessageValue:1])
         self.navigationController?.popViewController(animated: true)
     }
     
@@ -35,7 +35,7 @@ class MXSPVPController: MXSGroundController {
         
         player.joingame()
         pickHeroView.isHidden = true
-        MXSNetServ.shared.send([kMessageType:MessageType.pickHero.rawValue, kMessageValue:hero.photo])
+        MXSNetServ.shared.sendMsg([kMessageType:MessageType.pickHero.rawValue, kMessageValue:hero.photo])
         
     }
     
@@ -51,7 +51,7 @@ class MXSPVPController: MXSGroundController {
                 div_hero.append(h.photo)
             }
             //TODO：客户端加入时，主机端还没有准备好数据
-            MXSNetServ.shared.send([kMessageType:MessageType.showHero.rawValue, kMessageValue:div_hero])
+            MXSNetServ.shared.sendMsg([kMessageType:MessageType.showHero.rawValue, kMessageValue:div_hero])
             
         case .pickHero:
             let hero_name = dict[kMessageValue] as! String
@@ -84,61 +84,20 @@ class MXSPVPController: MXSGroundController {
         }
     }
     
-    //MARK:- hero
-    public override func someoneHeroTaped(_ heroView: MXSHeroView) {
-        MXSLog("controller action hero")
-        if player.signStatus != .active {
-            return
-        }
-        guard let hero = heroView.belong else {
-            return
-        }
-        
-        if hero.signStatus == .selected {
-            hero.signStatus = .blank
-            MXSJudge.cmd.leader?.takeOrDisAimAtHero(hero)
-        }
-        else {
-            hero.signStatus = .selected
-            MXSJudge.cmd.leader?.takeOrDisAimAtHero(hero)
-        }
-        checkCanCertainAction()
-    }
-    
-    //MARK:- poker
-    @objc public override func someonePokerTaped(_ pokerView: MXSPokerView) {
-        if let index = player.holdPokers.firstIndex(where: {$0 === pokerView.belong}) {
-            MXSLog("controller action pok at " + "\(index)")
-        }
-        
-        pokerView.isUp = !pokerView.isUp
-        if player.signStatus != .active {
-            return
-        }
-        
-        let poker = pokerView.belong!
-        if pokerView.isUp {
-            player.pickPoker(poker)
-        } else {
-            player.freePoker(poker)
-        }
-        
-        checkCanCertainAction()
-    }
-    
     //MARK:- leadingView
     public override func certainForAttack() {
+        leadingView.hide()
+        
         let poker = player.picked.first!
         var div_p:Array<Int> = Array<Int>()
         for p in player.picked {
             div_p.append(p.uid)
         }
-        MXSNetServ.shared.send([kMessageType:MessageType.discard.rawValue, kMessageValue:div_p])
+        MXSNetServ.shared.sendMsg([kMessageType:MessageType.discard.rawValue, kMessageValue:div_p])
         
         player.holdPokers.removeAll(where: {$0 === poker})
         poker.state = .pass
         
-        leadingView.hide()
     }
     
     public override func endActive() {
@@ -147,7 +106,7 @@ class MXSPVPController: MXSGroundController {
         passedView.fadeout()
         
         player.signStatus = .blank
-        MXSNetServ.shared.send([kMessageType:MessageType.turnOver.rawValue, kMessageValue:0])
+        MXSNetServ.shared.sendMsg([kMessageType:MessageType.turnOver.rawValue, kMessageValue:0])
     }
     public override func certainForDefense() {
         MXSJudge.cmd.leaderReactive()

@@ -87,6 +87,7 @@ class MXSGroundController: MXSViewController {
         /*self.view.layer.contents = UIImage.init(named: "play_bg")?.cgImage  // 拉伸*/
         
         MXSJudge.cmd.desktop = self;
+        MXSPokerCmd.shared.ready()
         
         self.initionalSubViewes()
         /*--------------------------------------------*/
@@ -213,7 +214,8 @@ class MXSGroundController: MXSViewController {
         //no action
         if player.holdAction == nil {
             MXSLog("player haven't action")
-            return }
+            return
+        }
         
         if let index = player.holdPokers.firstIndex(where: {$0 === pokerView.belong}) {
             MXSLog("controller action pok at " + "\(index)")
@@ -234,7 +236,11 @@ class MXSGroundController: MXSViewController {
     public override func someoneHeroTaped(_ heroView: MXSHeroView) {
         MXSLog("controller action hero")
         //no action
-        if player.holdAction == nil { return }
+        if player.holdAction == nil {
+            MXSLog("player haven't action")
+            return
+        }
+        //TODO: - tap oneself -> return
         
         MXSJudge.cmd.leader?.takeOrDisAimAtHero(heroView.belong!)
         checkCanCertainAction()

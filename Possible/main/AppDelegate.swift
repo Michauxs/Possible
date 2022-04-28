@@ -33,20 +33,48 @@ import UIKit
 
 @UIApplicationMain
 
-class AppDelegate: UIResponder, UIApplicationDelegate, NetServiceDelegate, StreamDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate, NetServiceDelegate, StreamDelegate, UNUserNotificationCenterDelegate {
     
     var window: UIWindow?
     
     func testSomething() {
 //        if MXSPokerCmd.shared.shuffle() {
 //            let pokers = MXSPokerCmd.shared.push(1)
-//            MXSLog(pokers, "pokers")
-//            
-//            var pokers2 = [MXSPoker]() //var
-//            pokers2.append(pokers.first!)
-//            pokers2.append(pokers.first!)
-//            pokers2.append(pokers.first!)
-//            MXSLog(pokers2, "pokers2 ")//[<Possible.MXSPoker: 0x280ecef40>, <Possible.MXSPoker: 0x280ecef40>, <Possible.MXSPoker: 0x280ecef40>]
+//            MXSLog(pokers, "some pokers")
+//
+//            let hero = MXSHeroCmd.shared.getNewBlankHero()
+//            let hero2 = MXSHeroCmd.shared.getNewBlankHero()
+//            let hero3 = MXSHeroCmd.shared.getNewBlankHero()
+//            MXSLog(hero, "hero")
+//            MXSLog(Unmanaged.passRetained(hero3), "hero3")//pointee
+//            withUnsafeBytes(of: &hero) { ptr in
+//                MXSLog(ptr, "hero'ptr-&")
+//            }
+//            withUnsafeBytes(of: hero) { ptr in
+//                MXSLog(ptr, "hero'ptr")
+//            }
+            
+//            var memoryPointer: Int64 = 0
+//            withUnsafePointer(to: &hero) { ptr in
+//                            memoryPointer = unsafeBitCast(ptr.pointee, to: Int64.self)
+//                print(memoryPointer)
+//            }
+            /**
+             withUnsafePointer(to: obj) { #ptr in print(ptr)} ( let #ptr = withUnsafeMutablePointer(to: obj, {$0}) ) =指针的地址
+             Unmanaged.passRetained(obj) = #ptr.pointee
+             **/
+//            withUnsafePointer(to: hero) { ptr in
+//                MXSLog(ptr, "hero'ptr  ")//hero'ptr : 0x00000001 6ef1 d100
+//            }
+//            withUnsafePointer(to: &hero) { ptr in
+//                MXSLog(ptr, "hero'ptr-&")//hero'ptr-& : 0x00000001 6ef1 d128
+//            }
+//            withUnsafePointer(to: &hero) { ptr in
+//                MXSLog(ptr, "hero'ptr")//hero'ptr : 0x00000001 6b16 d100
+//            }
+//            withUnsafePointer(to: hero) { ptr in
+//                MXSLog(ptr, "hero'ptr-&")//hero'ptr-& : 0x00000001 6b16 d128
+//            }
 //        }
 //        if MXSPokerCmd.shared.shuffle() {
 //            var pokers = MXSPokerCmd.shared.push(3)
@@ -79,10 +107,104 @@ class AppDelegate: UIResponder, UIApplicationDelegate, NetServiceDelegate, Strea
 //        }
         
     }
+    
+    // 将要通知
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+          print("willPresent")
+    }
+        
+    // 已经完成推送
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+          print("didReceive")
+          completionHandler()
+    }
+    func setNotification() {
+        // 通知内容设置
+       let content = UNMutableNotificationContent()
+       content.title = "推送标题"
+       content.subtitle = "推送子标题"
+       content.body = "推送消息主体内容"
+       content.badge = 2   // 图标右上角数字
+       content.categoryIdentifier = "categoryIdentifier"  // 通知标识
+       content.sound = UNNotificationSound.default() // 推送声音
+       content.launchImageName = "01.png"  // 启动图片
+     
+       do {
+           /*
+            在创建附件的方法：
+            （1）URL必须是一个有效地文件路径，
+            （2）option 是共有4个选项，
+            UNNotificationAttachmentOptionsTypeHintKey: 如果添加附件的文件名字中没有类型，就要靠该键值来确定文件类型；
+            UNNotificationAttachmentOptionsThumbnailHiddenKey: 是一个BOOL值，为YES时候，缩略图将隐藏，默认为YES；
+            UNNotificationAttachmentOptionsThumbnailClippingRectKey: 是一个矩形CGRect 剪贴图片的缩略图的键值；
+            UNNotificationAttachmentOptionsThumbnailTimeKey: 如果附件是一个视频的话，可以用这值来指定视频中的某一秒为视频的缩略图
+            */
+           // 设置通知下拉的图片，可以是图片，视频，音频
+           let attachment = try UNNotificationAttachment(identifier: "note1", url: URL(fileURLWithPath: Bundle.main.path(forResource: "01", ofType: ".png")!), options: nil)
+           content.attachments = [attachment]
+       } catch  {
+            print(error)
+       }
+       
+       // 通知下拉时候的动作
+       let action = UNNotificationAction(identifier: "action", title: "进入应用", options: UNNotificationActionOptions.foreground)
+       let clearAction = UNNotificationAction(identifier: "clearaction", title: "忽略", options: UNNotificationActionOptions.destructive)
+       let category = UNNotificationCategory(identifier: "categoryIdentifier", actions: [action,clearAction], intentIdentifiers: [], options: [])
+        UNUserNotificationCenter.current().setNotificationCategories([category])
+       
+       ///1，一段时间后触发（UNTimeIntervalNotificationTrigger）
+       // 通知触发器，10秒触发
+       let timeTrigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
+       /* 2.指定日期时间触发（UNCalendarNotificationTrigger）
+        // 下面代码我们设置2019年11月11日凌晨触发推送通知。
+        var components = DateComponents()
+        components.year = 2019
+        components.month = 11
+        components.day = 11
+        let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
+        
+        // 下面代码我们设置每周一上午8点都会触发推送通知。
+        var components = DateComponents()
+        components.weekday = 2 //周一
+        components.hour = 8 //上午8点
+        components.second = 30 //30分
+        let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: true)
+        */
+       
+       /* 3，根据位置触发（UNLocationNotificationTrigger）
+        // 该触发器支持进入某地触发、离开某地触发、或者两种情况均触发。下面代码设置成当手机进入到指定点（纬度：52.10，经度：51.11）200 米范围内时会触发推送通知。（注意：这里我们需要 import CoreLocation 框架）
+        let coordinate = CLLocationCoordinate2D(latitude: 52.10, longitude: 51.11)
+        let region = CLCircularRegion(center: coordinate, radius: 200, identifier: "center")
+        region.notifyOnEntry = true  //进入此范围触发
+        region.notifyOnExit = false  //离开此范围不触发
+        let trigger = UNLocationNotificationTrigger(region: region, repeats: true)
+        */
+       // 请求标识符
+
+       let requestidentifier = "requestidentifier"
+       let request = UNNotificationRequest(identifier: requestidentifier, content: content, trigger: timeTrigger)
+       // 将通知请求添加到发送中心
+        UNUserNotificationCenter.current().add(request) { (error: Error?) in
+           
+       }
+    }
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         NSLog("HomeDirectory: %@", NSHomeDirectory())
         testSomething()
+        
+        /*----------------------*/
+        
+//        let type = UIUserNotificationType(rawValue: UIUserNotificationType.alert.rawValue | UIUserNotificationType.badge.rawValue | UIUserNotificationType.sound.rawValue)
+//        let setting = UIUserNotificationSettings(types: type, categories: nil)
+//        application.registerUserNotificationSettings(setting)
+        
+        UNUserNotificationCenter.current().requestAuthorization(options: [.sound, .alert, .badge]) { auth, error in
+            if auth {
+                UNUserNotificationCenter.current().delegate = self
+                self.setNotification()
+            }
+        }
         
         /*----------------------*/
         let root_vc = MXSLobbyController()

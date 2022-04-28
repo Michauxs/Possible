@@ -53,6 +53,7 @@ class MXSPVESoloController: MXSGroundController {
             leadingView.state = .attackUnPick
         }
         else {
+            MXSLog("shuffle poker failed")
             didCloseGameBtnClick()
         }
     }

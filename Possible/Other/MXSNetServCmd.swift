@@ -31,9 +31,9 @@ enum MessageType : Int {
 }
 enum ServiceStatus : Int {
     case unknown = 0
-    case idle
     case starting
     case working
+    case stoping
     case stop
 }
 
@@ -47,7 +47,7 @@ class MXSNetServ: NetService, NetServiceDelegate, StreamDelegate {
     
     var currentConnectServ:NetService?
     /**已启动发布*/
-    var status : ServiceStatus = .idle
+    var status : ServiceStatus = .unknown
     
     static let shared : MXSNetServ = {
         let single = MXSNetServ.init(domain: "local", type: "_mxs._tcp", name: UIDevice.current.name, port: 0)
@@ -95,18 +95,24 @@ class MXSNetServ: NetService, NetServiceDelegate, StreamDelegate {
         }
         currentConnectCount = 0
     }
+    
+    //MARK: - act
     func publishOrRestart() {
-        if status == .starting || status == .working {
+        if status == .starting || status == .working || status == .stoping {
             return
         }
-        
+        MXSLog("netService starting...")
         closeStreams()
-        MXSNetServ.shared.publish(options: .listenForConnections)
         status = .starting
+        MXSNetServ.shared.publish(options: .listenForConnections)
     }
     func stopService() {
+        if status == .stoping {
+            return
+        }
+        MXSLog("netService stoping...")
+        status = .stoping
         MXSNetServ.shared.stop()
-        status = .idle
     }
     func offLine() {
         closeStreams()
@@ -116,52 +122,56 @@ class MXSNetServ: NetService, NetServiceDelegate, StreamDelegate {
 //        closeStreams()
     }
     
-    func send(_ message:Dictionary<String, Any>) {
-        MXSLog(message, "send message 123: ")
-        let data = try? JSONSerialization.data(withJSONObject: message, options: .prettyPrinted)
-        if (data != nil) {
-            let length = data?.withUnsafeBytes { MXSNetServ.shared.outputStream?.write($0, maxLength: data!.count) }
-            if length == 0 {
-                MXSLog("send message Error")
-            }
-        }
+    //MARK: - serv delegate
+    func netServiceDidPublish(_ sender: NetService) {
+        MXSLog("netServiceDidPublish")
+        status = .working
+        self.belong?.servicePublished()
+    }
+    func netServiceDidResolveAddress(_ sender: NetService) {
+        print("netServiceDidResolveAddress", sender.name, sender.addresses as Any, sender.hostName as Any, sender.addresses?.first as Any)
+        let data = sender.txtRecordData()
+        let dict = NetService.dictionary(fromTXTRecord: data!)
+        let info = String.init(data: dict["node"]!, encoding: String.Encoding.utf8)
+        MXSLog(info as Any, "mac info = ");
+
+    }
+    func netServiceDidStop(_ sender: NetService) {
+        status = .stop
+        MXSLog(status, "netServiceDidStop")
+        self.belong?.serviceStoped()
         
-        /**
-         let l = JSONSerialization.writeJSONObject(message, to: MXSNetServ.shared.outputStream!, options: .prettyPrinted, error: nil)
-         if l == 0 {
-         MXSLog("send message Error")
-         }
-         */
-        /**
-        let data = message.data(using: .utf8)!
-        _ = data.withUnsafeBytes { MXSNetServ.shared.outputStream?.write($0, maxLength: data.count) }
-         */
-        /**
-         let value = Int(bigEndian: data.subdata(in: 0..<4).withUnsafeBytes { $0.pointee })
-         let value = Int(bigEndian: data.subdata(in: 0..<4).withUnsafeBytes { $0.baseAddress!.bindMemory(to: Int.self, capacity: 4).pointee })
-         */
-         
-        /**
-         let bytes = [UInt8](data)
-         */
-         
-        /**
-         let bytes = data.withUnsafeBytes {
-         [UInt8](UnsafeBufferPointer(start: $0, count: data.count))
-         }
-         MXSLog(bytes)
-         */
-         
-        /**
-         var msg = message
-         let bytesW = MXSNetServ.shared.outputStream?.write(&msg, maxLength: MemoryLayout.size(ofValue: msg))
-         if bytesW != MemoryLayout.size(ofValue: msg) {
-         MXSLog("Error")
-         }
-         */
+        MXSLog(inputStream as Any)
+        MXSLog(outputStream as Any)
+    }
+    func netService(_ sender: NetService, didNotPublish errorDict: [String : NSNumber]) {
+        MXSLog("didNotPublish")
+        status = .stop
+        self.belong?.servicePublishFiled()
     }
     
-    //MARK:stream delegate
+    func netService(_ sender: NetService, didAcceptConnectionWith inputStream: InputStream, outputStream: OutputStream) {
+        MXSLog("didAcceptConnectionWith inputStream, outputStream")
+        
+        if MXSNetServ.shared.inputStream != nil {
+            MXSLog("didAcceptConnectionWith other")
+            inputStream.open()
+            inputStream.close()
+            outputStream.open()
+            outputStream.close()
+        }
+        else {
+            MXSLog("didAcceptConnectionWith ")
+//            stopService()
+
+            MXSNetServ.shared.inputStream = inputStream
+            MXSNetServ.shared.outputStream = outputStream
+            openStreams()
+        }
+    }
+    
+    
+    //MARK: - stream delegate
     func stream(_ aStream: Stream, handle eventCode: Stream.Event) {
         MXSLog(aStream, "\n=== aStream ===")
         switch eventCode {
@@ -228,47 +238,49 @@ class MXSNetServ: NetService, NetServiceDelegate, StreamDelegate {
         self.belong!.havesomeMessage(msg)
     }
     
-    //MARK:serv delegate
-    func netServiceDidPublish(_ sender: NetService) {
-        MXSLog("netServiceDidPublish")
-        status = .working
-    }
-    func netServiceDidResolveAddress(_ sender: NetService) {
-        print("netServiceDidResolveAddress", sender.name, sender.addresses, sender.hostName, sender.addresses?.first)
-        let data = sender.txtRecordData()
-        let dict = NetService.dictionary(fromTXTRecord: data!)
-        let info = String.init(data: dict["node"]!, encoding: String.Encoding.utf8)
-        MXSLog(info, "mac info = ");
-
-    }
-    func netServiceDidStop(_ sender: NetService) {
-        MXSLog("netServiceDidStop")
-    }
-    func netService(_ sender: NetService, didNotPublish errorDict: [String : NSNumber]) {
-        MXSLog("didNotPublish")
-    }
-    
-    func netService(_ sender: NetService, didAcceptConnectionWith inputStream: InputStream, outputStream: OutputStream) {
-        MXSLog("didAcceptConnectionWith inputStream, outputStream")
+    func sendMsg(_ message:Dictionary<String, Any>) {
+        MXSLog(message, "send message 123: ")
+        let data = try? JSONSerialization.data(withJSONObject: message, options: .prettyPrinted)
+        if (data != nil) {
+            let length = data?.withUnsafeBytes { MXSNetServ.shared.outputStream?.write($0, maxLength: data!.count) }
+            if length == 0 {
+                MXSLog("send message Error")
+            }
+        }
         
-        if MXSNetServ.shared.inputStream != nil {
-            MXSLog("didAcceptConnectionWith other")
-            inputStream.open()
-            inputStream.close()
-            outputStream.open()
-            outputStream.close()
-        }
-        else {
-            MXSLog("didAcceptConnectionWith ")
-//            stopService()
-
-            MXSNetServ.shared.inputStream = inputStream
-            MXSNetServ.shared.outputStream = outputStream
-            openStreams()
-        }
+        /**
+         let l = JSONSerialization.writeJSONObject(message, to: MXSNetServ.shared.outputStream!, options: .prettyPrinted, error: nil)
+         if l == 0 {
+         MXSLog("send message Error")
+         }
+         */
+        /**
+        let data = message.data(using: .utf8)!
+        _ = data.withUnsafeBytes { MXSNetServ.shared.outputStream?.write($0, maxLength: data.count) }
+         */
+        /**
+         let value = Int(bigEndian: data.subdata(in: 0..<4).withUnsafeBytes { $0.pointee })
+         let value = Int(bigEndian: data.subdata(in: 0..<4).withUnsafeBytes { $0.baseAddress!.bindMemory(to: Int.self, capacity: 4).pointee })
+         */
+         
+        /**
+         let bytes = [UInt8](data)
+         */
+         
+        /**
+         let bytes = data.withUnsafeBytes {
+         [UInt8](UnsafeBufferPointer(start: $0, count: data.count))
+         }
+         MXSLog(bytes)
+         */
+         
+        /**
+         var msg = message
+         let bytesW = MXSNetServ.shared.outputStream?.write(&msg, maxLength: MemoryLayout.size(ofValue: msg))
+         if bytesW != MemoryLayout.size(ofValue: msg) {
+         MXSLog("Error")
+         }
+         */
     }
-    
-    
-    
     
 }

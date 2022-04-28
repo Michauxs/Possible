@@ -25,6 +25,7 @@
 		7654CDD4251B52060053B4F3 /* KT_GB2312.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7654CDD3251B4FD60053B4F3 /* KT_GB2312.ttf */; };
 		7654CDD8251C4F640053B4F3 /* MXSFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7654CDD7251C4F640053B4F3 /* MXSFont.swift */; };
 		7654CDDA251C98D90053B4F3 /* MXSPickHeroView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7654CDD9251C98D90053B4F3 /* MXSPickHeroView.swift */; };
+		7656587C281927DE00A99FF7 /* 01.png in Resources */ = {isa = PBXBuildFile; fileRef = 7656587B281927DD00A99FF7 /* 01.png */; };
 		765824D02509D64A00EB55E5 /* MXSTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 765824C82509D64A00EB55E5 /* MXSTableViewCell.swift */; };
 		765824D12509D64A00EB55E5 /* MXSTableDlg.swift in Sources */ = {isa = PBXBuildFile; fileRef = 765824C92509D64A00EB55E5 /* MXSTableDlg.swift */; };
 		765824D22509D64A00EB55E5 /* MXSTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 765824CA2509D64A00EB55E5 /* MXSTableView.swift */; };
@@ -112,6 +113,7 @@
 		7654CDD3251B4FD60053B4F3 /* KT_GB2312.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = KT_GB2312.ttf; sourceTree = "<group>"; };
 		7654CDD7251C4F640053B4F3 /* MXSFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSFont.swift; sourceTree = "<group>"; };
 		7654CDD9251C98D90053B4F3 /* MXSPickHeroView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSPickHeroView.swift; sourceTree = "<group>"; };
+		7656587B281927DD00A99FF7 /* 01.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 01.png; sourceTree = "<group>"; };
 		765824C82509D64A00EB55E5 /* MXSTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MXSTableViewCell.swift; sourceTree = "<group>"; };
 		765824C92509D64A00EB55E5 /* MXSTableDlg.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MXSTableDlg.swift; sourceTree = "<group>"; };
 		765824CA2509D64A00EB55E5 /* MXSTableView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MXSTableView.swift; sourceTree = "<group>"; };
@@ -351,6 +353,7 @@
 		7697A5C224ECB8AC00FB93A6 /* SupportFiles */ = {
 			isa = PBXGroup;
 			children = (
+				7656587B281927DD00A99FF7 /* 01.png */,
 				7697A5C324ECB8F100FB93A6 /* MXSEnumDefines.swift */,
 				765824DC250A08E300EB55E5 /* hero.json */,
 				765824DD250A08E300EB55E5 /* skill.json */,
@@ -576,6 +579,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7656587C281927DE00A99FF7 /* 01.png in Resources */,
 				7654CDD4251B52060053B4F3 /* KT_GB2312.ttf in Resources */,
 				76053DB324E39B5A001860E7 /* Assets.xcassets in Resources */,
 				765824DF250A08E300EB55E5 /* skill.json in Resources */,

@@ -11,6 +11,10 @@ import UIKit
 func MXSLog(_ args:Any, _ sign:String = "MXSSwift") {
     #if DEBUG
         print(Date.init(), sign, ":", args)
+//    withUnsafePointer(to: args) { ptr in
+//        print(Date.init(), sign, ":", args, "  =>P:\(ptr)")
+//        print(Date.init(), sign, ":", args, "  =>P:\(ptr.pointee)")
+//    }
     #endif
 }
 func printPointer<T>(ptr: UnsafePointer<T>, _ sign:String="Possible") {

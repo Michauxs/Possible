@@ -12,7 +12,7 @@ class MXSPVPCustomerController: MXSPVPController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        MXSNetServ.shared.send([kMessageType:MessageType.joined.rawValue, kMessageValue:1])
+        MXSNetServ.shared.sendMsg([kMessageType:MessageType.joined.rawValue, kMessageValue:1])
     }
     
     override func pickedHero(_ hero: MXSHero, isOpponter:Bool = false) {
@@ -22,7 +22,7 @@ class MXSPVPCustomerController: MXSPVPController {
         
         player.joingame()
         pickHeroView.isHidden = true
-        MXSNetServ.shared.send([kMessageType:MessageType.pickHero.rawValue, kMessageValue:hero.photo])
+        MXSNetServ.shared.sendMsg([kMessageType:MessageType.pickHero.rawValue, kMessageValue:hero.photo])
     }
     
     override func havesomeMessage(_ dict: Dictionary<String, Any>) {
@@ -80,30 +80,6 @@ class MXSPVPCustomerController: MXSPVPController {
             
         default: break
         }
-    }
-    
-    //MARK:- hero
-    
-    
-    //MARK:- poker
-    @objc public override func someonePokerTaped(_ pokerView: MXSPokerView) {
-        if let index = player.holdPokers.firstIndex(where: {$0 === pokerView.belong}) {
-            MXSLog("controller action pok at " + "\(index)")
-        }
-        
-        pokerView.isUp = !pokerView.isUp
-        if player.signStatus != .active {
-            return
-        }
-        
-        let poker = pokerView.belong!
-        if pokerView.isUp {
-            player.pickPoker(poker)
-        } else {
-            player.freePoker(poker)
-        }
-        
-        checkCanCertainAction()
     }
     
     //MARK:- leadingView

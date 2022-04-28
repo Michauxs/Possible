@@ -61,7 +61,7 @@ class MXSPoker : NSObject {
 class MXSPokerCmd {
     
     var pokers: Array<MXSPoker> = Array<MXSPoker>()
-    var pokers_ready: Array<MXSPoker>?
+    var pokers_ready: Array<MXSPoker> = Array<MXSPoker>()
     
     var priority: Array<PokerAction> = [.steal, .destroy, .warFire, .arrowes, .duel, .attack]
     
@@ -82,35 +82,38 @@ class MXSPokerCmd {
         return single
     }()
     
+    func ready() {
+        //nothing todo
+    }
     public func push(_ count: Int) -> Array<MXSPoker> {
         var tmp = Array<MXSPoker>()
         for _ in 0..<count {
-            if pokers_ready!.isEmpty {
-                if !shuffle() { //丧尽天良刷牌机
+            if pokers_ready.count == 0 { //
+                if !shuffle() { //get passed pokers -> 0
                     return tmp
                 }
             }
-            let last = pokers_ready!.removeLast()
+            let last = pokers_ready.removeLast()
             last.state = .handOn
             tmp.append(last)
         }
-        MXSLog(tmp, "dealcard")
+        MXSLog(tmp, "dealcard pokers")
         return tmp
     }
     
     public func shuffle() -> Bool {
-        var result = Array<MXSPoker>()
         for poker in pokers {
             if poker.state == PokerState.pass {
                 poker.state = .ready
-                result.append(poker)
+                pokers_ready.append(poker)
             }
         }
         
-        if result.count == 0 { return false }
+        if pokers_ready.count == 0 {
+            return false
+        }
         else {
-            result.shuffle()
-            pokers_ready = result
+            pokers_ready.shuffle()
             return true
         }
     }

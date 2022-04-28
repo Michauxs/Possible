@@ -54,4 +54,8 @@ class MXSViewController: UIViewController {
     public func stopBrowser() { }
     public func setupForNewGame() { }
     public func setupForConnected() { }
+    
+    public func servicePublished() { }
+    public func serviceStoped() { }
+    public func servicePublishFiled() { }
 }
