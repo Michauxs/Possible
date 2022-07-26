@@ -202,7 +202,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, NetServiceDelegate, Strea
         UNUserNotificationCenter.current().requestAuthorization(options: [.sound, .alert, .badge]) { auth, error in
             if auth {
                 UNUserNotificationCenter.current().delegate = self
-                self.setNotification()
+                //self.setNotification()
             }
         }
         

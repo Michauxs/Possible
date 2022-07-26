@@ -11,7 +11,7 @@ import UIKit
 class MXSPokerView: MXSBaseView {
     weak var belong: MXSPoker?
     let actionTextTranslater: [PokerAction:String] = [.attack:"攻",
-                                                      .defense:"守",
+                                                      .dodge:"闪",
                                                       .steal:"偷窃",
                                                       .destroy:"破坏",
                                                       .warFire:"战火",

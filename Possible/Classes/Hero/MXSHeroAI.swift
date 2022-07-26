@@ -18,11 +18,11 @@ extension MXSHero {
         let action_attck = MXSJudge.cmd.leader?.holdAction?.action
         switch action_attck {
         case .attack:
-            return minsHPOrDefenseWithAction(.defense)
+            return minsHPOrDefenseWithAction(.dodge)
         case .warFire:
             return minsHPOrDefenseWithAction(.attack)
         case .arrowes:
-            return minsHPOrDefenseWithAction(.defense)
+            return minsHPOrDefenseWithAction(.dodge)
         case .destroy:
             return distributeWithState(.pass)
         case .steal:
@@ -80,7 +80,7 @@ extension MXSHero {
             if let index = self.holdPokers.firstIndex(where: { (item) -> Bool in item.actionGuise == action }) {
                 let poker = self.holdPokers[index]
                 switch action {
-                case .unknown, .defense, .detect, .recover, .gain:
+                case .unknown, .dodge, .detect, .recover, .gain:
                     hasPoker = false
                 case .steal, .destroy:
                     if let target = MXSJudge.cmd.returnMinHero() {

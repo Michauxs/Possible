@@ -228,7 +228,7 @@ class MXSJudge {
         let hero:MXSHero = responder.first!
         let action = MXSJudge.cmd.leader?.holdAction?.action
         switch action {
-        case .unknown, .defense, .detect, .give, .recover, .gain:
+        case .unknown, .dodge, .detect, .give, .recover, .gain:
             reBlock(.nothing, nil)
         case .attack, .warFire, .arrowes, .duel:
             hero.minsHP()

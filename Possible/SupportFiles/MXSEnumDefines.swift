@@ -88,15 +88,15 @@ enum PokerState : Int {
 enum PokerAction : Int {
     case unknown = 0
     case attack = 1
-    case defense
+    case dodge
     case warFire
     case arrowes
     case duel
     case steal
     case destroy
     case detect
-    case remedy
-    case recover
+    case remedy//active
+    case recover//pissive
     case give
     case gain
 }

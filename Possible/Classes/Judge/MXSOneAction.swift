@@ -76,7 +76,7 @@ class MXSOneAction {
     var action:PokerAction = .unknown {
         didSet {
             switch action {
-            case .unknown, .defense, .detect, .recover, .gain:
+            case .unknown, .dodge, .detect, .recover, .gain:
                 reply.reset()
                 consequence.reset()
                 effect.reset()
@@ -85,13 +85,13 @@ class MXSOneAction {
                 reply.act = .detect
             case .attack:
                 reply.count = 1
-                reply.act = .defense
+                reply.act = .dodge
             case .warFire:
                 reply.count = 1
                 reply.act = .attack
             case .arrowes:
                 reply.count = 1
-                reply.act = .defense
+                reply.act = .dodge
             case .duel:
                 reply.count = 1
                 reply.act = .attack
