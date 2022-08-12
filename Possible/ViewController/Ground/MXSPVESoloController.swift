@@ -131,7 +131,7 @@ class MXSPVESoloController: MXSGroundController {
                         passedView.collectPoker(poker)
                     }
                     else if type == .handover {
-                        // TODO : - animate P->P
+                        // TODO: - animate P->P
                     }
                 })
                 

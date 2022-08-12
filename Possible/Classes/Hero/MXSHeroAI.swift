@@ -69,7 +69,7 @@ extension MXSHero {
     }
     
     //MARK: - AI leader
-    public func hasPokerDoAttack(reBlock:(_ has :Bool, _ pokers :Array<MXSPoker>?, _ skill:MXSSkill?) -> Void) {
+    public func hasPokerDoAttack(reBlock:(_ has :Bool, _ pokers :[MXSPoker]?, _ skill:MXSSkill?) -> Void) {
         if self.holdPokers.count == 0 {
             reBlock(false, nil, nil)
             return

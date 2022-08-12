@@ -49,10 +49,12 @@ class MXSHero {
         return HPCurrent < HPSum
     }
     public func minsHP (_ hp:Int = 1) {
+        concreteView?.dangrousFade()
         self.HPCurrent = HPCurrent - hp
     }
     public func plusHP (_ hp:Int = 1) -> Bool {
         if  self.HPCurrent >= self.HPSum { return false }
+        
         var willHP = HPCurrent + hp
         if  willHP > self.HPSum { willHP = self.HPSum }
         self.HPCurrent = willHP
@@ -67,7 +69,7 @@ class MXSHero {
     
     
     // MARK: - View
-    init(_ attr:Dictionary<String,Any>) { /**name photo hp skills desc*/
+    init(_ attr:[String:Any]) { /**name photo hp skills desc*/
         attribute = attr
         
         if let tmp_n = attr[kStringName] as? String { name = tmp_n }
@@ -109,8 +111,8 @@ class MXSHero {
     
     
     //MARK: - Pokers
-    var holdPokers: Array<MXSPoker> = []
-    lazy var picked: Array<MXSPoker> = Array<MXSPoker>()
+    var holdPokers: [MXSPoker] = []
+    lazy var picked: [MXSPoker] = []
     func pickPoker(_ poker:MXSPoker) {
         picked.append(poker)
         self.transTheAction()
@@ -128,7 +130,7 @@ class MXSHero {
             holdAction?.reset()
         }
     }
-    func losePokers(_ pokers:Array<MXSPoker>) {
+    func losePokers(_ pokers:[MXSPoker]) {
         for poker in pokers {
             holdPokers.removeAll(where: { $0 === poker })
             poker.state = .pass
@@ -137,7 +139,7 @@ class MXSHero {
         pokersView?.layoutPokerView()
         concreteView?.pokerCount = holdPokers.count
     }
-    func getPokers(_ pokers:Array<MXSPoker>) {
+    func getPokers(_ pokers:[MXSPoker]) {
         holdPokers.append(contentsOf: pokers)
         for poker in pokers {
             poker.state = .handOn

@@ -73,6 +73,7 @@ class MXSPickHeroView: MXSBaseView {
     let contentView = UIView()
     let tipsLabel:UILabel = UILabel.init(text: "", fontSize: 314, textColor: .gray, align: .left)
     var conctectViewes:Array<MXSHeroShowView> = Array<MXSHeroShowView>()
+    
     var heroData:Array<MXSHero>? {
         didSet {
             guard heroData != nil else {
@@ -134,7 +135,7 @@ class MXSPickHeroView: MXSBaseView {
             pickedCount += 1
             
             if pickType == .PVP {
-                autoHiddenSelfAfter(1500)
+                autoHiddenSelfAfter(500)
             }
             else {
                 tipsLabel.text = "请选择客体"
@@ -144,7 +145,7 @@ class MXSPickHeroView: MXSBaseView {
             
             self.belong?.pickedHero(heroData![view.tag], isOpponter: true)
             pickedCount += 1
-            autoHiddenSelfAfter(1500)
+            autoHiddenSelfAfter(500)
             
             tipsLabel.text = "即将开始。"
         }

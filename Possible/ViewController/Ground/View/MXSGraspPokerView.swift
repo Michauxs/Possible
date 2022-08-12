@@ -66,7 +66,7 @@ class MXSGraspPokerView: UIScrollView  {
             if pok.concreteView == nil { pok.concreteView = MXSPokerView.init() }
             else { pok.concreteView!.removeFromSuperview() }//
             pok.concreteView!.controller = self.controller
-            UIView.animate(withDuration: 0.25) {
+            UIView.animate(withDuration: 0.5) {
                 pok.concreteView!.frame = CGRect(x: margin_base * CGFloat(index), y: self.PPedMargin, width: MXSSize.Pw, height: MXSSize.Ph) }
             self.addSubview(pok.concreteView!)
             

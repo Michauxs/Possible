@@ -274,8 +274,8 @@ class MXSGroundController: MXSViewController {
     public func someHeroHPZero(_ hero:MXSHero) {
         MXSLog(hero.name, "Hero defalt")
         
-        let alert = UIAlertController.init(title: "GameOver", message: "", preferredStyle: .alert)
-        alert.addAction(UIAlertAction.init(title: "get", style: .cancel, handler: { (act) in
+        let alert = UIAlertController.init(title: "GameOver", message: hero.name+" defalt", preferredStyle: .alert)
+        alert.addAction(UIAlertAction.init(title: "ok", style: .cancel, handler: { (act) in
             self.didCloseGameBtnClick()
         }))
         self.present(alert, animated: true, completion: nil)

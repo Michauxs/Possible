@@ -166,7 +166,7 @@ class MXSJudge {
         return hero.holdPokers.count > 0
     }
     
-    func AIReplyAsResponder(reBlock:(_ type :ReplyResultType, _ pokers :Array<MXSPoker>?) -> Void) {
+    func AIReplyAsResponder(reBlock:(_ type :ReplyResultType, _ pokers:[MXSPoker]?) -> Void) {
         
         let action_reply: PokerAction = self.leader!.holdAction!.reply.act
         if let responder_one = responder.first { //expect
@@ -223,7 +223,7 @@ class MXSJudge {
 //        }
 //    }
     
-    func responderSufferConsequence(reBlock:(_ spoils :SpoilsType, _ pokers :Array<MXSPoker>?) -> Void) {
+    func responderSufferConsequence(reBlock:(_ spoils :SpoilsType, _ pokers :[MXSPoker]?) -> Void) {
         //let conseq = leader?.holdAction?.consequence
         let hero:MXSHero = responder.first!
         let action = MXSJudge.cmd.leader?.holdAction?.action

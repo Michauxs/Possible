@@ -82,6 +82,22 @@ class MXSHeroView: MXSBaseView {
             }
         }
     }
+//    lazy var maskView: UIView = {
+//        let mask = UIView.init(frame: view.bounds)
+//        mask.backgroundColor = .clear
+//        return mask
+//    }()
+    lazy var loseBloodmaskAnmate:UIView = {
+        let mask = UIView.init(frame: self.bounds)
+        mask.backgroundColor = UIColor.init(R: 255, G: 0, B: 0, A: 0.25)
+        return mask
+    }()
+    func dangrousFade() {
+        self.addSubview(self.loseBloodmaskAnmate)
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(500)) {
+            self.loseBloodmaskAnmate.removeFromSuperview()
+        }
+    }
     
     var pokerCount:Int = 0 {
         didSet {

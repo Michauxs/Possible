@@ -58,7 +58,7 @@ class MXSPassedView: MXSBaseView {
         
         for index in 0..<passPokeres.count {
             let pok = passPokeres[index]
-            UIView.animate(withDuration: 0.15) {
+            UIView.animate(withDuration: 0.35) {
                 pok.concreteView!.frame = CGRect.init(x: org_x + MXSSize.Pw * CGFloat(index), y: 0, width: MXSSize.Pw, height: MXSSize.Ph)
             }
         }
