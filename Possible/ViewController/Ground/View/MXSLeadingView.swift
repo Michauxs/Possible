@@ -36,53 +36,51 @@ case unPick
 class MXSLeadingView: MXSBaseView {
     weak var belong:MXSGroundController?
     
-    var cancelBtn: UIButton?
-    var certainBtn: UIButton?
     var state: LeadingState! {
         didSet {
             self.isHidden = false
             switch state {
             case .attackUnPick:
-                certainBtn?.isEnabled = false
-                cancelBtn?.isSelected = true
+                certainBtn.isEnabled = false
+                cancelBtn.isSelected = true
             case .attackPicked, .defenseUnPick, .defensePicked:
-                certainBtn?.isEnabled = false
-                cancelBtn?.isSelected = false
+                certainBtn.isEnabled = false
+                cancelBtn.isSelected = false
             case .attackReadyOn, .defenseReadyOn:
-                certainBtn?.isEnabled = true
-                cancelBtn?.isSelected = false
+                certainBtn.isEnabled = true
+                cancelBtn.isSelected = false
                 
             case .none:
-                certainBtn?.isEnabled = false
-                cancelBtn?.isSelected = false
+                certainBtn.isEnabled = false
+                cancelBtn.isSelected = false
             }
         }
         
     }
     
+    let cancelBtn: UIButton = UIButton.init("取消", fontSize: 614, textColor: .white)
+    let certainBtn: UIButton = UIButton.init("确定", fontSize: 614, textColor: .white)
     override func setupSubviews() {
         
-        certainBtn = UIButton.init("确定", fontSize: 614, textColor: .white)
-        certainBtn?.setTitleColor(.gray, for: .disabled)
-        certainBtn?.setRaius(3.0, borderColor: .white, borderWitdh: 0.5)
-        certainBtn!.addTarget(self, action: #selector(didCertainBtnClick), for: .touchUpInside)
-        self.addSubview(certainBtn!)
-        certainBtn!.snp.makeConstraints { (m) in
+        certainBtn.setTitleColor(.gray, for: .disabled)
+        certainBtn.setRaius(3.0, borderColor: .white, borderWitdh: 0.5)
+        certainBtn.addTarget(self, action: #selector(didCertainBtnClick), for: .touchUpInside)
+        self.addSubview(certainBtn)
+        certainBtn.snp.makeConstraints { (m) in
             m.center.equalTo(self)
             m.size.equalTo(CGSize.init(width: 64, height: 38))
         }
-        certainBtn?.isEnabled = false
+        certainBtn.isEnabled = false
         
         /*--------------------------------------------*/
-        cancelBtn = UIButton.init("取消", fontSize: 614, textColor: .white)
-        cancelBtn!.setTitle("结束", for: .selected)
-        cancelBtn!.setRaius(3.0, borderColor: .white, borderWitdh: 0.5)
-        cancelBtn!.addTarget(self, action: #selector(didCancelBtnClick), for: .touchUpInside)
-        self.addSubview(cancelBtn!)
-        cancelBtn!.snp.makeConstraints { (m) in
+        cancelBtn.setTitle("结束", for: .selected)
+        cancelBtn.setRaius(3.0, borderColor: .white, borderWitdh: 0.5)
+        cancelBtn.addTarget(self, action: #selector(didCancelBtnClick), for: .touchUpInside)
+        self.addSubview(cancelBtn)
+        cancelBtn.snp.makeConstraints { (m) in
             m.centerY.equalTo(self)
-            m.left.equalTo(certainBtn!.snp.right).offset(30)
-            m.size.equalTo(certainBtn!)
+            m.left.equalTo(certainBtn.snp.right).offset(30)
+            m.size.equalTo(certainBtn)
         }
         self.state = .attackUnPick
     }

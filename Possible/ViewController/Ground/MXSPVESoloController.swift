@@ -27,9 +27,9 @@ class MXSPVESoloController: MXSGroundController {
     
     override func pickedHero(_ hero: MXSHero, isOpponter:Bool = false) {
         if isOpponter {
-            opponter = hero
-            opponter.concreteView = oppontView
-            opponter.joingame()
+            players.replaceSubrange(0...0, with: [hero])
+            hero.concreteView = heroConcreteView.first
+            hero.joingame()
             
             allHeroReady()
         }

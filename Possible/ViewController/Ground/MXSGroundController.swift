@@ -11,69 +11,46 @@ import UIKit
 
 class MXSGroundController: MXSViewController {
     
-    let PPedMargin: CGFloat = 5.0
-    
     var player: MXSHero = MXSHeroCmd.shared.getNewBlankHero()
-    var opponter: MXSHero = MXSHeroCmd.shared.getNewBlankHero()
     
-    var graspPokerView: MXSGraspPokerView?
-    
-    var skillScrollView: UIScrollView = UIScrollView.init()
     let pickHeroView = MXSPickHeroView.init(frame: CGRect.init(x: 0, y: 0, width: MXSSize.Sw, height: MXSSize.Sh))
     
-    lazy var leadingView: MXSLeadingView = {
-        let leader = MXSLeadingView.init()
-        let pokerViewFrame = graspPokerView!.frame
-        leader.frame = CGRect(x: pokerViewFrame.minX, y: pokerViewFrame.minY - 44, width: pokerViewFrame.width, height: 44)
-        view.addSubview(leader)
-        leader.belong = self
-        return leader
-    }()
-    
-    lazy var passedView: MXSPassedView = {
-        let view_pass = MXSPassedView.init()
-        let margin: CGFloat = MXSSize.Pw + 30.0
-        view_pass.frame = CGRect.init(x: margin, y: MXSSize.Hh + 5, width: MXSSize.Sw - margin * CGFloat(2), height: MXSSize.Ph)
-        view.addSubview(view_pass)
-        return view_pass
-    }()
-    
-    lazy var maskView: UIView = {
-        let mask = UIView.init(frame: view.bounds)
-        mask.backgroundColor = .clear
-        return mask
-    }()
-    var userEnable: Bool = true {
-        didSet {
-            self.maskView.isHidden = userEnable
-        }
-    }
-    
-    @objc func didCloseGameBtnClick() {
-        MXSPokerCmd.shared.packagePoker()
-        MXSJudge.cmd.gameOver()
-        self.navigationController?.popViewController(animated: true)
-    }
+    /* -------- user enterface view -------- */
+    let passedView: MXSPassedView = MXSPassedView.init()
+    let leadingView: MXSLeadingView = MXSLeadingView.init()
     
     let playerView = MXSHeroView.init()
-    let oppontView = MXSHeroView.init()
-    public func pickedHero(_ hero:MXSHero, isOpponter:Bool = false) {
-        
-    }
+    let graspPokerView: MXSGraspPokerView = MXSGraspPokerView.init(frame: CGRect.zero)
+    let skillDivView: UIScrollView = UIScrollView.init()
+    /* --------                    -------- */
     
-    public func layoutSkillViews(skilles:[MXSSkill]) {
-        
-        let btn_height:CGFloat = 40.0
-        var height_sum:CGFloat = 5.0
-        for skill in skilles {
-            if skill.power == .blank || skill.power == .unKnown || skill.power == .lock { continue }
-            let btn = MXSSkillBtn.init(skill:skill)
-            btn.frame = CGRect(x: 5, y: height_sum, width: skillScrollView.frame.width-10.0, height: btn_height)
-            skillScrollView.addSubview(btn)
-            height_sum += btn_height+3
-            btn.addTarget(self, action: #selector(didSkillBtnClick(btn:)), for: .touchUpInside)
+    var players:[MXSHero] = [MXSHero]()
+    var heroConcreteView:[MXSHeroView] = [MXSHeroView]()
+    var numberChair: Int = 0 {
+        didSet {
+            
+            if numberChair == 2 {
+                let opponter: MXSHero = MXSHeroCmd.shared.getNewBlankHero()
+                
+                let oppontView = MXSHeroView.init()
+                view.addSubview(oppontView)
+                oppontView.frame = CGRect(x: (MXSSize.Sw - MXSSize.Hw)*0.5, y: 0, width: MXSSize.Hw, height: MXSSize.Hh)
+                oppontView.controller = self
+                
+                
+                heroConcreteView = [oppontView]
+                players.append(opponter)
+            }
+            else if numberChair == 3 {
+                
+            }
+            else if numberChair == 4 {
+                
+            }
+            else if numberChair > 4 {
+                
+            }
         }
-        skillScrollView.contentSize = CGSize.init(width: 0, height: height_sum)
     }
     
     //MARK:- viewdidload
@@ -86,6 +63,7 @@ class MXSGroundController: MXSViewController {
         /** self.backgroundColor = UIColor(patternImage: UIImage(named:"recentExam_bgimg")!) //平铺  */
         /*self.view.layer.contents = UIImage.init(named: "play_bg")?.cgImage  // 拉伸*/
         
+        self.numberChair = 2
         MXSJudge.cmd.desktop = self;
         MXSPokerCmd.shared.ready()
         
@@ -99,36 +77,41 @@ class MXSGroundController: MXSViewController {
         pveBtn.frame = CGRect.init(x: 15, y: 15, width: 64, height: 40)
         view.addSubview(pveBtn)
         pveBtn.addTarget(self, action: #selector(didCloseGameBtnClick), for: .touchUpInside)
+        /*--------------------------------------------*/
         
-        let actionBg = UIView.init()
-        actionBg.backgroundColor = UIColor.init(75, 80, 100)
-        actionBg.frame = CGRect.init(x: 0, y: MXSSize.Sh - MXSSize.Hh + 15, width: MXSSize.Sw, height: MXSSize.Hh-15)
-        self.view.addSubview(actionBg)
         
         /*--------------------------------------------*/
-        self.view.addSubview(playerView)
+        
+        
+        /*--------------------------------------------*/
+        let margin: CGFloat = MXSSize.Pw + 30.0
+        passedView.frame = CGRect.init(x: margin, y: MXSSize.Hh + 5, width: MXSSize.Sw - margin * CGFloat(2), height: MXSSize.Ph)
+        view.addSubview(passedView)
+        /*--------------------------------------------*/
+        let enterfaceView = UIView.init()
+        enterfaceView.backgroundColor = UIColor.init(75, 80, 100)
+        enterfaceView.frame = CGRect.init(x: 0, y: MXSSize.Sh - MXSSize.Hh + 15, width: MXSSize.Sw, height: MXSSize.Hh-15)
+        view.addSubview(enterfaceView)
+        /*--------                         ----------*/
+        let middle_width:CGFloat = MXSSize.Sw - 10 - MXSSize.Hw - 10 - 10 - MXSSize.Hw
+        let skill_width:CGFloat = MXSSize.Hw
+        leadingView.frame = CGRect(x: 10 + MXSSize.Hw + 10, y: enterfaceView.frame.minY - 44, width: middle_width, height: 44)
+        view.addSubview(leadingView)
+        leadingView.belong = self
+        
         playerView.frame = CGRect.init(x: 10, y: MXSSize.Sh - MXSSize.Hh, width: MXSSize.Hw, height: MXSSize.Hh)
+        view.addSubview(playerView)
         playerView.controller = self
+        
+        graspPokerView.frame = CGRect.init(x: 10 + MXSSize.Hw + 10, y: MXSSize.Sh - (MXSSize.Ph + 5.0), width: middle_width, height: MXSSize.Ph + 5.0)
+        view.addSubview(graspPokerView)
+        graspPokerView.controller = self;
+        
+        skillDivView.backgroundColor = .brown
+        skillDivView.frame = CGRect.init(x: MXSSize.Sw - skill_width, y: enterfaceView.frame.minY, width: skill_width, height: enterfaceView.frame.height)
+        view.addSubview(skillDivView)
         /*--------------------------------------------*/
         
-        self.view.addSubview(oppontView)
-        oppontView.frame = CGRect(x: (MXSSize.Sw - MXSSize.Hw)*0.5, y: 0, width: MXSSize.Hw, height: MXSSize.Hh)
-        oppontView.controller = self
-        /*--------------------------------------------*/
-        skillScrollView.backgroundColor = .brown
-        skillScrollView.frame = CGRect.init(x: MXSSize.Sw-MXSSize.Hw, y: actionBg.frame.minY, width: MXSSize.Hw, height: actionBg.frame.height)
-        view.addSubview(skillScrollView)
-        
-        /*--------------------------------------------*/
-        graspPokerView = MXSGraspPokerView.init(frame: CGRect.init(x: playerView.frame.maxX+10,
-                                                                    y: MXSSize.Sh - (MXSSize.Ph + PPedMargin),
-                                                                    width: MXSSize.Sw - 10 - MXSSize.Hw - 10 - 10 - MXSSize.Hw,
-                                                                    height: MXSSize.Ph + PPedMargin),
-                                                 controller: self)
-        view.addSubview(graspPokerView!)
-        
-        /*--------------------------------------------*/
-        pickHeroView.frame = self.view.bounds
         view.addSubview(pickHeroView)
         pickHeroView.belong = self
     }
@@ -137,8 +120,34 @@ class MXSGroundController: MXSViewController {
         
     }
     
+    //MARK: - actions
+    @objc func didCloseGameBtnClick() {
+        MXSPokerCmd.shared.packagePoker()
+        MXSJudge.cmd.gameOver()
+        self.navigationController?.popViewController(animated: true)
+    }
+    
+    //MARK: - Pick hero
+    public func pickedHero(_ hero:MXSHero, isOpponter:Bool = false) {
+        
+    }
     
     //MARK: - Skill
+    public func layoutSkillViews(skilles:[MXSSkill]) {
+        
+        let btn_height:CGFloat = 40.0
+        var height_sum:CGFloat = 5.0
+        for skill in skilles {
+            if skill.power == .blank || skill.power == .unKnown || skill.power == .lock { continue }
+            let btn = MXSSkillBtn.init(skill:skill)
+            btn.frame = CGRect(x: 5, y: height_sum, width: skillDivView.frame.width-10.0, height: btn_height)
+            skillDivView.addSubview(btn)
+            height_sum += btn_height+3
+            btn.addTarget(self, action: #selector(didSkillBtnClick(btn:)), for: .touchUpInside)
+        }
+        skillDivView.contentSize = CGSize.init(width: 0, height: height_sum)
+    }
+    
     @objc func didSkillBtnClick(btn:MXSSkillBtn) {
         
     }

@@ -9,11 +9,16 @@
 import UIKit
 
 class MXSBaseView: UIView {
+//    weak var belong:MXSGroundController?
+    weak var control:MXSViewController?
     
-//    convenience init() {
-//        self.init()
-////        setupSubviews()
-//    }
+    var responHandler: ((_ meth:String, _ args:Dictionary<String,Any>) -> Dictionary<String,Any>)?
+    var responder: ((_ meth:String, _ args:Dictionary<String,Any>) -> Void)?
+    
+    convenience init(control :MXSViewController) {
+        self.init()
+        self.control = control;
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -24,6 +29,8 @@ class MXSBaseView: UIView {
         super.init(coder: coder)
         setupSubviews()
     }
+    
+    
 
     open func setupSubviews() {
         

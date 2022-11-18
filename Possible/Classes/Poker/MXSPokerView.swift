@@ -9,7 +9,11 @@
 import UIKit
 
 class MXSPokerView: MXSBaseView {
-    weak var belong: MXSPoker?
+    weak var belong: MXSPoker? {
+        didSet {
+            reverseView.isHidden = true
+        }
+    }
     let actionTextTranslater: [PokerAction:String] = [.attack:"攻",
                                                       .dodge:"闪",
                                                       .steal:"偷窃",
@@ -175,11 +179,14 @@ class MXSPokerView: MXSBaseView {
         
         reverseView.frame = self.bounds
         reverseView.image = UIImage(named: "poker_reverse")
-        reverseView.contentMode = .scaleAspectFill
+//        reverseView.contentMode = .scaleAspectFill
         //reverseView.backgroundColor = UIColor(patternImage: UIImage(named:"recentExam_bgimg")!) //平铺
         /*self.view.layer.contents = UIImage.init(named: "play_bg")?.cgImage  // 拉伸*/
         addSubview(reverseView)
-        reverseView.isHidden = true
+//        reverseView.snp.makeConstraints { make in
+//            make.edges.equalTo(self)
+//        }
+//        reverseView.isHidden = true
     }
     
 

@@ -141,12 +141,16 @@ class MXSHero {
     }
     func getPokers(_ pokers:[MXSPoker]) {
         holdPokers.append(contentsOf: pokers)
-        for poker in pokers {
-            poker.state = .handOn
-            MXSLog(poker, name+" +get poker")
+        
+        self.concreteView?.getPokerAnimate {
+            
+            for poker in pokers {
+                poker.state = .handOn
+                MXSLog(poker, self.name+" +get poker")
+            }
+            self.pokersView?.layoutPokerView()
+            self.concreteView?.pokerCount = self.holdPokers.count
         }
-        pokersView?.layoutPokerView()
-        concreteView?.pokerCount = holdPokers.count
     }
     /**return is need reply*/
     func discardPoker(reBlock:(_ type:DiscardPokerType, _ poker:[MXSPoker]) -> Void) -> Bool {

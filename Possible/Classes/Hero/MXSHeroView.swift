@@ -99,6 +99,26 @@ class MXSHeroView: MXSBaseView {
         }
     }
     
+    // MARK: Poker
+    let pok_view = MXSPokerView()
+    func getPokerAnimate( complete:@escaping ()->Void ) -> Void {
+        
+        let p_w = MXSSize.Hw*0.5
+        let p_h = p_w * MXSSize.Ph / MXSSize.Pw
+        pok_view.frame = CGRect(x: (self.bounds.width-p_w)*0.5, y: (self.bounds.height-p_h)*0.5, width: p_w, height: p_h)
+        self.addSubview(pok_view)
+        
+        UIView.animate(withDuration: 0.75) {
+            self.pok_view.frame = CGRect(x: 5, y: 5, width: 0, height: 0)
+//            self.pok_view.layoutIfNeeded()
+//            self.pok_view.transform = CGAffineTransform.init(scaleX: 0, y: 0)
+        } completion: { _ in
+            self.pok_view.removeFromSuperview()
+            complete()
+        }
+
+    }
+    
     var pokerCount:Int = 0 {
         didSet {
             pokerCountLabel.text = String.init(format: "%d", pokerCount)

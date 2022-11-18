@@ -16,14 +16,15 @@ class MXSGraspPokerView: UIScrollView  {
 //    var graspPokers: Array<MXSPoker> = Array<MXSPoker>()
     let PPedMargin: CGFloat = 5.0
     
-    init(frame:CGRect, controller:MXSGroundController) {
+    override init(frame:CGRect) {
         super.init(frame: frame)
-        self.controller = controller
+//        self.controller = controller
         self.frame = frame
         self.showsHorizontalScrollIndicator = false
     }
     
     required init?(coder: NSCoder) {
+        super.init(coder: coder)
         fatalError("init(coder:) has not been implemented")
     }
     

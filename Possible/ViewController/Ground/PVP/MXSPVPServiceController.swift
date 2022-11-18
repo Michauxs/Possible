@@ -27,16 +27,16 @@ class MXSPVPServiceController: MXSPVPController {
     }
     
     func allPlayerReady() {
-        if player.name == kStringUnknown || opponter.name == kStringUnknown {
-            return
-        }
+//        if player.name == kStringUnknown || opponter.name == kStringUnknown {
+//            return
+//        }
         if MXSPokerCmd.shared.shuffle() {
             let pokers = MXSPokerCmd.shared.push(6)
             player.getPokers(pokers)
             
             
             let arr_p = MXSPokerCmd.shared.push(6)
-            opponter.getPokers(arr_p)
+//            opponter.getPokers(arr_p)
             var poker_uid_arr:Array<Int> = Array<Int>()
             for poker in arr_p {
                 poker_uid_arr.append(poker.uid)
@@ -65,9 +65,9 @@ class MXSPVPServiceController: MXSPVPController {
         case .pickHero:
             let hero_name = dict[kMessageValue] as! String
             if let hero = MXSHeroCmd.shared.someoneFromName(hero_name) {
-                opponter = hero
-                opponter.concreteView = oppontView
-                opponter.joingame()
+//                opponter = hero
+//                opponter.concreteView = oppontView
+//                opponter.joingame()
                 
                 self.allPlayerReady()
             }

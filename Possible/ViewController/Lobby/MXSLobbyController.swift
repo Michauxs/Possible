@@ -39,7 +39,7 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate {
             }))
             alert.addAction(UIAlertAction.init(title: "接受", style: .default, handler: { (act) in
                 MXSNetServ.shared.sendMsg([kMessageType:MessageType.replyRequest.rawValue, kMessageValue:1])
-                let vc = MXSPVPServiceController.init()
+                let vc = MXSPVPServiceController()
                 self.navigationController?.pushViewController(vc, animated: true)
             }))
             self.present(alert, animated: true, completion: nil)
@@ -53,7 +53,7 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate {
             }
             else {
                 MXSTIPMaskCmd.shared.showMaskWithTip("connected success", auto:true)
-                let vc = MXSPVPCustomerController.init()
+                let vc = MXSPVPCustomerController()
                 self.navigationController?.pushViewController(vc, animated: true)
             }
             
@@ -146,7 +146,7 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate {
     
     //MARK: - actions
     @objc func didPVEBtnClick() {
-        let vc = MXSPVESoloController.init()
+        let vc = MXSPVESoloController()
         self.navigationController?.pushViewController(vc, animated: false)
     }
     @objc func assemBtnClick() {

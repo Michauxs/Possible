@@ -44,9 +44,9 @@ class MXSPVPCustomerController: MXSPVPController {
             let hero_name = dict[kMessageValue] as! String
             if let hero = MXSHeroCmd.shared.someoneFromName(hero_name) {
                 
-                opponter = hero
-                opponter.concreteView = oppontView
-                opponter.joingame()
+//                opponter = hero
+//                opponter.concreteView = oppontView
+//                opponter.joingame()
             }
             
         case .dealcard:
