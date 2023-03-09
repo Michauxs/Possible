@@ -164,6 +164,7 @@ enum SpoilsType {
     case destroy
     case wrest
     case gain
+    case injured
 }
 
 enum DiscardPokerType : Int {
@@ -177,9 +178,9 @@ enum ReplyResultType : Int {
     case gain
 }
 
-enum CycleState {
-    case blank
-    case leader
-    case responder
-    case active
-}
+//enum CycleState {
+//    case blank
+//    case leader
+//    case responder
+//    case active
+//}

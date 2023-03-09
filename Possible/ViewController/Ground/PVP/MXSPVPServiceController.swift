@@ -14,7 +14,7 @@ class MXSPVPServiceController: MXSPVPController {
         pickHeroView.heroData = MXSHeroCmd.shared.allHeroModel
     }
     
-    override func pickedHero(_ hero: MXSHero, isOpponter:Bool = false) {
+    override func pickedHero(_ hero: MXSHero, chairNumb: Int = 0) {
         player = hero
         player.isAxle = true
         player.concreteView = playerView

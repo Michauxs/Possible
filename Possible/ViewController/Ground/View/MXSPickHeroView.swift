@@ -66,6 +66,7 @@ class MXSPickHeroView: MXSBaseView {
     var pickType:PickHeroType = .PVE
     
     var pickedCount:Int = 0
+    var expectCount:Int = 2
     let hero_width:CGFloat = 80.0
     let hero_height:CGFloat = 120.0
     let between:CGFloat = 3.0
@@ -108,6 +109,43 @@ class MXSPickHeroView: MXSBaseView {
             tipsLabel.text = "请选择主体"
         }
     }
+    func showHeroOption(Data option:[MXSHero], andExpect expect:Int) {
+        
+        guard option != nil else {
+            return
+        }
+        
+        heroData = option
+        expectCount = expect
+        
+        let content_width:CGFloat = hero_width * CGFloat(numb_col) + between * CGFloat(numb_col-1)
+        let padding_left:CGFloat = (self.frame.width - content_width) * 0.5
+        for index in 0 ..< heroData!.count {
+            let row = index/numb_col
+            let col = index%numb_col
+            let view = MXSHeroShowView()
+            view.frame = CGRect(x: padding_left + (hero_width+between)*CGFloat(col), y: (hero_height+between)*CGFloat(row), width: hero_width, height: hero_height)
+            view.tag = index
+            contentView.addSubview(view)
+            conctectViewes.append(view)
+            
+            let hero = heroData![index]
+            view.photo = hero.photo
+            view.name = hero.name
+            
+            view.isUserInteractionEnabled = true
+            view.addGestureRecognizer(UITapGestureRecognizer.init(target: self, action: #selector(didTapedSelf(taped:))))
+            
+        }
+        
+        contentView.addSubview( tipsLabel)
+        tipsLabel.snp.makeConstraints { make in
+            make.left.equalTo(contentView).offset(padding_left*0.5)
+            make.top.equalTo(contentView).offset(20)
+            make.width.equalTo(20)
+        }
+        tipsLabel.text = "请选择主体"
+    }
     
     override func setupSubviews() {
         let maskView = UIView()
@@ -126,30 +164,34 @@ class MXSPickHeroView: MXSBaseView {
     }
 
     @objc func didTapedSelf(taped:UITapGestureRecognizer) {
+        pickedCount += 1
+        if pickedCount > expectCount {
+            return
+        }
+        
         let view:MXSHeroShowView = taped.view as! MXSHeroShowView
         if view.isSelect { return }
         
         view.isSelect = true
-        if pickedCount == 0 {
-            self.belong?.pickedHero(heroData![view.tag])
-            pickedCount += 1
+        if pickedCount == 1 {
+            self.belong?.pickedHero(heroData![view.tag], chairNumb: pickedCount)
             
             if pickType == .PVP {
                 autoHiddenSelfAfter(500)
+                return
             }
             else {
                 tipsLabel.text = "请选择客体"
             }
         }
-        else if pickedCount == 1 {
+        else {
+            self.belong?.pickedHero(heroData![view.tag], chairNumb: pickedCount)
             
-            self.belong?.pickedHero(heroData![view.tag], isOpponter: true)
-            pickedCount += 1
-            autoHiddenSelfAfter(500)
-            
-            tipsLabel.text = "即将开始。"
+            if pickedCount == expectCount {
+                autoHiddenSelfAfter(500)
+                tipsLabel.text = "即将开始。"
+            }
         }
-        else { return }
     }
         
     func autoHiddenSelfAfter(_ m_second:Int = 1000) {

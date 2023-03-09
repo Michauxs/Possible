@@ -37,8 +37,8 @@ extension MXSHero {
             popCard(poker)
             return poker
         } else {
-            let index = Int(arc4random_uniform(UInt32(self.holdPokers.count)))
-            let pok_random = self.holdPokers.remove(at: index)
+            let index = Int(arc4random_uniform(UInt32(self.ownPokers.count)))
+            let pok_random = self.ownPokers.remove(at: index)
             pok_random.state = state
             return pok_random
         }
@@ -54,14 +54,14 @@ extension MXSHero {
         }
     }
     func hasPokerWithAction(_ action:PokerAction) -> MXSPoker? {
-        if let index = self.holdPokers.firstIndex(where: { (item) -> Bool in item.actionGuise == action }) {
-            return self.holdPokers[index]
+        if let index = self.ownPokers.firstIndex(where: { (item) -> Bool in item.actionGuise == action }) {
+            return self.ownPokers[index]
         }
         else { return nil }
     }
     
     public func popCard(_ poker:MXSPoker) {
-        self.holdPokers.removeAll(where: {$0 === poker})
+        self.ownPokers.removeAll(where: {$0 === poker})
         poker.state = .pass
         if poker.actionGuise == PokerAction.attack {
             attackCount += 1
@@ -69,16 +69,17 @@ extension MXSHero {
     }
     
     //MARK: - AI leader
-    public func hasPokerDoAttack(reBlock:(_ has :Bool, _ pokers :[MXSPoker]?, _ skill:MXSSkill?) -> Void) {
-        if self.holdPokers.count == 0 {
+    public func hasPokerDoAttack(reBlock:(_ has :Bool, _ pokers :[MXSPoker]?, _ skill:MXSSkill?) -> Void) -> Bool  {
+        if self.ownPokers.count == 0 {
             reBlock(false, nil, nil)
-            return
+            return false
         }
+        
         
         var hasPoker:Bool = false
         for action in MXSPokerCmd.shared.priority {
-            if let index = self.holdPokers.firstIndex(where: { (item) -> Bool in item.actionGuise == action }) {
-                let poker = self.holdPokers[index]
+            if let index = self.ownPokers.firstIndex(where: { (item) -> Bool in item.actionGuise == action }) {
+                let poker = self.ownPokers[index]
                 switch action {
                 case .unknown, .dodge, .detect, .recover, .gain:
                     hasPoker = false
@@ -92,9 +93,7 @@ extension MXSHero {
                         self.takeOrDisAimAtHero(target)
                         hasPoker = attackCount < attackLimit
                     }
-                case .warFire:
-                    hasPoker = true
-                case .arrowes:
+                case .warFire, .arrowes:
                     hasPoker = true
                 case .duel:
                     if let target = MXSJudge.cmd.returnMinHero() {
@@ -109,19 +108,56 @@ extension MXSHero {
                     else { hasPoker = self.canRecover() }
                 case .give:
                     hasPoker = false
-                default:
-                    break
                 }
                 
                 if hasPoker {
                     reBlock(hasPoker, [poker], nil)
-                    return
+                    return hasPoker
                 }
             }//
                 
         }
         
         reBlock(hasPoker, nil, nil)
+        return hasPoker
+    }
+    
+    public func asReplyerParryAttack(reBlock:(_ type :ReplyResultType, _ pokers:[MXSPoker]?) -> Void) {
+        let leader = MXSJudge.cmd.leader!
+        let action_reply: PokerAction = leader.holdAction!.reply.act
+        
+        self.holdAction = MXSOneAction(axle: self, type: .reply)
+        MXSJudge.cmd.diary.append(self.holdAction!)
+        
+        if action_reply == .recover {
+            let _ = self.plusHP()
+            reBlock(.nothing, nil)
+        }
+        else if action_reply == .gain {
+            self.getPokers(leader.holdAction!.pokers)
+            reBlock(.gain, leader.holdAction?.pokers)
+        }
+        else {// need
+            
+            if let index = self.ownPokers.firstIndex(where: { poker in poker.actionGuise == action_reply }) {
+                let contain = self.ownPokers[index]
+                self.losePokers([contain])
+                
+                if leader.holdAction?.action == .warFire || leader.holdAction?.action == .arrowes {
+                    MXSLog("responder ---------------------->  reply group")
+                }
+                
+                reBlock(.success, [contain])
+            }
+            else {
+                if leader.holdAction?.action == .warFire || leader.holdAction?.action == .arrowes {
+                    MXSLog("responder ----------------------> can't reply group")
+                }
+                
+                reBlock(.failed, nil)
+            }
+        }
+        
     }
     
 }

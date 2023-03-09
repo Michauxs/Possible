@@ -28,7 +28,7 @@ class MXSPVPController: MXSGroundController {
         pickHeroView.pickType = .PVP
     }
     
-    override func pickedHero(_ hero: MXSHero, isOpponter:Bool = false) {
+    override func pickedHero(_ hero: MXSHero, chairNumb: Int = 0) {
         player = hero
         player.isAxle = true
         player.concreteView = playerView
@@ -95,7 +95,7 @@ class MXSPVPController: MXSGroundController {
         }
         MXSNetServ.shared.sendMsg([kMessageType:MessageType.discard.rawValue, kMessageValue:div_p])
         
-        player.holdPokers.removeAll(where: {$0 === poker})
+        player.ownPokers.removeAll(where: {$0 === poker})
         poker.state = .pass
         
     }

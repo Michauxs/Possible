@@ -49,7 +49,7 @@ class MXSGraspPokerView: UIScrollView  {
             subv.removeFromSuperview()
         }
         
-        let count = belong?.holdPokers.count ?? 0
+        let count = belong?.ownPokers.count ?? 0
         let need_width = MXSSize.Pw * CGFloat(count)
         let box_width = self.bounds.size.width
         
@@ -63,7 +63,7 @@ class MXSGraspPokerView: UIScrollView  {
         /*--------------------------*/
         
         for index in 0..<count {
-            let pok = belong!.holdPokers[index]
+            let pok = belong!.ownPokers[index]
             if pok.concreteView == nil { pok.concreteView = MXSPokerView.init() }
             else { pok.concreteView!.removeFromSuperview() }//
             pok.concreteView!.controller = self.controller
@@ -71,7 +71,7 @@ class MXSGraspPokerView: UIScrollView  {
                 pok.concreteView!.frame = CGRect(x: margin_base * CGFloat(index), y: self.PPedMargin, width: MXSSize.Pw, height: MXSSize.Ph) }
             self.addSubview(pok.concreteView!)
             
-            pok.concreteView?.showWidth = pok === belong?.holdPokers.last ? MXSSize.Pw : margin_base
+            pok.concreteView?.showWidth = pok === belong?.ownPokers.last ? MXSSize.Pw : margin_base
         }
     }
     

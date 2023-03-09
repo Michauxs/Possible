@@ -11,7 +11,6 @@ import UIKit
 
 class MXSGroundController: MXSViewController {
     
-    var player: MXSHero = MXSHeroCmd.shared.getNewBlankHero()
     
     let pickHeroView = MXSPickHeroView.init(frame: CGRect.init(x: 0, y: 0, width: MXSSize.Sw, height: MXSSize.Sh))
     
@@ -19,36 +18,58 @@ class MXSGroundController: MXSViewController {
     let passedView: MXSPassedView = MXSPassedView.init()
     let leadingView: MXSLeadingView = MXSLeadingView.init()
     
-    let playerView = MXSHeroView.init()
+    var player: MXSHero = MXSHeroCmd.shared.getNewBlankHero()
+    let playerView = MXSHeroView.init(seqNo: 1)
     let graspPokerView: MXSGraspPokerView = MXSGraspPokerView.init(frame: CGRect.zero)
     let skillDivView: UIScrollView = UIScrollView.init()
     /* --------                    -------- */
     
-    var players:[MXSHero] = [MXSHero]()
     var heroConcreteView:[MXSHeroView] = [MXSHeroView]()
-    var numberChair: Int = 0 {
+    
+    var numberOfChair: Int = 0 {
         didSet {
-            
-            if numberChair == 2 {
-                let opponter: MXSHero = MXSHeroCmd.shared.getNewBlankHero()
-                
-                let oppontView = MXSHeroView.init()
-                view.addSubview(oppontView)
-                oppontView.frame = CGRect(x: (MXSSize.Sw - MXSSize.Hw)*0.5, y: 0, width: MXSSize.Hw, height: MXSSize.Hh)
+            for index in 2...numberOfChair {
+                let oppontView = MXSHeroView.init(seqNo: index)
+                //view.addSubview(oppontView)
                 oppontView.controller = self
                 
-                
-                heroConcreteView = [oppontView]
-                players.append(opponter)
+                self.heroConcreteView.append(oppontView)
             }
-            else if numberChair == 3 {
+            
+            var frameArray:[CGRect] = [CGRect]()
+            let top_width = MXSSize.Sw - MXSSize.Hw*2
+            
+            if numberOfChair == 2 {
+                frameArray = [CGRect(x: (MXSSize.Hw + top_width - MXSSize.Hw)*0.5, y: 0, width: MXSSize.Hw, height: MXSSize.Hh)]
                 
             }
-            else if numberChair == 4 {
-                
+            else if numberOfChair == 3 {
+                frameArray = [CGRect(x: MXSSize.Hw + top_width*0.66 - MXSSize.Hw*0.5, y: 0, width: MXSSize.Hw, height: MXSSize.Hh),
+                              CGRect(x: MXSSize.Hw + top_width*0.33 - MXSSize.Hw*0.5, y: 0, width: MXSSize.Hw, height: MXSSize.Hh)]
             }
-            else if numberChair > 4 {
+            else if numberOfChair == 4 {
+                frameArray = [CGRect(x: MXSSize.Hw + top_width*0.75 - MXSSize.Hw*0.5, y: 0, width: MXSSize.Hw, height: MXSSize.Hh),
+                              CGRect(x: MXSSize.Hw + top_width*0.5 - MXSSize.Hw*0.5, y: 0, width: MXSSize.Hw, height: MXSSize.Hh),
+                              CGRect(x: MXSSize.Hw + top_width*0.25 - MXSSize.Hw*0.5, y: 0, width: MXSSize.Hw, height: MXSSize.Hh)]
+            }
+            else if numberOfChair > 4 {
+                frameArray.append(CGRect(x: MXSSize.Sw - MXSSize.Hw, y:(MXSSize.Sh - MXSSize.Hh)*0.5 , width: MXSSize.Hw, height: MXSSize.Hh))
+                let top_numb:CGFloat = CGFloat(numberOfChair-3)
+                let div_width = top_width / top_numb
+                for index in 0..<numberOfChair-3 {
+                    frameArray.append(CGRect(x: MXSSize.Hw + top_width - div_width*CGFloat(index+1) + (div_width-MXSSize.Hw)*0.5, y:0 , width: MXSSize.Hw, height: MXSSize.Hh))
+                }
                 
+                frameArray.append(CGRect(x: 0, y:(MXSSize.Sh - MXSSize.Hh)*0.5 , width: MXSSize.Hw, height: MXSSize.Hh))
+            }
+            else {
+                //frameArray = []
+            }
+            
+            for index in 0..<frameArray.count {
+                let someoneView = self.heroConcreteView[index+1]
+                view.addSubview(someoneView)
+                someoneView.frame = frameArray[index]
             }
         }
     }
@@ -63,7 +84,6 @@ class MXSGroundController: MXSViewController {
         /** self.backgroundColor = UIColor(patternImage: UIImage(named:"recentExam_bgimg")!) //平铺  */
         /*self.view.layer.contents = UIImage.init(named: "play_bg")?.cgImage  // 拉伸*/
         
-        self.numberChair = 2
         MXSJudge.cmd.desktop = self;
         MXSPokerCmd.shared.ready()
         
@@ -102,6 +122,7 @@ class MXSGroundController: MXSViewController {
         playerView.frame = CGRect.init(x: 10, y: MXSSize.Sh - MXSSize.Hh, width: MXSSize.Hw, height: MXSSize.Hh)
         view.addSubview(playerView)
         playerView.controller = self
+        self.heroConcreteView.append(playerView)
         
         graspPokerView.frame = CGRect.init(x: 10 + MXSSize.Hw + 10, y: MXSSize.Sh - (MXSSize.Ph + 5.0), width: middle_width, height: MXSSize.Ph + 5.0)
         view.addSubview(graspPokerView)
@@ -117,7 +138,7 @@ class MXSGroundController: MXSViewController {
     }
     
     func readyModelForView() {
-        
+        self.numberOfChair = 2
     }
     
     //MARK: - actions
@@ -128,7 +149,7 @@ class MXSGroundController: MXSViewController {
     }
     
     //MARK: - Pick hero
-    public func pickedHero(_ hero:MXSHero, isOpponter:Bool = false) {
+    public func pickedHero(_ hero:MXSHero, chairNumb:Int = 0) {
         
     }
     
@@ -226,7 +247,7 @@ class MXSGroundController: MXSViewController {
             return
         }
         
-        if let index = player.holdPokers.firstIndex(where: {$0 === pokerView.belong}) {
+        if let index = player.ownPokers.firstIndex(where: {$0 === pokerView.belong}) {
             MXSLog("controller action pok at " + "\(index)")
         }
         

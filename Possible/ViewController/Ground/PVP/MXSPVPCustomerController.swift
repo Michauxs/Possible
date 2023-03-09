@@ -15,7 +15,7 @@ class MXSPVPCustomerController: MXSPVPController {
         MXSNetServ.shared.sendMsg([kMessageType:MessageType.joined.rawValue, kMessageValue:1])
     }
     
-    override func pickedHero(_ hero: MXSHero, isOpponter:Bool = false) {
+    override func pickedHero(_ hero: MXSHero, chairNumb: Int = 0) {
         player = hero
         player.isAxle = true
         player.concreteView = playerView

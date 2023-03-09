@@ -12,6 +12,8 @@ import SnapKit
 class MXSHeroView: MXSBaseView {
     weak var belong:MXSHero?
     
+    var seqNo : Int = 0
+    
     let contentView :UIView = UIView()
     let lightSign: UIView = UIView()
     
@@ -101,7 +103,7 @@ class MXSHeroView: MXSBaseView {
     
     // MARK: Poker
     let pok_view = MXSPokerView()
-    func getPokerAnimate( complete:@escaping ()->Void ) -> Void {
+    func getPokerAnimate(_ pokers:[MXSPoker], complete:@escaping ()->Void ) -> Void {
         
         let p_w = MXSSize.Hw*0.5
         let p_h = p_w * MXSSize.Ph / MXSSize.Pw
@@ -133,6 +135,12 @@ class MXSHeroView: MXSBaseView {
                 sk_view.image = UIImage(named: String(format: "skill_%03d", arguments: [skill.power.rawValue]))
             }
         }
+    }
+    
+    convenience init(seqNo:Int) {
+        self.init()
+        self.seqNo = seqNo
+        setupSubviews()
     }
     
     override func setupSubviews() {

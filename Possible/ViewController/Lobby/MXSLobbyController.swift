@@ -78,7 +78,7 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate {
         super.viewDidLoad()
         let width = MXSSize.Sw * 0.25
 //        let textSign = "情深不寿，慧极必伤"
-        let textSign = "sometimes ever，\n               sometimes never."
+        let textSign = "sometimes ever，\n          sometimes never."
         let textLabel = UILabel.init(text: textSign, fontSize: 1034, textColor: .darkText, align: .left)
         textLabel.sizeToFit()
         textLabel.frame = CGRect(x: 45, y: 90, width: textLabel.bounds.width, height: textLabel.bounds.height)
@@ -212,7 +212,7 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate {
     }
     
     func netServiceBrowser(_ browser: NetServiceBrowser, didFind service: NetService, moreComing: Bool) {
-        MXSLog("self is: " + "\(MXSNetServ.shared)" + " == didFind: " + "\(service)")
+        MXSLog("self is: [" + "\(MXSNetServ.shared)" + "] didFind: [" + "\(service)" + "]")
         
         if MXSNetServ.shared == service {
             MXSLog("- didFind Self")

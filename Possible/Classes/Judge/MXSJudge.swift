@@ -22,53 +22,41 @@ class MXSJudge {
         return single
     }()
     
-    var subject:Array<MXSHero> = Array<MXSHero>()
+    var subject:[MXSHero] = [MXSHero]()
     /**hero action pokeres aim?  /hp  /cycle  */
-    var diary:Array<MXSOneAction> = Array<MXSOneAction>()
+    var diary:[MXSOneAction] = [MXSOneAction]()
     weak var desktop :MXSGroundController?
     
     //MARK: - intermediary
     func appendOrRemoveResponder(_ hero:MXSHero) {
-        if hero.cycleState == .blank {
-            hero.cycleState = .responder
-            hero.signStatus = .selected
-        }
-        else if hero.cycleState == .responder {
-            hero.cycleState = .blank
+        
+        if let index = self.responder.firstIndex(where: { one in hero.name == one.name }) {
             hero.signStatus = .blank
+            self.responder.remove(at: index)
+        }
+        else {
+            hero.signStatus = .selected
+            self.responder.append(hero)
         }
     }
     
     func clearResponder() {
-        for hero in responder {
-            hero.cycleState = .blank
-            hero.signStatus = .blank
-        }
-//        for hero in subject {
-//            if hero.cycleState != .leader {
-//                hero.cycleState = .blank
-//                hero.signStatus = .blank
-//            }
-//        }
-    }
-    
-    func selectAllElseSelf() {
-        let others = self.subject.filter { hero in
-            hero.cycleState == .blank
-        }
-        for hero in others {
-            hero.cycleState = .responder
-            hero.signStatus = .selected
-        }
+        self.responder.removeAll()
     }
     
     //MARK: - leader cycle
-    var flowNote:Int = -1
+    var flowNote:Int = -1 {
+        didSet {
+            if flowNote == self.subject.count {
+                flowNote = 0
+            }
+        }
+    }
+    
     var leader:MXSHero? {
         didSet {
             leader?.holdAction = MXSOneAction(axle: leader!, type: .active)
             leader?.signStatus = .active
-            leader?.cycleState = .leader
         }
     }
     func dealcardForGameStart() {
@@ -81,22 +69,22 @@ class MXSJudge {
         flowNote = -1
         diary.removeAll()
         subject.removeAll()
+        responder.removeAll()
     }
     
     func dealcardForNextLeader(reBlock:(_ hero :MXSHero, _ pokers :[MXSPoker]?) -> Void) {
         
         if leader != nil {
-            for hero in subject { hero.cycleState = .blank }
             leader!.endActiveByClearStatus()
             
             leader!.holdAction!.categy = .endLead //note end lead
             diary.append(leader!.holdAction!)
         }
         
-        flowNote += 1
+        self.flowNote += 1
         MXSLog("--------------------------")
         MXSLog(flowNote, "Did set flow note:")
-        let hero = subject[flowNote%subject.count]
+        let hero = subject[flowNote]
         self.leader = hero
         
         let pokers = MXSPokerCmd.shared.push(leader!.collectNumb)
@@ -118,9 +106,11 @@ class MXSJudge {
         let action:PokerAction = leader!.holdAction!.action
         if action == .unknown { return false }
         
+        if (action == .warFire || action == .arrowes) { return true }
+        
         if responder.count == 0 { //no aim
             if action == .remedy && leader!.HPCurrent < leader!.HPSum { return true }
-            if (action == .warFire || action == .arrowes) { return true }
+            
         }
         else {
             if action == .attack {
@@ -129,7 +119,7 @@ class MXSJudge {
             if action == .duel {
                 return true
             }
-            if (action == .steal || action == .destroy) && responder.first!.holdPokers.count > 0 {
+            if (action == .steal || action == .destroy) && responder.first!.ownPokers.count > 0 {
                 return true
             }
             if action == .remedy && responder.first!.HPCurrent < responder.first!.HPSum  {
@@ -153,17 +143,42 @@ class MXSJudge {
     }
     
     
+    func selectAllElseSelf(_ except:Bool) {
+//        let others = self.subject.filter { hero in
+//            //hero.cycleState == .blank
+//        }
+//        for hero in others {
+//            //hero.cycleState = .responder
+//            hero.signStatus = .selected
+//        }
+        
+        responder.removeAll()
+        
+        var byone = 0
+        while byone < subject.count-1 {
+            let next_index = (flowNote + byone + 1)%subject.count
+            let hero = subject[next_index]
+            responder.append(hero)
+            
+            hero.signStatus = .selected
+            
+            byone+=1
+        }
+        MXSLog("MXSJudge ----------------------> leader call group")
+    }
+    func oneByOneReplyGroup() {
+        let hero:MXSHero = responder.first!
+        hero.signStatus = .blank
+        self.responder.removeFirst()
+    }
     //MARK: - responder
 //    var responder:Array<MXSHero> = Array<MXSHero>()
-    var responder:Array<MXSHero> {
-        return self.subject.filter { hero in
-            hero.cycleState == .responder
-        }
-    }
+    var responder:[MXSHero] = [MXSHero]()
+    var replyer:MXSHero?
     
     func aimHavingPoker() -> Bool {
         let hero:MXSHero = responder.first!
-        return hero.holdPokers.count > 0
+        return hero.ownPokers.count > 0
     }
     
     func AIReplyAsResponder(reBlock:(_ type :ReplyResultType, _ pokers:[MXSPoker]?) -> Void) {
@@ -183,10 +198,10 @@ class MXSJudge {
             }
             else {// need
                 
-                if let idx = responder_one.holdPokers.firstIndex(where: { poker in
+                if let idx = responder_one.ownPokers.firstIndex(where: { poker in
                     poker.actionGuise == action_reply
                 }) {
-                    let contain = responder_one.holdPokers[idx]
+                    let contain = responder_one.ownPokers[idx]
                     responder_one.losePokers([contain])
                     if leader?.holdAction?.action == .warFire || leader?.holdAction?.action == .arrowes {
                         MXSLog("MXSJudge set responder ---------------------->  reply group")
@@ -204,7 +219,7 @@ class MXSJudge {
             
             let categy = self.leader!.holdAction!.categy
             if categy == .group {
-                selectAllElseSelf()
+                selectAllElseSelf(false)
                 //TODO: group, taketurns = one by one
 //                takeTurnsReply()
                 MXSLog("MXSJudge set responder ------ >>")
@@ -223,7 +238,7 @@ class MXSJudge {
 //        }
 //    }
     
-    func responderSufferConsequence(reBlock:(_ spoils :SpoilsType, _ pokers :[MXSPoker]?) -> Void) {
+    func responderSufferConsequence(reBlock:(_ spoils :SpoilsType, _ pokers :[MXSPoker]?) -> Void) -> Bool {
         //let conseq = leader?.holdAction?.consequence
         let hero:MXSHero = responder.first!
         let action = MXSJudge.cmd.leader?.holdAction?.action
@@ -232,7 +247,10 @@ class MXSJudge {
             reBlock(.nothing, nil)
         case .attack, .warFire, .arrowes, .duel:
             hero.minsHP()
-            reBlock(.nothing, nil)
+            reBlock(.injured, nil)
+            if hero.HPCurrent == 0 {
+                return true
+            }
         case .steal:
             let random = hero.rollRandomPoker()
             MXSLog(random, "The poker will handover")
@@ -249,6 +267,7 @@ class MXSJudge {
         case .none:
             break
         }
+        return false
     }
     
     func responderGainPoker(_ pokers:[MXSPoker]) -> Void {
@@ -273,10 +292,15 @@ class MXSJudge {
 //        }
 //        return others.first!
         MXSLog("Judge.subject: " + "\(self.subject)", "choose aim at")
-        let hero = self.subject.first { hero in
-            hero.cycleState == .blank
-        }
-        MXSLog(hero?.name as Any, "AI aim at hero")
+//        let hero = self.subject.first { hero in
+//            hero.cycleState == .blank
+//        }
+        
+        var next = flowNote+1
+        if next == subject.count { next = 0 }
+        let hero = subject[next]
+        
+        MXSLog(hero.name as String, "AI aim at hero")
         return hero
     }
 }
