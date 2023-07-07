@@ -136,7 +136,7 @@ class MXSHero {
             poker.state = .pass
             MXSLog(poker, name+" lose poker = ")
         }
-        pokersView?.layoutPokerView()
+        pokersView?.losePoker(pokers)
         concreteView?.pokerCount = ownPokers.count
     }
     func getPokers(_ pokers:[MXSPoker]) {
@@ -148,8 +148,8 @@ class MXSHero {
         }
         
         //纯粹UIAnimate
+        self.pokersView?.collectPoker(pokers)
         self.concreteView?.getPokerAnimate(pokers, complete: {
-            self.pokersView?.layoutPokerView()
             self.concreteView?.pokerCount = self.ownPokers.count
         })
         

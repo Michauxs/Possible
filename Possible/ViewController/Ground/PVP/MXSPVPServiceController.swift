@@ -21,7 +21,7 @@ class MXSPVPServiceController: MXSPVPController {
         
         player.joingame()
         pickHeroView.isHidden = true
-        MXSNetServ.shared.sendMsg([kMessageType:MessageType.pickHero.rawValue, kMessageValue:hero.photo])
+        MXSNetServ.shared.sendMsg([kMsgType:MessageType.pickHero.rawValue, kMsgValue:hero.photo])
         
         self.allPlayerReady()
     }
@@ -41,7 +41,7 @@ class MXSPVPServiceController: MXSPVPController {
             for poker in arr_p {
                 poker_uid_arr.append(poker.uid)
             }
-            MXSNetServ.shared.sendMsg([kMessageType:MessageType.dealcard.rawValue, kMessageValue:poker_uid_arr])
+            MXSNetServ.shared.sendMsg([kMsgType:MessageType.dealcard.rawValue, kMsgValue:poker_uid_arr])
             
             player.signStatus = .active
             leadingView.state = .attackUnPick
@@ -51,7 +51,7 @@ class MXSPVPServiceController: MXSPVPController {
     override func havesomeMessage(_ dict: Dictionary<String, Any>) {
         super.havesomeMessage(dict)
         
-        let type:MessageType = MessageType.init(rawValue: dict[kMessageType] as! Int)!
+        let type:MessageType = MessageType.init(rawValue: dict[kMsgType] as! Int)!
         switch type {
         case .joined:
             MXSLog("some one joined game")
@@ -60,10 +60,10 @@ class MXSPVPServiceController: MXSPVPController {
                 div_hero.append(h.photo)
             }
             //TODO：客户端加入时，主机端还没有准备好数据
-            MXSNetServ.shared.sendMsg([kMessageType:MessageType.showHero.rawValue, kMessageValue:div_hero])
+            MXSNetServ.shared.sendMsg([kMsgType:MessageType.showHero.rawValue, kMsgValue:div_hero])
             
         case .pickHero:
-            let hero_name = dict[kMessageValue] as! String
+            let hero_name = dict[kMsgValue] as! String
             if let hero = MXSHeroCmd.shared.someoneFromName(hero_name) {
 //                opponter = hero
 //                opponter.concreteView = oppontView
@@ -73,7 +73,7 @@ class MXSPVPServiceController: MXSPVPController {
             }
             
         case .discard:
-            let poker_uid_arr = dict[kMessageValue] as! Array<Int>
+            let poker_uid_arr = dict[kMsgValue] as! Array<Int>
             let poker_arr = MXSPokerCmd.shared.getPokersFromUids(poker_uid_arr)
             for p in poker_arr {
                 p.state = .pass

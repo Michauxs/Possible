@@ -110,7 +110,7 @@ class MXSHeroView: MXSBaseView {
         pok_view.frame = CGRect(x: (self.bounds.width-p_w)*0.5, y: (self.bounds.height-p_h)*0.5, width: p_w, height: p_h)
         self.addSubview(pok_view)
         
-        UIView.animate(withDuration: 0.75) {
+        UIView.animate(withDuration: 0.5) {
             self.pok_view.frame = CGRect(x: 5, y: 5, width: 0, height: 0)
 //            self.pok_view.layoutIfNeeded()
 //            self.pok_view.transform = CGAffineTransform.init(scaleX: 0, y: 0)

@@ -21,7 +21,7 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate {
         if MXSNetServ.shared.connectToService(server) {
 //            stopBrowser()
             
-            MXSNetServ.shared.sendMsg([kMessageType:MessageType.request.rawValue, kMessageValue:"请求接连，来自：" + MXSNetServ.shared.name])
+            MXSNetServ.shared.sendMsg([kMsgType:MessageType.request.rawValue, kMsgValue:"请求接连，来自：" + MXSNetServ.shared.name])
             MXSTIPMaskCmd.shared.showMaskWithTip("Waiting...", auto: false)
         }
     }
@@ -29,16 +29,16 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate {
     override func havesomeMessage(_ dict:Dictionary<String, Any>) {
         super.havesomeMessage(dict)
         
-        let type:MessageType = MessageType.init(rawValue: dict[kMessageType] as! Int)!
+        let type:MessageType = MessageType.init(rawValue: dict[kMsgType] as! Int)!
         switch type {
         case .request:
-            let name = dict[kMessageValue] as! String
+            let name = dict[kMsgValue] as! String
             let alert = UIAlertController.init(title: "接连请求", message: name, preferredStyle: .alert)
             alert.addAction(UIAlertAction.init(title: "拒绝", style: .cancel, handler: { (act) in
-                MXSNetServ.shared.sendMsg([kMessageType:MessageType.replyRequest.rawValue, kMessageValue:0])
+                MXSNetServ.shared.sendMsg([kMsgType:MessageType.replyRequest.rawValue, kMsgValue:0])
             }))
             alert.addAction(UIAlertAction.init(title: "接受", style: .default, handler: { (act) in
-                MXSNetServ.shared.sendMsg([kMessageType:MessageType.replyRequest.rawValue, kMessageValue:1])
+                MXSNetServ.shared.sendMsg([kMsgType:MessageType.replyRequest.rawValue, kMsgValue:1])
                 let vc = MXSPVPServiceController()
                 self.navigationController?.pushViewController(vc, animated: true)
             }))
@@ -46,7 +46,7 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate {
             
         case .replyRequest:
             MXSTIPMaskCmd.shared.dispearMaskTip()
-            let value = dict[kMessageValue] as! Int
+            let value = dict[kMsgValue] as! Int
             if value == 0 {
                 MXSTIPMaskCmd.shared.showMaskWithTip("connect be refused", auto:true)
                 

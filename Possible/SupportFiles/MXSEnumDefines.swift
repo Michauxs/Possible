@@ -22,8 +22,8 @@ func printPointer<T>(ptr: UnsafePointer<T>, _ sign:String="Possible") {
     print(ptr)
 }
 
-let kMessageType: String = "develop_message_type"
-let kMessageValue: String = "develop_message_value"
+let kMsgType: String = "develop_message_type"
+let kMsgValue: String = "develop_message_value"
 
 
 let kSkill: String = "key_skill"
