@@ -43,8 +43,8 @@ class MXSPassedView: MXSBaseView {
                 pok.concreteView = MXSPokerView.init()
             }
             pok.concreteView!.removeFromSuperview()
-            pok.concreteView!.frame = CGRect(x: self.frame.width-MXSSize.Pw, y: 0, width: MXSSize.Pw, height: MXSSize.Ph)
             self.addSubview(pok.concreteView!)
+            pok.concreteView!.frame = CGRect(x: self.frame.width-MXSSize.Pw, y: 0, width: MXSSize.Pw, height: MXSSize.Ph)
             pok.concreteView?.showWidth = MXSSize.Pw
             passPokeres.append(pok)
         }

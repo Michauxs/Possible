@@ -28,20 +28,22 @@ class MXSJudge {
     weak var desktop :MXSGroundController?
     
     //MARK: - intermediary
-    func appendOrRemoveResponder(_ hero:MXSHero) {
-        
+    func appendResponder(_ hero:MXSHero) {
+        hero.signStatus = .selected
+        self.responder.append(hero)
+//        leader?.holdAction?.aim.append(hero)
+    }
+    func removeResponder(_ hero:MXSHero) {
         if let index = self.responder.firstIndex(where: { one in hero.name == one.name }) {
             hero.signStatus = .blank
             self.responder.remove(at: index)
-        }
-        else {
-            hero.signStatus = .selected
-            self.responder.append(hero)
+//            leader?.holdAction?.aim.remove(at: index)
         }
     }
     
     func clearResponder() {
         self.responder.removeAll()
+        leader?.holdAction?.aim.removeAll()
     }
     
     //MARK: - leader cycle
@@ -131,7 +133,7 @@ class MXSJudge {
     }
     
     
-    func markDiscardedOnAction() {
+    func recordDiscardPokerToAction() {
         leader?.holdAction?.pokers.append(contentsOf: leader!.picked)
         MXSLog(leader?.holdAction?.pokers as Any, "action note pokers")
     }
@@ -142,20 +144,18 @@ class MXSJudge {
         leader!.holdAction = MXSOneAction(axle: leader!, type: .active)
     }
     
-    
-    func selectAllElseSelf(_ except:Bool) {
+    /**⚠️默认不包括自己**/
+    func selectAllPlayer(exceptSelf:Bool = true) {
 //        let others = self.subject.filter { hero in
 //            //hero.cycleState == .blank
-//        }
-//        for hero in others {
-//            //hero.cycleState = .responder
-//            hero.signStatus = .selected
 //        }
         
         responder.removeAll()
         
         var byone = 0
-        while byone < subject.count-1 {
+        var except:Int = 0
+        if exceptSelf { except = 1 }
+        while byone < subject.count-except {
             let next_index = (flowNote + byone + 1)%subject.count
             let hero = subject[next_index]
             responder.append(hero)
@@ -170,14 +170,29 @@ class MXSJudge {
         let hero:MXSHero = responder.first!
         hero.signStatus = .blank
         self.responder.removeFirst()
+        
+        MXSLog("one opponter done -> goon")
     }
+    
     //MARK: - responder
-//    var responder:Array<MXSHero> = Array<MXSHero>()
     var responder:[MXSHero] = [MXSHero]()
+    var activer:MXSHero?
     var replyer:MXSHero?
+    /*------------ 触动链 --------------- 230719：可能不需要触动链，触动激活是临时的，只需记录当前正在对峙的双方
+     Activer <-note | aim-> Replyer <-note | next-> Next ...
+     */
+    
+    func pleaseResponderReply() -> MXSHero? {
+        var hero:MXSHero?
+        if MXSJudge.cmd.responder.count > 0 {
+            hero = MXSJudge.cmd.responder.first!
+            hero!.holdAction = MXSOneAction(axle: hero!, type: .reply)
+        }
+        return hero
+    }
     
     func aimHavingPoker() -> Bool {
-        let hero:MXSHero = responder.first!
+        let hero = responder.first!
         return hero.ownPokers.count > 0
     }
     
@@ -217,9 +232,9 @@ class MXSJudge {
         }
         else { // no aim
             
-            let categy = self.leader!.holdAction!.categy
-            if categy == .group {
-                selectAllElseSelf(false)
+            let categy = self.leader!.holdAction!.aimType
+            if categy == .aoe {
+                self.selectAllPlayer()
                 //TODO: group, taketurns = one by one
 //                takeTurnsReply()
                 MXSLog("MXSJudge set responder ------ >>")

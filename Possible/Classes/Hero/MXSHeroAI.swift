@@ -69,10 +69,10 @@ extension MXSHero {
     }
     
     //MARK: - AI leader
-    public func hasPokerDoAttack(reBlock:(_ has :Bool, _ pokers :[MXSPoker]?, _ skill:MXSSkill?) -> Void) -> Bool  {
+    public func hasPokerDoAttack(reBlock:(_ has :Bool, _ pokers :[MXSPoker]?, _ skill:MXSSkill?) -> Void) {
         if self.ownPokers.count == 0 {
             reBlock(false, nil, nil)
-            return false
+            return
         }
         
         
@@ -85,24 +85,24 @@ extension MXSHero {
                     hasPoker = false
                 case .steal, .destroy:
                     if let target = MXSJudge.cmd.returnMinHero() {
-                        self.takeOrDisAimAtHero(target)
+                        MXSJudge.cmd.appendResponder(target)
                         hasPoker = MXSJudge.cmd.aimHavingPoker()
                     }
                 case .attack:
                     if let target = MXSJudge.cmd.returnMinHero() {
-                        self.takeOrDisAimAtHero(target)
+                        MXSJudge.cmd.appendResponder(target)
                         hasPoker = attackCount < attackLimit
                     }
                 case .warFire, .arrowes:
                     hasPoker = true
                 case .duel:
                     if let target = MXSJudge.cmd.returnMinHero() {
-                        self.takeOrDisAimAtHero(target)
+                        MXSJudge.cmd.appendResponder(target)
                         hasPoker = true
                     }
                 case .remedy:
                     if let target = MXSJudge.cmd.returnMinHero() {
-                        self.takeOrDisAimAtHero(target)
+                        MXSJudge.cmd.appendResponder(target)
                         hasPoker = target.canRecover()
                     }
                     else { hasPoker = self.canRecover() }
@@ -112,21 +112,19 @@ extension MXSHero {
                 
                 if hasPoker {
                     reBlock(hasPoker, [poker], nil)
-                    return hasPoker
+                    return
                 }
             }//
                 
         }
         
         reBlock(hasPoker, nil, nil)
-        return hasPoker
     }
     
-    public func asReplyerParryAttack(reBlock:(_ type :ReplyResultType, _ pokers:[MXSPoker]?) -> Void) {
+    public func asReplyerParryAttack(reBlock:(_ type:ReplyResultType, _ pokers:[MXSPoker]?) -> Void) {
         let leader = MXSJudge.cmd.leader!
         let action_reply: PokerAction = leader.holdAction!.reply.act
         
-        self.holdAction = MXSOneAction(axle: self, type: .reply)
         MXSJudge.cmd.diary.append(self.holdAction!)
         
         if action_reply == .recover {
@@ -137,24 +135,24 @@ extension MXSHero {
             self.getPokers(leader.holdAction!.pokers)
             reBlock(.gain, leader.holdAction?.pokers)
         }
-        else {// need
-            
-            if let index = self.ownPokers.firstIndex(where: { poker in poker.actionGuise == action_reply }) {
-                let contain = self.ownPokers[index]
-                self.losePokers([contain])
-                
-                if leader.holdAction?.action == .warFire || leader.holdAction?.action == .arrowes {
-                    MXSLog("responder ---------------------->  reply group")
-                }
-                
-                reBlock(.success, [contain])
+        else {// need parry
+            if self.isAxle {
+                reBlock(.operate, nil)
             }
             else {
-                if leader.holdAction?.action == .warFire || leader.holdAction?.action == .arrowes {
-                    MXSLog("responder ----------------------> can't reply group")
+                //AI
+                if let index = self.ownPokers.firstIndex(where: { poker in poker.actionGuise == action_reply }) {
+                    let contain = self.ownPokers[index]
+                    self.losePokers([contain])
+                    reBlock(.success, [contain])
+                    
+                    if leader.holdAction?.aimType == .aoe { MXSLog("responder ---------->  reply group") }
                 }
-                
-                reBlock(.failed, nil)
+                else {
+                    reBlock(.failed, nil)
+                    
+                    if leader.holdAction?.aimType == .aoe { MXSLog("responder ----------> can't reply group") }
+                }
             }
         }
         

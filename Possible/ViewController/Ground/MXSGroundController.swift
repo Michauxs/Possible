@@ -177,22 +177,24 @@ class MXSGroundController: MXSViewController {
     public func certainForAttack() {
         leadingView.hide()
         
-        let waiting = MXSJudge.cmd.leader?.discardPoker(reBlock: { type, poker in
+        MXSJudge.cmd.leader?.discardPoker(reBlock: { needWaiting, type, poker in
             if type == .passed {
                 passedView.collectPoker(poker)
             }
             else if type == .handover {//= active give + responder gain
                 
             }
+            
+            if needWaiting {
+                self.checkResponderAndWaitReply()
+            }
+            else {
+                MXSJudge.cmd.leaderReactive()
+                leadingView.state = .attackUnPick
+            }
         })
-        
-        if waiting! { self.waitingResponerReply() }
-        else {
-            MXSJudge.cmd.leaderReactive()
-            leadingView.state = .attackUnPick
-        }
     }
-    public func waitingResponerReply() { //sub object
+    public func checkResponderAndWaitReply() { //sub object
         
     }
     
@@ -217,8 +219,6 @@ class MXSGroundController: MXSViewController {
     public func certainForDefense() {
         leadingView.hide()
         playerReplyAsResponder()
-        
-//        MXSJudge.cmd.
     }
     func playerReplyAsResponder() { //sub object
         
@@ -272,7 +272,14 @@ class MXSGroundController: MXSViewController {
         }
         //TODO: - tap oneself -> return
         
-        MXSJudge.cmd.leader?.takeOrDisAimAtHero(heroView.belong!)
+        let hero = heroView.belong!
+        if heroView.signStatus == .selected {
+            MXSJudge.cmd.removeResponder(hero)
+        }
+        else {
+            MXSJudge.cmd.appendResponder(hero)
+        }
+        
         checkCanCertainAction()
     }
     

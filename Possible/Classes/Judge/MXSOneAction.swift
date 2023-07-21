@@ -8,7 +8,7 @@
 
 import UIKit
 
-enum CycleType : String{
+enum CycleType : String {
     case start = "start"
     case end = "end"
 }
@@ -17,10 +17,9 @@ enum ActionType {
     case reply
 }
 enum ActionCategy {
-    case single
-    case group
-    case oneself
-    case endLead
+    case unknown
+    case alive//common act
+    case endLead//end note
 }
 
 enum EffectType {
@@ -35,6 +34,13 @@ enum ConsequenceType {
     case buff
     case hp
     case poker
+}
+enum ActionAimType {
+    case unknown
+    case oneself
+    case ptp
+    case aoe
+    case all//
 }
 
 class MXSOneAction {
@@ -71,7 +77,8 @@ class MXSOneAction {
     
     weak var belong:MXSHero?
     var type:ActionType = .active
-    var categy:ActionCategy = .single
+    var categy:ActionCategy = .alive
+    var aimType:ActionAimType = .unknown
     var skill:MXSSkill?
     var action:PokerAction = .unknown {
         didSet {
@@ -83,34 +90,39 @@ class MXSOneAction {
             case .steal, .destroy:
                 reply.count = 1
                 reply.act = .detect
+                aimType = .ptp
             case .attack:
                 reply.count = 1
                 reply.act = .dodge
+                aimType = .ptp
             case .warFire:
                 reply.count = 1
                 reply.act = .attack
+                aimType = .aoe
             case .arrowes:
                 reply.count = 1
                 reply.act = .dodge
+                aimType = .aoe
             case .duel:
                 reply.count = 1
                 reply.act = .attack
+                aimType = .ptp
             case .remedy:
                 reply.count = 0
                 reply.act = .recover
+                aimType = .ptp
             case .give:
                 reply.count = 0
                 reply.act = .gain
+                //TODO: one -> group: several/multiple
+                aimType = .ptp
             }
             
-            if action == .warFire || action == .arrowes {
-                categy = .group
-            }
-            else { categy = .single }
         }
     }
     lazy var pokers:Array<MXSPoker> = Array<MXSPoker>()
     lazy var aim:Array<MXSHero> = Array<MXSHero>()
+    
     lazy var reply:ActionReply = ActionReply()
     lazy var effect:ActionEffect = ActionEffect()
     lazy var consequence:ActionConsequence = ActionConsequence()

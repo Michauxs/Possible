@@ -31,7 +31,11 @@ class MXSPokerView: MXSBaseView {
     var actionLabel: UILabel = UILabel.init(text: "0", fontSize: 618, textColor: .black, align: .center)
     var actionGuiseLabel: UILabel = UILabel.init(text: "0", fontSize: 313, textColor: .black, align: .center)
     
+    var beAnimate: Bool = false
     var isUp: Bool = false {
+        willSet {
+            if beAnimate { return }
+        }
         didSet {
             let org_y = self.frame.origin.y
             var offset_y:CGFloat = 0.0
@@ -45,11 +49,11 @@ class MXSPokerView: MXSBaseView {
                 belong?.colorGuise = belong!.color
             }
             
-            self.isUserInteractionEnabled = false
+            beAnimate = true
             UIView.animate(withDuration: 0.1, animations: {
                 self.frame = CGRect.init(x: self.frame.origin.x, y: offset_y, width: MXSSize.Pw, height: MXSSize.Ph)
             }) { (success) in
-                self.isUserInteractionEnabled = true
+                self.beAnimate = false
             }
         }
     }
@@ -66,16 +70,19 @@ class MXSPokerView: MXSBaseView {
         }
     }
     
-    
-    weak var controller: MXSViewController? {
-        didSet {
-            self.isUserInteractionEnabled = true
-            self.addGestureRecognizer(UITapGestureRecognizer.init(target: self, action: #selector(didTapedSelf)))
-        }
-    }
+//    weak var controller: MXSViewController?
+//    weak var controller: MXSViewController? {
+//        didSet {
+//            self.isUserInteractionEnabled = true
+//            self.addGestureRecognizer(UITapGestureRecognizer.init(target: self, action: #selector(didTapedSelf)))
+//        }
+//    }
     @objc func didTapedSelf() {
         MXSLog("poker did taped")
-        self.controller?.perform(#selector(MXSGroundController.someonePokerTaped(_:)), with: self)
+        if beAnimate {
+            return
+        }
+        self.control?.perform(#selector(MXSGroundController.someonePokerTaped(_:)), with: self)
 //        self.controller?.perform(#selector(someonePokerTapedWithPokerView:), with: self)
 //        let _ = self.controller?.perform(Selector(("someonePokerTaped:")), with: self)?.takeUnretainedValue()
 //        self.controller?.someonePokerTaped(self)
@@ -125,6 +132,11 @@ class MXSPokerView: MXSBaseView {
         didSet{
             actionGuiseLabel.text = actionTextTranslater[actionGuise!]
         }
+    }
+    
+    convenience init(Belong:MXSPoker, controller:MXSViewController) {
+        self.init(control: controller)
+        MXSLog("after pokerView setSubviews")
     }
     
     override func setupSubviews() {
@@ -187,6 +199,9 @@ class MXSPokerView: MXSBaseView {
 //            make.edges.equalTo(self)
 //        }
 //        reverseView.isHidden = true
+        
+        self.isUserInteractionEnabled = true
+        self.addGestureRecognizer(UITapGestureRecognizer.init(target: self, action: #selector(didTapedSelf)))
     }
     
 

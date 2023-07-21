@@ -32,11 +32,7 @@ class MXSViewController: UIViewController {
 //        MXSNetServ.shared.belong = self
     }
     
-    // MARK: - common
-//    public func someonePokerTaped(_ pokerView: MXSPokerView) {
-//        
-//    }
-    
+    // MARK: - common    
     public func someoneHeroTaped(_ heroView: MXSHeroView) {
         
     }

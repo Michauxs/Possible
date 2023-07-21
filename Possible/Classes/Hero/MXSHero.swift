@@ -94,9 +94,14 @@ class MXSHero {
         desc = attr[kStringDesc] as? String
     }
     
-    var pokersView: MXSGraspPokerView? {
+    var graspCount:Int = 0 {
         didSet {
-            pokersView?.belong = self
+            concreteView?.pokerCount = graspCount
+        }
+    }
+    var oneGraspPokerView: MXSGraspPokerView? {
+        didSet {
+            oneGraspPokerView?.belong = self
         }
     }
     var concreteView: MXSHeroView? {
@@ -136,72 +141,84 @@ class MXSHero {
             poker.state = .pass
             MXSLog(poker, name+" lose poker = ")
         }
-        pokersView?.losePoker(pokers)
-        concreteView?.pokerCount = ownPokers.count
+        oneGraspPokerView?.losePokerView(pokers, complete: {
+            
+        })
+        self.graspCount = ownPokers.count
     }
     func getPokers(_ pokers:[MXSPoker]) {
         ownPokers.append(contentsOf: pokers)
         
         for poker in pokers {
             poker.state = .handOn
-            MXSLog(poker, self.name+" get poker = ")
+            MXSLog(poker, self.name + " get poker = ")
         }
         
         //纯粹UIAnimate
-        self.pokersView?.collectPoker(pokers)
+        self.oneGraspPokerView?.collectPoker(pokers)
         self.concreteView?.getPokerAnimate(pokers, complete: {
             self.concreteView?.pokerCount = self.ownPokers.count
         })
         
     }
     /**return is need reply*/
-    func discardPoker(reBlock:(_ type:DiscardPokerType, _ poker:[MXSPoker]) -> Void) -> Bool {
+    func discardPoker(reBlock:(_ needWaiting:Bool, _ type:DiscardPokerType, _ poker:[MXSPoker]) -> Void) {
         
-        losePokers(self.picked)
+        let pickedPokers = self.picked
+        let action = holdAction?.action
+        losePokers(pickedPokers)
+        //action修正
+        //TODO: maybe ,can adjust that append Responder on picked poker
+        if MXSJudge.cmd.responder.count == 0 && action == .remedy {
+            MXSJudge.cmd.appendResponder(self)
+        }
         MXSJudge.cmd.diary.append(holdAction!)
         
-        if holdAction?.action == .give {
-            reBlock(.handover, picked)
-        }
-        else {
-            
-            if holdAction?.action == .warFire || holdAction?.action == .arrowes {
-                MXSJudge.cmd.selectAllElseSelf(false)
+        //reply
+        if holdAction?.type == .reply {
+            MXSLog(holdAction?.pokers as Any, "after ActivePicked be remove, the markAction'pokers")
+            if holdAction?.action == .steal {
+                reBlock(false, .handover, pickedPokers)
             }
-            
-            reBlock(.passed, picked)
+            else {
+                reBlock(false, .passed, pickedPokers)
+            }
         }
-        
-        var need_wait_reply = true
-        if holdAction?.type == .active {
+        else {//active
             
-            MXSJudge.cmd.markDiscardedOnAction()
+            MXSJudge.cmd.recordDiscardPokerToAction()
             //note onestep active action
             lastActiveAction = holdAction
+            MXSLog(picked, name + " Active with pokers")
             
-            let action = holdAction?.action
-            if action == .attack {
-                attackCount+=1
+            if holdAction?.aimType == .aoe {
+                MXSJudge.cmd.selectAllPlayer()
+                reBlock(true, .passed, pickedPokers)
             }
-            else if action == .remedy {
-                let _ = plusHP()
-                need_wait_reply = false
+            else if holdAction?.aimType == .all {
+                
             }
-            
-            MXSLog(picked, name+" Active with pokers")
-        }
-        else {//.reply
-            MXSLog(picked, name+" Reply with pokers")
+            else if holdAction?.aimType == .ptp {
+                if action == .give {
+                    reBlock(true, .handover, pickedPokers)
+                }
+                else {
+                    if action == .attack {
+                        attackCount+=1
+                    }
+                    reBlock(true, .passed, pickedPokers)
+                }
+            }
+            else if holdAction?.aimType == .oneself {
+                reBlock(false, .passed, pickedPokers)
+            }
+            else {
+                
+            }
         }
         
-        
+        /**------------------------------**/
         self.picked.removeAll()// giveup
-        if holdAction?.type == .active {
-            MXSLog(holdAction?.pokers as Any, "after ActivePicked be remove, the markAction'pokers")
-            
-        }
-        
-        return need_wait_reply
     }
     
     func rollRandomPoker() -> MXSPoker {
@@ -218,11 +235,10 @@ class MXSHero {
     }
     
     // MARK: - hero action
+    weak var aim:MXSHero?
+    weak var aimedBySomeone:MXSHero?
     var lastActiveAction:MXSOneAction?
     var holdAction:MXSOneAction?
-    func makeOneReplyAction() {
-        holdAction = MXSOneAction(axle: self, type: .reply)
-    }
     
     //MARK: - skill
     func stopAllSkill(_ state:SkillState) {
@@ -261,17 +277,6 @@ class MXSHero {
     //MARK: - hero->Judge
     func joingame(){
         MXSJudge.cmd.subject.append(self)
-    }
-    func takeOrDisAimAtHero(_ hero:MXSHero) {
-        if let idx = holdAction?.aim.firstIndex(where: { hero_one in
-            hero_one === hero
-        }) {
-            holdAction?.aim.remove(at: idx)
-        }
-        else {
-            holdAction?.aim.append(hero)
-        }
-        MXSJudge.cmd.appendOrRemoveResponder(hero)
     }
     
     func distakeAllAim() {

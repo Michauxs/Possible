@@ -88,7 +88,7 @@ enum PokerState : Int {
 enum PokerAction : Int {
     case unknown = 0
     case attack = 1
-    case dodge
+    case dodge //闪避
     case warFire
     case arrowes
     case duel
@@ -176,6 +176,7 @@ enum ReplyResultType : Int {
     case success
     case failed
     case gain
+    case operate
 }
 
 //enum CycleState {
