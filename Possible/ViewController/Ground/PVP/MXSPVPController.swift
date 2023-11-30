@@ -85,7 +85,7 @@ class MXSPVPController: MXSGroundController {
     }
     
     //MARK:- leadingView
-    public override func certainForAttack() {
+    public override func offensiveCertain() {
         leadingView.hide()
         
         let poker = player.picked.first!
@@ -100,7 +100,7 @@ class MXSPVPController: MXSGroundController {
         
     }
     
-    public override func endActive() {
+    public override func offensiveEndActive() {
         leadingView.hide()
         leadingView.state = .defenseUnPick
         passedView.fadeout()
@@ -108,7 +108,7 @@ class MXSPVPController: MXSGroundController {
         player.signStatus = .blank
         MXSNetServ.shared.sendMsg([kMsgType:MessageType.turnOver.rawValue, kMsgValue:0])
     }
-    public override func certainForDefense() {
+    public override func defensiveCertain() {
         MXSJudge.cmd.leaderReactive()
         leadingView.hide()
     }

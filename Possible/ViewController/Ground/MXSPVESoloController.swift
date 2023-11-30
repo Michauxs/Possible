@@ -64,7 +64,8 @@ class MXSPVESoloController: MXSGroundController {
             player = hero
             player.isAxle = true
             
-            player.oneGraspPokerView = graspPokerView;
+            player.oneGraspPokerView = self.graspPokerView;
+            player.leadingView = self.leadingView
         }
         
         if chairNumb == self.numberOfChair {
@@ -77,13 +78,12 @@ class MXSPVESoloController: MXSGroundController {
     func allHeroReady() {
         if MXSPokerCmd.shared.shuffle() {
             
-            MXSJudge.cmd.dealcardForGameStart()
-            MXSJudge.cmd.dealcardForNextLeader { hero, pokers in
+            MXSJudge.cmd.dealcardForGameStart { hero in
                 if hero.isAxle {
                     leadingView.state = .attackUnPick
                 }
                 else {
-                    AITurnToAttack()
+                    turnToAIAttack()
                 }
             }
         }
@@ -108,10 +108,10 @@ class MXSPVESoloController: MXSGroundController {
     // MARK: - leadingView
     override func checkResponderAndWaitReply() {
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(750)) {
-            self.asyncAfterSecondWaitingResponerReply()
+            self.responerReplyAfterFewSecond()
         }
     }
-    func asyncAfterSecondWaitingResponerReply() {
+    func responerReplyAfterFewSecond() {
         guard let replyer = MXSJudge.cmd.pleaseResponderReply() else {
             // no one reply / all reply done
             MXSJudge.cmd.leaderReactive()
@@ -119,59 +119,74 @@ class MXSPVESoloController: MXSGroundController {
             if MXSJudge.cmd.leader!.isAxle {
                 leadingView.state = .attackUnPick
             }
-            else {
-                AITurnToAttack()
-            }
+            else { turnToAIAttack() }
             return
         }
         
-//        if let replyer = MXSJudge.cmd.pleaseResponderReply() { }
-        replyer.asReplyerParryAttack(reBlock: { type, pokers in
-            if type == .failed {
-                let hasFailed = MXSJudge.cmd.responderSufferConsequence { spoils, pokers in
-                    if spoils == .destroy {
-                        passedView.collectPoker(pokers!)
-                    }
-                    else if spoils == .wrest {
-                        
-                    }
-                    else if spoils == .injured {
-                        if replyer.HPCurrent == 0 {
-                            return
-                        }
+        if MXSJudge.cmd.leader!.isAxle {
+            replyer.parryAttack { parry, pokers, pokerWay in
+                if parry == .recover { }
+                else if parry == .gain { }
+                else if parry == .operate {
+                    leadingView.state = .defenseUnPick
+                    MXSLog("there need Return")
+                    return
+                }
+                
+                MXSLog("step done")
+                MXSJudge.cmd.theHeroHasReplyed()
+                checkResponderAndWaitReply()
+            }
+        }
+        else {
+            replyer.AIParryAttack { parry, pokers, pokerWay in
+                self.defensiverParryAttack(hero:replyer, parry: parry, pokers: pokers, pokerWay: pokerWay)
+            }
+        }
+    }
+    
+    var playerParryAttackBlock : HeroParryResult?
+    func defensiverParryAttack(hero:MXSHero, parry:ParryType, pokers:[MXSPoker]?, pokerWay:LosePokerWay?) {
+        if parry == .failed {
+            MXSJudge.cmd.responderSufferConsequence { spoils, pokers in
+                if spoils == .destroy {
+                    passedView.collectPoker(pokers!)
+                }
+                else if spoils == .wrest {
+                    
+                }
+                else if spoils == .injured {
+                    if hero.HPCurrent <= 0 {
+                        return
                     }
                 }
             }
-            else if type == .success {
-                passedView.collectPoker(pokers!)
-            }
-            else if type == .nothing {
-                
-            }
-            else if type == .gain {
-                
-            }
-            else if type == .operate {
-                leadingView.state = .defenseUnPick
-                MXSLog("there need Return")
-                return
-            }
-            
-            MXSLog("step done")
-            MXSJudge.cmd.oneByOneReplyGroup()
-            checkResponderAndWaitReply()
-        })
-        
-    }
-    
-    override func endLeaderCycle() {
-        MXSJudge.cmd.dealcardForNextLeader { hero, pokers in
-            
         }
-        AITurnToAttack()
+        else if parry == .success {
+            passedView.collectPoker(pokers!)
+        }
+        else if parry == .unneed { }
+        else if parry == .gain { }
+        else if parry == .operate {
+            leadingView.state = .defenseUnPick
+            MXSLog("there need Return")
+            return
+        }
+        
+        MXSLog("step done")
+        MXSJudge.cmd.theHeroHasReplyed()
+        checkResponderAndWaitReply()
     }
     
-    override func playerReplyAsResponder() {
+    override func offensiveEndActiveSubject() {
+        player.endCurrentCycle { hero in
+            self.turnToAIAttack()
+        }
+    }
+    
+    override func defensiveCertainSubject() {
+//        self.playerParryAttackBlock?(.unneed, nil, nil)
+        
         let responder = MXSJudge.cmd.responder.first
         responder?.discardPoker(reBlock: { needWaiting, type, poker in
             if type == .passed {
@@ -186,15 +201,15 @@ class MXSPVESoloController: MXSGroundController {
 //        MXSJudge.cmd.leaderReactive()
 //        AITurnToAttack()
         
-        MXSJudge.cmd.oneByOneReplyGroup()
+        MXSJudge.cmd.theHeroHasReplyed()
         checkResponderAndWaitReply()
     }
-    func AITurnToAttack() {
+    func turnToAIAttack() {
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(750)) {
-            self.asyncAfterSecondAICantAttack()
+            self.AIDoActionAfterFewSecond()
         }
     }
-    func asyncAfterSecondAICantAttack() {
+    func AIDoActionAfterFewSecond() {
         let leader = MXSJudge.cmd.leader!
         leader.hasPokerDoAttack(reBlock: { has, pokers, skill in
             if has {
@@ -212,34 +227,31 @@ class MXSPVESoloController: MXSGroundController {
                         checkResponderAndWaitReply()
                     }
                     else {
-                        AITurnToAttack()
+                        turnToAIAttack()
                     }
                 })
             }
             else {
-                AICantAttack()
+                MXSLog("AI cant attack")
+                passedView.fadeout()
+                leader.endCurrentCycle { hero in
+                    if hero.isAxle {
+                        self.leadingView.state = .attackUnPick
+                    }
+                    else {
+                        self.turnToAIAttack()
+                    }
+                }
             }
+                
         })
         
     }
     
     
-    func AICantAttack() {
-        MXSLog("AI cant attack")
-        passedView.fadeout()
+    override func defensiveCancelSubject() {
         
-        MXSJudge.cmd.dealcardForNextLeader { hero, pokers in
-            
-            if hero.isAxle { leadingView.state = .attackUnPick }
-            else {
-                AITurnToAttack()
-            }
-        }
-    }
-    
-    override func playerDidntReply() {
-        
-        let hasDefault = MXSJudge.cmd.responderSufferConsequence { spoils, pokers in
+        MXSJudge.cmd.responderSufferConsequence { spoils, pokers in
             if spoils == .destroy {
                 passedView.collectPoker(pokers!)
             }
@@ -247,14 +259,15 @@ class MXSPVESoloController: MXSGroundController {
                 //let pok_view = MXSPokerView()
             }
             else if spoils == .injured {
-                if player.HPCurrent == 0 {
+                if player.HPCurrent <= 0 {
                     return
                 }
+                else {
+                    
+                }
             }
-        }
-        
-        if hasDefault == false {
-            MXSJudge.cmd.oneByOneReplyGroup()
+            
+            MXSJudge.cmd.theHeroHasReplyed()
             self.checkResponderAndWaitReply()
         }
     }

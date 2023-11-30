@@ -99,9 +99,14 @@ class MXSHero {
             concreteView?.pokerCount = graspCount
         }
     }
-    var oneGraspPokerView: MXSGraspPokerView? {
+    weak var oneGraspPokerView: MXSGraspPokerView? {
         didSet {
             oneGraspPokerView?.belong = self
+        }
+    }
+    weak var leadingView: MXSLeadingView? {
+        didSet {
+            leadingView?.belong = self
         }
     }
     var concreteView: MXSHeroView? {
@@ -136,14 +141,17 @@ class MXSHero {
         }
     }
     func losePokers(_ pokers:[MXSPoker]) {
+        
+        MXSJudge.cmd.record(discardPokers: pokers, toAction: self.holdAction!)
+        
         for poker in pokers {
             ownPokers.removeAll(where: { $0 === poker })
             poker.state = .pass
             MXSLog(poker, name+" lose poker = ")
         }
-        oneGraspPokerView?.losePokerView(pokers, complete: {
-            
-        })
+//        oneGraspPokerView?.losePokerView(pokers, complete: {
+//
+//        })
         self.graspCount = ownPokers.count
     }
     func getPokers(_ pokers:[MXSPoker]) {
@@ -161,12 +169,14 @@ class MXSHero {
         })
         
     }
-    /**return is need reply*/
-    func discardPoker(reBlock:(_ needWaiting:Bool, _ type:DiscardPokerType, _ poker:[MXSPoker]) -> Void) {
+    
+    //offensive/defensive
+    /**只做 修正\前置判定\补充指定\记录 等前置操作 -> 反馈有无pokerView及其处置方式*/
+    func discardPoker(reBlock:(_ needWaiting:Bool, _ type:LosePokerWay, _ poker:[MXSPoker]) -> Void) {
         
         let pickedPokers = self.picked
         let action = holdAction?.action
-        losePokers(pickedPokers)
+        self.losePokers(pickedPokers)
         //action修正
         //TODO: maybe ,can adjust that append Responder on picked poker
         if MXSJudge.cmd.responder.count == 0 && action == .remedy {
@@ -175,7 +185,7 @@ class MXSHero {
         MXSJudge.cmd.diary.append(holdAction!)
         
         //reply
-        if holdAction?.type == .reply {
+        if holdAction?.fensive == .defensive {
             MXSLog(holdAction?.pokers as Any, "after ActivePicked be remove, the markAction'pokers")
             if holdAction?.action == .steal {
                 reBlock(false, .handover, pickedPokers)
@@ -186,7 +196,6 @@ class MXSHero {
         }
         else {//active
             
-            MXSJudge.cmd.recordDiscardPokerToAction()
             //note onestep active action
             lastActiveAction = holdAction
             MXSLog(picked, name + " Active with pokers")
@@ -217,7 +226,11 @@ class MXSHero {
             }
         }
         
-        /**------------------------------**/
+        func discardPokerOnDefensive() {
+            
+        }
+        
+        /*------------------------------*/
         self.picked.removeAll()// giveup
     }
     
@@ -239,6 +252,33 @@ class MXSHero {
     weak var aimedBySomeone:MXSHero?
     var lastActiveAction:MXSOneAction?
     var holdAction:MXSOneAction?
+    
+    func endCurrentCycle( next:((_ hero:MXSHero)->Void)?) {
+        MXSJudge.cmd.dealcardForNextLeader { hero, pokers in
+            if next != nil { next!(hero) }
+        }
+    }
+    
+    
+    public func parryAttack(reBlock:HeroParryResult) { //(_ parry:ParryType, _ pokers:[MXSPoker]?, _ pokerWay:LosePokerWay?)
+        let leader = MXSJudge.cmd.leader!
+        let pokers: [MXSPoker] = leader.holdAction!.pokers
+        let action_reply: PokerAction = leader.holdAction!.reply.act
+        
+        MXSJudge.cmd.diary.append(self.holdAction!)
+        
+        if action_reply == .recover {
+            let _ = self.plusHP()
+            reBlock(.recover, nil, nil)
+        }
+        else if action_reply == .gain {
+            self.getPokers(pokers)
+            reBlock(.gain, pokers, .handover)
+        }
+        else {
+            reBlock(.operate, nil, .nil)
+        }
+    }
     
     //MARK: - skill
     func stopAllSkill(_ state:SkillState) {

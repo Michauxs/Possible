@@ -8,6 +8,9 @@
 
 import UIKit
 
+
+typealias HeroParryResult = (_ parry:ParryType, _ pokers:[MXSPoker]?, _ pokerWay:LosePokerWay?) -> Void
+
 func MXSLog(_ args:Any, _ sign:String = "MXSSwift") {
     #if DEBUG
         print(Date.init(), sign, ":", args)
@@ -165,18 +168,23 @@ enum SpoilsType {
     case wrest
     case gain
     case injured
+    case recover
 }
-
-enum DiscardPokerType : Int {
-    case passed = 0
-    case handover // = active give + responder gain
-}
-enum ReplyResultType : Int {
-    case nothing = 0
+enum ParryType : Int {
+    case unknown = 0
+    case unneed = 1
     case success
     case failed
     case gain
+    case recover
     case operate
+}
+
+
+enum LosePokerWay : Int {
+    case unknown = 0
+    case passed = 1
+    case handover // = active give + responder gain
 }
 
 //enum CycleState {

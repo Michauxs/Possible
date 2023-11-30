@@ -117,7 +117,7 @@ class MXSGroundController: MXSViewController {
         let skill_width:CGFloat = MXSSize.Hw
         leadingView.frame = CGRect(x: 10 + MXSSize.Hw + 10, y: enterfaceView.frame.minY - 44, width: middle_width, height: 44)
         view.addSubview(leadingView)
-        leadingView.belong = self
+        leadingView.controller = self
         
         playerView.frame = CGRect.init(x: 10, y: MXSSize.Sh - MXSSize.Hh, width: MXSSize.Hw, height: MXSSize.Hh)
         view.addSubview(playerView)
@@ -174,61 +174,56 @@ class MXSGroundController: MXSViewController {
     }
     
     //MARK: - leadingView
-    public func certainForAttack() {
+    public func offensiveCertain() {
         leadingView.hide()
         
         MXSJudge.cmd.leader?.discardPoker(reBlock: { needWaiting, type, poker in
             if type == .passed {
-                passedView.collectPoker(poker)
+//                passedView.collectPoker(poker)
             }
             else if type == .handover {//= active give + responder gain
                 
             }
             
-            if needWaiting {
-                self.checkResponderAndWaitReply()
-            }
-            else {
-                MXSJudge.cmd.leaderReactive()
-                leadingView.state = .attackUnPick
-            }
+            self.checkResponderAndWaitReply()
         })
     }
     public func checkResponderAndWaitReply() { //sub object
         
     }
     
-    public func cancelForAttack() {
+    public func offensiveCancel() {
         for poker in player.picked { poker.concreteView?.isUp = false }
         player.picked.removeAll()
         MXSJudge.cmd.clearResponder()
     }
+    func offensiveCancelSubject() { //sub object
         
-    public func endActive() {
+    }
+        
+    public func offensiveEndActive() {
         leadingView.hide()
         
         passedView.fadeout()
-        endLeaderCycle()
+        offensiveEndActiveSubject()
     }
-    func endLeaderCycle() { //sub object
-        MXSJudge.cmd.dealcardForNextLeader { hero, pokers in
-            
-        }
+    func offensiveEndActiveSubject() { //sub object
+        player.endCurrentCycle(next: nil)
     }
     
-    public func certainForDefense() {
+    public func defensiveCertain() {
         leadingView.hide()
-        playerReplyAsResponder()
+        defensiveCertainSubject()
     }
-    func playerReplyAsResponder() { //sub object
+    func defensiveCertainSubject() { //sub object
         
     }
         
-    public func cancelForDefense() {
+    public func defensiveCancel() {
         leadingView.hide()
-        playerDidntReply()
+        defensiveCancelSubject()
     }
-    func playerDidntReply() { //sub object
+    func defensiveCancelSubject() { //sub object
         
     }
         

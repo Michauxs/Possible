@@ -34,7 +34,8 @@ case unPick
 */
 
 class MXSLeadingView: MXSBaseView {
-    weak var belong:MXSGroundController?
+    weak var controller:MXSGroundController?
+    weak var belong:MXSHero?
     
     var state: LeadingState! {
         didSet {
@@ -94,28 +95,28 @@ class MXSLeadingView: MXSBaseView {
     @objc func didCertainBtnClick () {
         if self.state == LeadingState.attackReadyOn {
             MXSLog("====== certain Attack ======", "LeadingView")
-            self.belong?.certainForAttack()
+            self.controller?.offensiveCertain()
         }
         else if self.state == LeadingState.defenseReadyOn {
             MXSLog("====== certain defence ======", "LeadingView")
-            self.belong?.certainForDefense()
+            self.controller?.defensiveCertain()
         }
     }
         
     @objc func didCancelBtnClick (btn:UIButton) {
         if self.state == .attackUnPick {
             MXSLog("====== end Active ======", "LeadingView")
-            self.belong?.endActive()
+            self.controller?.offensiveEndActive()
         }
         else if self.state == .attackPicked || self.state == .attackReadyOn {
             MXSLog("====== cancel Pickes ======", "LeadingView")
             self.state = .attackUnPick
-            self.belong?.cancelForAttack()
+            self.controller?.offensiveCancel()
         }
             
         else if self.state == .defenseUnPick || self.state == .defensePicked || self.state == .defenseReadyOn {
             MXSLog("====== didn't unRespond Attack ======", "LeadingView")
-            self.belong?.cancelForDefense()
+            self.controller?.defensiveCancel()
         }
     }
     

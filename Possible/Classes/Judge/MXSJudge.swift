@@ -57,13 +57,16 @@ class MXSJudge {
     
     var leader:MXSHero? {
         didSet {
-            leader?.holdAction = MXSOneAction(axle: leader!, type: .active)
+            leader?.holdAction = MXSOneAction(axle: leader!, fensive: .offensive)
             leader?.signStatus = .active
         }
     }
-    func dealcardForGameStart() {
+    func dealcardForGameStart(offensive:(_ hero:MXSHero)->Void) {
         for hero in subject {
             hero.getPokers(MXSPokerCmd.shared.push(4))
+        }
+        dealcardForNextLeader { hero, pokers in
+            offensive(hero)
         }
     }
     func gameOver() {
@@ -133,7 +136,7 @@ class MXSJudge {
     }
     
     
-    func recordDiscardPokerToAction() {
+    func record(discardPokers pokers:[MXSPoker], toAction holdAction:MXSOneAction) {
         leader?.holdAction?.pokers.append(contentsOf: leader!.picked)
         MXSLog(leader?.holdAction?.pokers as Any, "action note pokers")
     }
@@ -141,7 +144,7 @@ class MXSJudge {
         clearResponder()
         leader?.signStatus = .active
         
-        leader!.holdAction = MXSOneAction(axle: leader!, type: .active)
+        leader!.holdAction = MXSOneAction(axle: leader!, fensive: .offensive)
     }
     
     /**⚠️默认不包括自己**/
@@ -166,7 +169,7 @@ class MXSJudge {
         }
         MXSLog("MXSJudge ----------------------> leader call group")
     }
-    func oneByOneReplyGroup() {
+    func theHeroHasReplyed() {
         let hero:MXSHero = responder.first!
         hero.signStatus = .blank
         self.responder.removeFirst()
@@ -186,7 +189,7 @@ class MXSJudge {
         var hero:MXSHero?
         if MXSJudge.cmd.responder.count > 0 {
             hero = MXSJudge.cmd.responder.first!
-            hero!.holdAction = MXSOneAction(axle: hero!, type: .reply)
+            hero!.holdAction = MXSOneAction(axle: hero!, fensive: .defensive)
         }
         return hero
     }
@@ -196,16 +199,16 @@ class MXSJudge {
         return hero.ownPokers.count > 0
     }
     
-    func AIReplyAsResponder(reBlock:(_ type :ReplyResultType, _ pokers:[MXSPoker]?) -> Void) {
+    func AIReplyAsResponder(reBlock:(_ type :ParryType, _ pokers:[MXSPoker]?) -> Void) {
         
         let action_reply: PokerAction = self.leader!.holdAction!.reply.act
         if let responder_one = responder.first { //expect
-            responder_one.holdAction = MXSOneAction(axle: responder_one, type: .reply)
+            responder_one.holdAction = MXSOneAction(axle: responder_one, fensive: .defensive)
             diary.append(responder_one.holdAction!)
             
             if action_reply == .recover {
                 let _ = responder_one.plusHP()
-                reBlock(.nothing, nil)
+                reBlock(.unneed, nil)
             }
             else if action_reply == .gain {
                 responder_one.getPokers(leader!.holdAction!.pokers)
@@ -253,36 +256,39 @@ class MXSJudge {
 //        }
 //    }
     
-    func responderSufferConsequence(reBlock:(_ spoils :SpoilsType, _ pokers :[MXSPoker]?) -> Void) -> Bool {
+    func responderSufferConsequence(reBlock:(_ spoils :SpoilsType, _ pokers :[MXSPoker]?) -> Void) {
         //let conseq = leader?.holdAction?.consequence
         let hero:MXSHero = responder.first!
+        
         let action = MXSJudge.cmd.leader?.holdAction?.action
         switch action {
         case .unknown, .dodge, .detect, .give, .recover, .gain:
             reBlock(.nothing, nil)
+            
         case .attack, .warFire, .arrowes, .duel:
             hero.minsHP()
             reBlock(.injured, nil)
-            if hero.HPCurrent == 0 {
-                return true
-            }
+            
         case .steal:
             let random = hero.rollRandomPoker()
             MXSLog(random, "The poker will handover")
             hero.losePokers([random])
             MXSJudge.cmd.leader?.getPokers([random])
             reBlock(.wrest, [random])
+            
         case .destroy:
             let random = hero.rollRandomPoker()
             hero.losePokers([random])
             reBlock(.destroy, [random])
+            
         case .remedy:
             let _ = hero.plusHP()
-            reBlock(.nothing, nil)
+            reBlock(.recover, nil)
+            
         case .none:
             break
         }
-        return false
+        
     }
     
     func responderGainPoker(_ pokers:[MXSPoker]) -> Void {

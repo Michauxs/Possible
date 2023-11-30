@@ -12,9 +12,9 @@ enum CycleType : String {
     case start = "start"
     case end = "end"
 }
-enum ActionType {
-    case active
-    case reply
+enum ActionFensive {
+    case offensive
+    case defensive
 }
 enum ActionCategy {
     case unknown
@@ -76,7 +76,7 @@ class MXSOneAction {
     var cycleSign:CycleType = .start
     
     weak var belong:MXSHero?
-    var type:ActionType = .active
+    var fensive:ActionFensive = .offensive
     var categy:ActionCategy = .alive
     var aimType:ActionAimType = .unknown
     var skill:MXSSkill?
@@ -139,9 +139,9 @@ class MXSOneAction {
     init() {
         
     }
-    init(axle:MXSHero, type:ActionType) {
+    init(axle:MXSHero, fensive:ActionFensive) {
         self.belong = axle
-        self.type = type
+        self.fensive = fensive
     }
     
     
