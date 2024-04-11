@@ -276,7 +276,7 @@ class MXSHero {
             reBlock(.gain, pokers, .handover)
         }
         else {
-            reBlock(.operate, nil, .nil)
+            reBlock(.operate, nil, nil)
         }
     }
     

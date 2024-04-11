@@ -11,6 +11,7 @@ import UIKit
 class MXSBaseView: UIView {
 //    weak var belong:MXSGroundController?
     weak var control:MXSViewController?
+    var info: Any?
     
     var responHandler: ((_ meth:String, _ args:Dictionary<String,Any>) -> Dictionary<String,Any>)?
     var responder: ((_ meth:String, _ args:Dictionary<String,Any>) -> Void)?
@@ -31,9 +32,18 @@ class MXSBaseView: UIView {
     }
     
     
-
     open func setupSubviews() {
-        
+                
     }
 
+    /**-----------------------------**/
+    func setUserInteraction() {
+        self.isUserInteractionEnabled = true
+        self.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(selfTaped)))
+    }
+    @objc func selfTaped() {
+//        self.control?.callFunction(byName: <#T##String#>, withPara: <#T##Any#>)
+    }
+    
+    
 }

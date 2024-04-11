@@ -47,6 +47,8 @@ class MXSHeroView: MXSBaseView {
     @objc func didTapedSelf() {
         if self.belong!.signStatus == .active { return }
         self.controller?.someoneHeroTaped(self)
+        
+        //self.controller?.callFunction(byName: "someoneHeroTaped:", withPara: self)
     }
     
     var HPSum: Int = 0 {

@@ -18,11 +18,13 @@ public extension UILabel {
         self.init()
         self.text = text
         self.textColor = textColor
-        if fontSize>1000.0 && fontSize<1200 {self.font = UIFont.init(name: FontKaiTiBold, size: fontSize-1000)}
-        if fontSize>900.0 && fontSize<1000 {self.font = UIFont.init(name: FontXingKai, size: fontSize-900)}
-        if fontSize>600.0 && fontSize<900 {self.font = UIFont.systemFont(ofSize: fontSize-600.0, weight: .bold)}
-        if fontSize>300.0 && fontSize<600 {self.font = UIFont.systemFont(ofSize: fontSize-300.0, weight: .regular)}
-        if fontSize<300.0 {self.font = UIFont.systemFont(ofSize: fontSize-300.0, weight: .light)}
+        
+        if fontSize>1000.0 {self.font = UIFont.init(name: FontKaiTiBold, size: fontSize-1000)}
+        else if fontSize>900.0 {self.font = UIFont.init(name: FontXingKai, size: fontSize-900)}
+        else if fontSize>600.0 {self.font = UIFont.systemFont(ofSize: fontSize-600.0, weight: .bold)}
+        else if fontSize>300.0 {self.font = UIFont.systemFont(ofSize: fontSize-300.0, weight: .regular)}
+        else {self.font = UIFont.systemFont(ofSize: fontSize-300.0, weight: .light)}
+        
         self.textAlignment = align
         self.numberOfLines = 0
     }

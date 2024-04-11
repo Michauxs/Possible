@@ -21,6 +21,9 @@
 		764DE6492501F14700409586 /* MXSSkillAssemController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 764DE6482501F14700409586 /* MXSSkillAssemController.swift */; };
 		764DE64D25020B7C00409586 /* MXSLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 764DE64C25020B7C00409586 /* MXSLabel.swift */; };
 		764DE64F25020F8700409586 /* MXSButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 764DE64E25020F8700409586 /* MXSButton.swift */; };
+		7653AFAF2BC4EB6C00725AC6 /* MXSMinerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7653AFAE2BC4EB6C00725AC6 /* MXSMinerController.swift */; };
+		7653AFB12BC52EFC00725AC6 /* MXSMineItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7653AFB02BC52EFB00725AC6 /* MXSMineItemView.swift */; };
+		7653AFB42BC634F700725AC6 /* MXSBaseObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7653AFB32BC634F700725AC6 /* MXSBaseObject.swift */; };
 		7654CDD2251AF0EF0053B4F3 /* MXSDeviceCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7654CDD1251AF0EF0053B4F3 /* MXSDeviceCell.swift */; };
 		7654CDD4251B52060053B4F3 /* KT_GB2312.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7654CDD3251B4FD60053B4F3 /* KT_GB2312.ttf */; };
 		7654CDD8251C4F640053B4F3 /* MXSFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7654CDD7251C4F640053B4F3 /* MXSFont.swift */; };
@@ -109,6 +112,9 @@
 		764DE6482501F14700409586 /* MXSSkillAssemController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSSkillAssemController.swift; sourceTree = "<group>"; };
 		764DE64C25020B7C00409586 /* MXSLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSLabel.swift; sourceTree = "<group>"; };
 		764DE64E25020F8700409586 /* MXSButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSButton.swift; sourceTree = "<group>"; };
+		7653AFAE2BC4EB6C00725AC6 /* MXSMinerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSMinerController.swift; sourceTree = "<group>"; };
+		7653AFB02BC52EFB00725AC6 /* MXSMineItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSMineItemView.swift; sourceTree = "<group>"; };
+		7653AFB32BC634F700725AC6 /* MXSBaseObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSBaseObject.swift; sourceTree = "<group>"; };
 		7654CDD1251AF0EF0053B4F3 /* MXSDeviceCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSDeviceCell.swift; sourceTree = "<group>"; };
 		7654CDD3251B4FD60053B4F3 /* KT_GB2312.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = KT_GB2312.ttf; sourceTree = "<group>"; };
 		7654CDD7251C4F640053B4F3 /* MXSFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSFont.swift; sourceTree = "<group>"; };
@@ -261,6 +267,7 @@
 			isa = PBXGroup;
 			children = (
 				7697A5C924ECD22F00FB93A6 /* BaseController */,
+				7653AFAD2BC4EB0A00725AC6 /* Miner */,
 				76AC2AF92514B3F5005884CF /* Ground */,
 				76AC2AFA2514B3F5005884CF /* Lobby */,
 				765824D72509F4FE00EB55E5 /* SkillAssem */,
@@ -289,9 +296,27 @@
 			path = main;
 			sourceTree = "<group>";
 		};
+		7653AFAD2BC4EB0A00725AC6 /* Miner */ = {
+			isa = PBXGroup;
+			children = (
+				7653AFAE2BC4EB6C00725AC6 /* MXSMinerController.swift */,
+				7653AFB02BC52EFB00725AC6 /* MXSMineItemView.swift */,
+			);
+			path = Miner;
+			sourceTree = "<group>";
+		};
+		7653AFB22BC634AB00725AC6 /* Object */ = {
+			isa = PBXGroup;
+			children = (
+				7653AFB32BC634F700725AC6 /* MXSBaseObject.swift */,
+			);
+			path = Object;
+			sourceTree = "<group>";
+		};
 		765824C62509D64A00EB55E5 /* Common */ = {
 			isa = PBXGroup;
 			children = (
+				7653AFB22BC634AB00725AC6 /* Object */,
 				7697A5C724ECBD1500FB93A6 /* MXSBaseView.swift */,
 				765824C72509D64A00EB55E5 /* TableView */,
 				765824CB2509D64A00EB55E5 /* CollectonView */,
@@ -543,6 +568,7 @@
 				TargetAttributes = {
 					76053DA524E39B4E001860E7 = {
 						CreatedOnToolsVersion = 11.6;
+						LastSwiftMigration = "";
 					};
 					76053DBB24E39B5C001860E7 = {
 						CreatedOnToolsVersion = 11.6;
@@ -663,6 +689,7 @@
 				76F92F4724F3D8E80039478D /* MXSSkillCmd.swift in Sources */,
 				76F92F4524F3D8860039478D /* MXSHeroCmd.swift in Sources */,
 				7654CDD2251AF0EF0053B4F3 /* MXSDeviceCell.swift in Sources */,
+				7653AFAF2BC4EB6C00725AC6 /* MXSMinerController.swift in Sources */,
 				765C8BF128091B2F00A77293 /* MXSGraspPokerView.swift in Sources */,
 				7697A5C824ECBD1500FB93A6 /* MXSBaseView.swift in Sources */,
 				7697A5CF24EE453100FB93A6 /* MXSPokerCmd.swift in Sources */,
@@ -681,6 +708,7 @@
 				766C3F3B25245235002819E6 /* MXSOneAction.swift in Sources */,
 				765824D42509D64A00EB55E5 /* MXSCollectionViewLeftAlignLayout.swift in Sources */,
 				765824D12509D64A00EB55E5 /* MXSTableDlg.swift in Sources */,
+				7653AFB42BC634F700725AC6 /* MXSBaseObject.swift in Sources */,
 				76963DCB24FF388900007D9F /* MXSLobbyController.swift in Sources */,
 				765824D52509D64A00EB55E5 /* MXSCollectionCell.swift in Sources */,
 				765824E6250B51A500EB55E5 /* MXSAssemSkillItem.swift in Sources */,
@@ -696,6 +724,7 @@
 				76E9D0EA26453EF400D6E5C4 /* MXSPVESoloController.swift in Sources */,
 				765E6E76269584B7005499E9 /* MXSVCExchangeCmd.swift in Sources */,
 				764DE6492501F14700409586 /* MXSSkillAssemController.swift in Sources */,
+				7653AFB12BC52EFC00725AC6 /* MXSMineItemView.swift in Sources */,
 				76053E2324E68722001860E7 /* MXSHeroView.swift in Sources */,
 				76D036D926B3FBE200D312F9 /* MXSPVPController.swift in Sources */,
 				76CB0A5F27A0F2A400F7D56E /* MXSHero.swift in Sources */,

@@ -131,8 +131,14 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate {
         view.addSubview(assemBtn)
         assemBtn.addTarget(self, action: #selector(assemBtnClick), for: .touchUpInside)
         
-
+        let minerBtn = UIButton("Miner", fontSize: 614, textColor: .dullLine)
+        minerBtn.frame = CGRect.init(x: assemBtn.frame.maxX + 10, y: assemBtn.frame.minY, width: 96, height: 40)
+        minerBtn.layer.borderWidth = 1.0
+        minerBtn.layer.borderColor = UIColor.dullLine.cgColor
+        view.addSubview(minerBtn)
+        minerBtn.addTarget(self, action: #selector(minerBtnClick), for: .touchUpInside)
         
+
         publishBtn.setTitleColor(.theme, for: .selected)
         publishBtn.frame = CGRect.init(x: mainTable!.frame.minX - 70, y: assemBtn.frame.minY, width: 60, height: 40)
         view.addSubview(publishBtn)
@@ -152,6 +158,10 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate {
     @objc func assemBtnClick() {
         self.navigationController?.pushViewController(MXSSkillAssemController(), animated: false)
     }
+    @objc func minerBtnClick() {
+        self.navigationController?.pushViewController(MXSMinerController(), animated: false)
+    }
+    
     @objc func deviceOffLine(btn:UIButton) {
         //
         if browserStatus == .stoping || browserStatus == .starting { return }
