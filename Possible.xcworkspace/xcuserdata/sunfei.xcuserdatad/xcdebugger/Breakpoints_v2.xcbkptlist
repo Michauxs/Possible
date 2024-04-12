@@ -14,8 +14,8 @@
             filePath = "Possible/ViewController/Miner/MXSMinerController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "331"
-            endingLineNumber = "331"
+            startingLineNumber = "333"
+            endingLineNumber = "333"
             landmarkName = "endMission(complete:)"
             landmarkType = "9">
          </BreakpointContent>

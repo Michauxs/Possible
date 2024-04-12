@@ -93,7 +93,7 @@ class MXSMinerController: MXSViewController {
         restartBtn.addTarget(self, action: #selector(didRestartBtnClick), for: .touchUpInside)
         
         let gradeBtn = UIButton.init("Grade", fontSize: 14, textColor: .white, backgColor: .darkGray)
-        gradeBtn.frame = CGRect.init(x: (margin_left-86)*0.5, y: top_height+20, width: 86, height: top_height)
+        gradeBtn.frame = CGRect.init(x: margin_left, y: top_height+20, width: margin_left, height: top_height)
         self.view.addSubview(gradeBtn)
         gradeBtn.addTarget(self, action: #selector(didGradeBtnClick), for: .touchUpInside)
         /*--------------------------------------*/
@@ -107,7 +107,7 @@ class MXSMinerController: MXSViewController {
         
         layoutMine()
         
-        summaryView.frame = CGRect(x: mineGround.frame.maxX, y: top_height + 50.0, width: margin_left, height: 90)
+        summaryView.frame = CGRect(x: mineGround.frame.maxX, y: top_height + 20.0, width: margin_left, height: 90)
         summaryView.backgroundColor = .black
         summaryView.setRaius(1.0, borderColor: .white, borderWitdh: 1.0)
         self.view.addSubview(summaryView)
@@ -144,7 +144,7 @@ class MXSMinerController: MXSViewController {
         self.view.addSubview(doneBtn)
         doneBtn.addTarget(self, action: #selector(didCheckBtnClick), for: .touchUpInside)
         
-        let checkAroundBtn = UIButton.init("@", fontSize: 614, textColor: .white, backgColor: .darkGray)
+        let checkAroundBtn = UIButton.init("@@", fontSize: 614, textColor: .white, backgColor: .darkGray)
         checkAroundBtn.frame = CGRect.init(x: markBtn.frame.minX, y: markBtn.frame.maxY + 20, width: 50, height: 44)
         self.view.addSubview(checkAroundBtn)
 //        checkAroundBtn.addTarget(self, action: #selector(didCheckAroundBtnClick), for: .touchUpInside)
@@ -268,6 +268,7 @@ class MXSMinerController: MXSViewController {
                 
                 if C_check == numberOfRow*numberOfRow - S_mine {
                     endMission(complete: true)
+                    break
                 }
                 else {
                     GroundMask.isHidden = false
@@ -286,6 +287,7 @@ class MXSMinerController: MXSViewController {
     @objc func didCheckAroundBtnClick() {
         let neighbors = getNebghbors(mineHolder!)
         for neighbor in neighbors {
+            if neighbor.state == .check || neighbor.state == .mark { continue }
             
             if neighbor.isBoom {
                 neighbor.setupState(.boom)
