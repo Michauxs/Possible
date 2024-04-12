@@ -10,18 +10,24 @@ import UIKit
 
 class MXSMinerController: MXSViewController {
     
-    let numberOfRow = 15
+    var numberOfRow = 14
+    var possibleRang = 8
     let mineGround: UIView = UIView()
     let GroundMask: UIView = UIView()
     var minePackage = [MXSMineItemView]()
     var mineHolder: MXSMineItemView?
     
     let summaryView: UIView = UIView()
-    let summaryLabel = UILabel.init(text: "", fontSize: 616, textColor: .lightText, align: .center)
+    let summaryLabel = UILabel.init(text: "", fontSize: 616, textColor: .white, align: .center)
+    let summaryFace = UILabel.init(text: "", fontSize: 616, textColor: .lightText, align: .center)
     
     var S_mine = 0
-    var CountCheck = 0
-    var CountDone = 0
+    var C_mark = 0
+    var C_check = 0
+    
+    
+    let mineTest = MXSMineItemView()
+    
     
     @objc func didCloseGameBtnClick() {
         self.navigationController?.popViewController(animated: false)
@@ -41,6 +47,28 @@ class MXSMinerController: MXSViewController {
         functionMapPara["mineViewTaped:"] = mineViewTaped
     }
     
+    @objc func didGradeBtnClick() {
+        let alert = UIAlertController.init(title: "Grade", message: "", preferredStyle: .alert)
+        alert.addAction(UIAlertAction.init(title: "Primary", style: .default, handler: { (act) in
+            self.resetGradeLayoutMIne(row: 10, rang: 9)
+        }))
+        alert.addAction(UIAlertAction.init(title: "Middle", style: .default, handler: { (act) in
+            self.resetGradeLayoutMIne(row: 14, rang: 8)
+        }))
+        alert.addAction(UIAlertAction.init(title: "High", style: .default, handler: { (act) in
+            self.resetGradeLayoutMIne(row: 18, rang: 7)
+        }))
+        alert.addAction(UIAlertAction.init(title: "Cancel", style: .cancel, handler: { (act) in
+            
+        }))
+        self.present(alert, animated: true, completion: nil)
+    }
+    func resetGradeLayoutMIne(row: Int, rang: Int) {
+        numberOfRow = row
+        possibleRang = rang
+        layoutMine()
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -58,10 +86,16 @@ class MXSMinerController: MXSViewController {
         closeBtn.frame = CGRect.init(x: 10, y: 0, width: 64, height: top_height)
         self.view.addSubview(closeBtn)
         closeBtn.addTarget(self, action: #selector(didCloseGameBtnClick), for: .touchUpInside)
+        
         let restartBtn = UIButton.init("Reset", fontSize: 14, textColor: .white, backgColor: .darkGray)
         restartBtn.frame = CGRect.init(x: MXSSize.Sw - 10 - 64, y: 0, width: 64, height: top_height)
         self.view.addSubview(restartBtn)
         restartBtn.addTarget(self, action: #selector(didRestartBtnClick), for: .touchUpInside)
+        
+        let gradeBtn = UIButton.init("Grade", fontSize: 14, textColor: .white, backgColor: .darkGray)
+        gradeBtn.frame = CGRect.init(x: (margin_left-86)*0.5, y: top_height+20, width: 86, height: top_height)
+        self.view.addSubview(gradeBtn)
+        gradeBtn.addTarget(self, action: #selector(didGradeBtnClick), for: .touchUpInside)
         /*--------------------------------------*/
         
         mineGround.frame = CGRect(x: margin_left, y: 0, width: groundWH, height: groundWH)
@@ -73,12 +107,18 @@ class MXSMinerController: MXSViewController {
         
         layoutMine()
         
-        summaryView.frame = CGRect(x: mineGround.frame.maxX, y: top_height + 50.0, width: margin_left, height: 80)
+        summaryView.frame = CGRect(x: mineGround.frame.maxX, y: top_height + 50.0, width: margin_left, height: 90)
         summaryView.backgroundColor = .black
+        summaryView.setRaius(1.0, borderColor: .white, borderWitdh: 1.0)
         self.view.addSubview(summaryView)
         summaryLabel.frame = CGRect.init(x: 0, y: 0, width: margin_left, height: 50)
         summaryView.addSubview(summaryLabel)
+        summaryFace.frame = CGRect.init(x: 0, y: 44, width: margin_left, height: 40)
+        summaryView.addSubview(summaryFace)
         
+//        mineTest.frame = CGRect(x: 10, y: 50, width: 80, height: 80)
+//        view.addSubview(mineTest)
+//        mineTest.control = self
         /*--------------------------------------*/
         let centerPoint:CGPoint = CGPoint(x: margin_left*0.5, y: MXSSize.Sh*0.5 + 50.0)
         let sk_width: CGFloat = 44.0
@@ -94,20 +134,25 @@ class MXSMinerController: MXSViewController {
             dirtionBtn.addTarget(self, action: #selector(didDirectionBtnClick(btn:)), for: .touchUpInside)
         }
         /*--------------------------------------*/
-        
-        let removeBtn = UIButton.init("🚩", fontSize: 14, textColor: .white, backgColor: .darkGray)
-        removeBtn.frame = CGRect.init(x: mineGround.frame.maxX + 15.0, y: centerPoint.y - 22, width: 50, height: 44)
-        self.view.addSubview(removeBtn)
-        removeBtn.addTarget(self, action: #selector(didSignBtnClick), for: .touchUpInside)
+        let markBtn = UIButton.init("🚩", fontSize: 14, textColor: .white, backgColor: .darkGray)
+        markBtn.frame = CGRect.init(x: mineGround.frame.maxX + 15.0, y: centerPoint.y - 22, width: 50, height: 44)
+        self.view.addSubview(markBtn)
+        markBtn.addTarget(self, action: #selector(didSignBtnClick), for: .touchUpInside)
         
         let doneBtn = UIButton.init("#", fontSize: 614, textColor: .white, backgColor: .darkGray)
-        doneBtn.frame = CGRect.init(x: removeBtn.frame.maxX + 10.0, y: removeBtn.frame.minY, width: 50, height: 44)
+        doneBtn.frame = CGRect.init(x: markBtn.frame.maxX + 10.0, y: markBtn.frame.minY, width: 50, height: 44)
         self.view.addSubview(doneBtn)
-        doneBtn.addTarget(self, action: #selector(didDoneBtnClick), for: .touchUpInside)
-        /*--------------------------------------*/
-//        view.addSubview(nameLabel)
-//        nameLabel.frame = CGRect(x: mainTable!.frame.maxX+15, y: top_height+15, width: 100, height: 20)
+        doneBtn.addTarget(self, action: #selector(didCheckBtnClick), for: .touchUpInside)
         
+        let checkAroundBtn = UIButton.init("@", fontSize: 614, textColor: .white, backgColor: .darkGray)
+        checkAroundBtn.frame = CGRect.init(x: markBtn.frame.minX, y: markBtn.frame.maxY + 20, width: 50, height: 44)
+        self.view.addSubview(checkAroundBtn)
+//        checkAroundBtn.addTarget(self, action: #selector(didCheckAroundBtnClick), for: .touchUpInside)
+        
+        // 添加手势识别器来处理双击
+        let doubleTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(didCheckAroundBtnClick))
+        doubleTapGestureRecognizer.numberOfTapsRequired = 2
+        checkAroundBtn.addGestureRecognizer(doubleTapGestureRecognizer)
         /*--------------------------------------*/
     }
     
@@ -120,8 +165,8 @@ class MXSMinerController: MXSViewController {
         summaryView.isHidden = true
         GroundMask.isHidden = true
         S_mine = 0
-        CountCheck = 0
-        CountDone = 0
+        C_mark = 0
+        C_check = 0
         
         let space = 0.5
         let item_w = (mineGround.frame.size.width - space*CGFloat(numberOfRow-1)) / CGFloat(numberOfRow)
@@ -133,7 +178,7 @@ class MXSMinerController: MXSViewController {
                 mineGround.addSubview(mine)
                 minePackage.append(mine)
                 
-                if Int.random(in: 1...10) == 1 {
+                if Int.random(in: 1...possibleRang) == 1 {
                     mine.isBoom = true
                     S_mine += 1
                 }
@@ -178,76 +223,96 @@ class MXSMinerController: MXSViewController {
     @objc func didSignBtnClick() {
         guard mineHolder != nil else { return }
         
-        mineHolder?.state = .check
+        mineHolder?.setupState(.mark)
         if mineHolder!.isBoom {
-            CountCheck += 1
+            C_mark += 1
             
-            if CountCheck == S_mine {
+            if C_mark == S_mine {
                 endMission(complete: true)
             }
         }
     }
-    @objc func didDoneBtnClick() {
-        MXSLog("didDoneBtnClick")
+    @objc func didCheckBtnClick() {
+        MXSLog("didCheckBtnClick")
         guard mineHolder != nil else { return }
         
-        if mineHolder?.state == .done { return }
+        if mineHolder?.state == .check { return }
         
         if mineHolder!.isBoom {
-            mineHolder?.state = .boom
+            mineHolder?.setupState(.boom)
             endMission(complete: false)
         }
         else {
-            mineHolder?.state = .done
-            CountDone += 1
-            checkAround(view: mineHolder!)
+            mineHolder?.setupState(.check)
+            C_check += 1
+            seekClueFromAround(view: mineHolder!)
         }
     }
     
-    func checkAround(view: MXSMineItemView) {
-        
-        let tupleArray = [(view.row-1, view.col-1), (view.row-1, view.col), (view.row-1, view.col+1),
-                          (view.row, view.col-1), (view.row, view.col+1),
-                          (view.row+1, view.col-1), (view.row+1, view.col), (view.row+1, view.col+1)]
-        
-        var neighbors = [MXSMineItemView]()
-        for tuple in tupleArray {
-            if let anyone = findAnyoneMineView(row: tuple.0, col: tuple.1) {
-                if anyone.state != .done { neighbors.append(anyone) }
-            }
-        }
-        
+    func seekClueFromAround(view: MXSMineItemView) {
+        let neighbors = getNebghbors(view)
         //var diffuse = true
-        var count = 0
+        var C_clue = 0
         for mine in neighbors {
             if (mine.isBoom) {
-                count += 1
+                C_clue += 1
             }
         }
         
-        if count == 0 {
+        if C_clue == 0 {
             for mine in neighbors {
-                mine.state = .done
-                CountDone += 1
+                if mine.state == .check { continue }
                 
-                if CountDone == numberOfRow*numberOfRow - S_mine {
+                mine.setupState(.check)
+                C_check += 1
+                
+                if C_check == numberOfRow*numberOfRow - S_mine {
                     endMission(complete: true)
                 }
                 else {
                     GroundMask.isHidden = false
                     DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(250)) {
-                        self.checkAround(view: mine)
+                        self.seekClueFromAround(view: mine)
                         self.GroundMask.isHidden = true
                     }
                 }
             }
         }
         else {
-            view.clue = count
+            view.clue = C_clue
         }
-        
     }
     
+    @objc func didCheckAroundBtnClick() {
+        let neighbors = getNebghbors(mineHolder!)
+        for neighbor in neighbors {
+            
+            if neighbor.isBoom {
+                neighbor.setupState(.boom)
+                endMission(complete: false)
+                break
+            }
+            else {
+                neighbor.setupState(.check)
+                C_check += 1
+                seekClueFromAround(view: neighbor)
+            }
+            
+        }
+    }
+    
+    func getNebghbors(_ view: MXSMineItemView) -> [MXSMineItemView] {
+        let tupleArray = [(view.row-1, view.col-1), (view.row-1, view.col), (view.row-1, view.col+1),
+                          (view.row, view.col-1), (view.row, view.col+1),
+                          (view.row+1, view.col-1), (view.row+1, view.col), (view.row+1, view.col+1)]
+        var neighbors = [MXSMineItemView]()
+        for tuple in tupleArray {
+            if let anyone = findAnyoneMineView(row: tuple.0, col: tuple.1) {
+                neighbors.append(anyone)
+            }
+        }
+        return neighbors
+    }
     func findAnyoneMineView(row:Int, col:Int) -> MXSMineItemView? {
         if row >= numberOfRow || row < 0 || col >= numberOfRow || col < 0 {
             return nil
@@ -257,9 +322,21 @@ class MXSMinerController: MXSViewController {
     
     func endMission(complete: Bool) {
         mineHolder = nil
-        summaryLabel.text = complete ? "Mission Complete" : "Mission Failed"
+        summaryLabel.text = complete ? "Mission Complete!" : "Mission Failed!"
+        summaryFace.text = complete ? "😊" : "😫"
         summaryView.isHidden = false
         GroundMask.isHidden = false
+        
+        for mine in minePackage {
+            if mine.isBoom {
+                if (mine.state == .mark) {
+                    mine.setupState(.show)
+                }
+                else {
+                    mine.setupState(.boom)
+                }
+            }
+        }
     }
     
     //MARK: - notifies

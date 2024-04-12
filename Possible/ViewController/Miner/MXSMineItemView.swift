@@ -12,8 +12,8 @@ class MXSMineItemView: MXSBaseView {
     
     enum MineState : Int {
         case unknown = 0
-        case check = 1
-        case done = 2
+        case mark = 1
+        case check = 2
         case unable = 3
         case show = 4
         case boom = 5
@@ -27,31 +27,29 @@ class MXSMineItemView: MXSBaseView {
     var row : Int = 0
     var col : Int = 0
     var idx : Int = 0
-    var state : MineState = .unknown {
-        didSet {
-            self.backgroundColor = .white
-            
-            switch state {
-            case .unknown:
-                titleLabel.text = ""
-            case .check:
-                titleLabel.text = "🚩"
-                titleLabel.textColor = .green
-            case .done:
-                titleLabel.text = "#"
-                titleLabel.textColor = .white
-            case .unable:
-                titleLabel.text = "🤔"
-                titleLabel.textColor = .yellow
-            case .show:
-                titleLabel.text = "💣"
-                titleLabel.textColor = .green
-            case .boom:
-                titleLabel.text = "💥"
-                titleLabel.textColor = .red
-            }
+    var state : MineState = .unknown
+    
+    func setupState(_ sta: MineState) {
+        state = sta;
+        
+        self.backgroundColor = UIColor.init(white: 0.75, alpha: 1.0)
+        
+        switch state {
+        case .unknown:
+            titleLabel.text = ""
+        case .mark:
+            titleLabel.text = "🚩"
+        case .check:
+            titleLabel.text = ""
+        case .unable:
+            titleLabel.text = "🤔"
+        case .show:
+            titleLabel.text = "💣"
+        case .boom:
+            titleLabel.text = "💥"
         }
     }
+    
     var around = 0
     var position : MinePosition = .center {
         didSet {
@@ -88,15 +86,16 @@ class MXSMineItemView: MXSBaseView {
         self.backgroundColor = .gray
         
         selectedView.frame = self.bounds
-        selectedView.setRaius(0, borderColor: .lightText, borderWitdh: 1.0)
-        selectedView.backgroundColor = .lightGray
+        selectedView.backgroundColor = .clear
+        selectedView.setRaius(0, borderColor: .white, borderWitdh: 1.0)
         addSubview(selectedView)
-        self.selected = false
+        selectedView.isHidden = true
         
         addSubview(titleLabel)
-        titleLabel.snp.makeConstraints({ make in
-            make.center.equalTo(self)
-        })
+        titleLabel.frame = self.bounds
+//        titleLabel.snp.makeConstraints({ make in
+//            make.center.equalTo(self)
+//        })
         
         self.setUserInteraction()
     }

@@ -242,7 +242,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, NetServiceDelegate, Strea
     }
     
     func applicationWillTerminate(_ application: UIApplication) {
-        
+        MXSLog("applicationWillTerminate")
     }
 
 //    func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
