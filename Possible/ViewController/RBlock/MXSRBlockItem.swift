@@ -1,5 +1,5 @@
 //
-//  MXSMineItemCell.swift
+//  MXSRBlockItem.swift
 //  Possible
 //
 //  Created by Sunfei on 2024/4/9.
@@ -8,7 +8,7 @@
 
 import UIKit
 
-class MXSMineItemView: MXSBaseView {
+class MXSRBlockItem: MXSBaseView {
     
     enum MineState : Int {
         case unknown = 0
@@ -37,7 +37,6 @@ class MXSMineItemView: MXSBaseView {
         switch state {
         case .unknown:
             titleLabel.text = ""
-            self.backgroundColor = .gray
         case .mark:
             titleLabel.text = "🚩"
         case .check:
@@ -58,15 +57,14 @@ class MXSMineItemView: MXSBaseView {
             case .center:
                 around = 8
             case .corner:
-                around = 3
-            case .edge:
                 around = 5
+            case .edge:
+                around = 3
             }
         }
     }
     var clue = 0 {
         didSet {
-            MXSLog("mine view selected: " + "\(clue)")
             titleLabel.text = String(clue)
             titleLabel.textColor = .blue
         }
@@ -74,34 +72,24 @@ class MXSMineItemView: MXSBaseView {
     
     var isBoom = false
     
-//    let selectedView = UIView()
-    lazy var selectedView : UIView = {
-        let left_view = UIView(frame: self.bounds)
-        left_view.backgroundColor = .clear
-        left_view.setRaius(0, borderColor: .white, borderWitdh: 1.5)
-        addSubview(left_view)
-        return left_view
-    }()
-    
+    let selectedView = UIView()
     let titleLabel = UILabel.init(text: "", fontSize: 614, textColor: .darkText, align: .center)
-    let signImage = UIImageView()
     
     var selected = false {
         didSet {
-            MXSLog("mine view selected: " + "\(selected)")
             selectedView.isHidden = !selected
         }
     }
     
-    override func setupSubviews() {
+    override func layoutSubviews() {
         
         self.backgroundColor = .gray
         
-//        selectedView.frame = self.bounds
-//        selectedView.backgroundColor = .clear
-//        selectedView.setRaius(0, borderColor: .white, borderWitdh: 1.5)
-//        addSubview(selectedView)
-//        selectedView.isHidden = true
+        selectedView.frame = self.bounds
+        selectedView.backgroundColor = .clear
+        selectedView.setRaius(0, borderColor: .white, borderWitdh: 1.0)
+        addSubview(selectedView)
+        selectedView.isHidden = true
         
         addSubview(titleLabel)
         titleLabel.frame = self.bounds

@@ -7,17 +7,17 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "6032BE4E-05FA-49FA-AB08-15F78E620628"
+            uuid = "81C54ECC-2764-446C-88F1-080FA7AF543C"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Possible/ViewController/Miner/MXSMinerController.swift"
+            filePath = "Possible/ViewController/Miner/MXSMineItemView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "333"
-            endingLineNumber = "333"
-            landmarkName = "endMission(complete:)"
-            landmarkType = "9">
+            startingLineNumber = "105"
+            endingLineNumber = "105"
+            landmarkName = "setupSubviews()"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

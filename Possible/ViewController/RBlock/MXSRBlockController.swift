@@ -1,5 +1,5 @@
 //
-//  MXSMinerController.swift
+//  MXSRBlockController.swift
 //  Possible
 //
 //  Created by Sunfei on 2024/4/9.
@@ -8,7 +8,7 @@
 
 import UIKit
 
-class MXSMinerController: MXSViewController {
+class MXSRBlockController: MXSViewController {
     
     var numberOfRow = 14
     var possibleRang = 8
@@ -18,24 +18,17 @@ class MXSMinerController: MXSViewController {
     var mineHolder: MXSMineItemView?
     
     let summaryView: UIView = UIView()
-    let summaryLabel = UILabel.init(text: "", fontSize: 614, textColor: .white, align: .center)
+    let summaryLabel = UILabel.init(text: "", fontSize: 616, textColor: .white, align: .center)
     let summaryFace = UILabel.init(text: "", fontSize: 616, textColor: .lightText, align: .center)
     
     var S_mine = 0
-    var C_mark_real = 0
-    var C_mark = 0 {
-        didSet {
-            MXSLog("mine mark count: " + "\(C_mark)")
-            markCountLabel.text = String(C_mark)
-        }
-    }
+    var C_mark = 0
     var C_check = 0
-    let markCountLabel = UILabel(text: "0", fontSize: 314, textColor: .lightText, align: .left)
-    let mineSumLabel = UILabel(text: "0", fontSize: 314, textColor: .lightText, align: .left)
+    
     
     let mineTest = MXSMineItemView()
     
-    //MARK: - Method
+    
     @objc func didCloseGameBtnClick() {
         self.navigationController?.popViewController(animated: false)
     }
@@ -70,84 +63,12 @@ class MXSMinerController: MXSViewController {
         }))
         self.present(alert, animated: true, completion: nil)
     }
-    @objc func didCustomBtnClick() {
-        let alert = UIAlertController.init(title: "Custom", message: "", preferredStyle: .alert)
-        alert.addTextField { textField in
-            textField.placeholder = "SumBlock: x * x"
-            textField.keyboardType = .numberPad
-        }
-        alert.addTextField { textField in
-            textField.placeholder = "Possible: 1 / x"
-            textField.keyboardType = .numberPad
-        }
-        alert.addAction(UIAlertAction.init(title: "Cancel", style: .cancel, handler: { (act) in
-            
-        }))
-        alert.addAction(UIAlertAction.init(title: "OK", style: .default, handler: { (act) in
-            let textField0 = alert.textFields![0]
-            let textField1 = alert.textFields![1]
-            
-//            var row = 2
-//            var possible = 2
-//            if textField0.text != nil { row = Int(textField0.text!)! }
-//            if textField1.text != nil { possible = Int(textField1.text!)! }
-            
-            let input0: String = textField0.text!
-            let input1: String = textField1.text!
-            let row: Int? = Int(input0)
-            let rang: Int? = Int(input1)
-            if row != nil && rang != nil {
-                self.resetGradeLayoutMIne(row: row!, rang: rang!)
-            }
-        }))
-        self.present(alert, animated: true, completion: nil)
-    }
     func resetGradeLayoutMIne(row: Int, rang: Int) {
         numberOfRow = row
         possibleRang = rang
         layoutMine()
     }
-    func setupMarkCounter(contentView: UIView) {
-        contentView.addSubview(summaryLabel)
-        summaryLabel.snp.makeConstraints { make in
-            make.top.equalTo(contentView).offset(12)
-            make.centerX.equalTo(contentView)
-        }
-        contentView.addSubview(summaryFace)
-        summaryFace.snp.makeConstraints { make in
-            make.top.equalTo(summaryLabel.snp_bottom).offset(5)
-            make.centerX.equalTo(contentView)
-        }
-        
-        let markTitle = UILabel(text: "🚩:", fontSize: 314, textColor: .white, align: .left)
-        contentView.addSubview(markTitle)
-        markTitle.snp.makeConstraints { make in
-            make.left.equalTo(contentView).offset(10)
-            make.bottom.equalTo(contentView).inset(10)
-        }
-        contentView.addSubview(markCountLabel)
-        markCountLabel.snp.makeConstraints { make in
-            make.left.equalTo(markTitle.snp_right).offset(3)
-            make.centerY.equalTo(markTitle)
-        }
-        
-        let sumTitle = UILabel(text: "💣:", fontSize: 314, textColor: .white, align: .left)
-        contentView.addSubview(sumTitle)
-        sumTitle.snp.makeConstraints { make in
-            make.left.equalTo(markCountLabel.snp_right).offset(20)
-            make.centerY.equalTo(markTitle)
-        }
-        contentView.addSubview(mineSumLabel)
-        mineSumLabel.snp.makeConstraints { make in
-            make.left.equalTo(sumTitle.snp_right).offset(3)
-            make.centerY.equalTo(markTitle)
-        }
-        
-        
-    }
     
-    let ground_padding = 10.0
-    //MARK: - VC Load
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -172,14 +93,9 @@ class MXSMinerController: MXSViewController {
         restartBtn.addTarget(self, action: #selector(didRestartBtnClick), for: .touchUpInside)
         
         let gradeBtn = UIButton.init("Grade", fontSize: 14, textColor: .white, backgColor: .darkGray)
-        gradeBtn.frame = CGRect.init(x: 10, y: top_height+10, width: margin_left - 10*2, height: top_height)
+        gradeBtn.frame = CGRect.init(x: 10, y: top_height+20, width: margin_left - 10*2, height: top_height)
         self.view.addSubview(gradeBtn)
         gradeBtn.addTarget(self, action: #selector(didGradeBtnClick), for: .touchUpInside)
-        
-        let customBtn = UIButton.init("Custom", fontSize: 14, textColor: .white, backgColor: .darkGray)
-        customBtn.frame = CGRect.init(x: gradeBtn.frame.minX, y: gradeBtn.frame.maxY+5, width: gradeBtn.frame.width, height: gradeBtn.frame.size.height)
-        self.view.addSubview(customBtn)
-        customBtn.addTarget(self, action: #selector(didCustomBtnClick), for: .touchUpInside)
         /*--------------------------------------*/
         
         mineGround.frame = CGRect(x: margin_left, y: 0, width: groundWH, height: groundWH)
@@ -191,12 +107,14 @@ class MXSMinerController: MXSViewController {
         
         layoutMine()
         
-        summaryView.frame = CGRect(x: mineGround.frame.maxX + 10, y: top_height + 20.0, width: margin_left - 20, height: 90)
+        summaryView.frame = CGRect(x: mineGround.frame.maxX, y: top_height + 20.0, width: margin_left, height: 90)
         summaryView.backgroundColor = .black
         summaryView.setRaius(1.0, borderColor: .white, borderWitdh: 1.0)
         self.view.addSubview(summaryView)
-        
-        self.setupMarkCounter(contentView: summaryView)
+        summaryLabel.frame = CGRect.init(x: 0, y: 0, width: margin_left, height: 50)
+        summaryView.addSubview(summaryLabel)
+        summaryFace.frame = CGRect.init(x: 0, y: 44, width: margin_left, height: 40)
+        summaryView.addSubview(summaryFace)
         
 //        mineTest.frame = CGRect(x: 10, y: 50, width: 80, height: 80)
 //        view.addSubview(mineTest)
@@ -243,20 +161,19 @@ class MXSMinerController: MXSViewController {
             mine.removeFromSuperview()
         }
         minePackage.removeAll()
-        summaryLabel.text = "Mission..."
-        summaryFace.text = "👓"
+        
+        summaryView.isHidden = true
         GroundMask.isHidden = true
+        S_mine = 0
         C_mark = 0
         C_check = 0
-        S_mine = 0
-        C_mark_real = 0
         
         let space = 0.5
         let item_w = (mineGround.frame.size.width - space*CGFloat(numberOfRow-1)) / CGFloat(numberOfRow)
         for row in 0..<numberOfRow {
             for col in 0..<numberOfRow {
-                let mine = MXSMineItemView(frame: CGRect(x: (item_w+space)*CGFloat(col), y: (item_w+space)*CGFloat(row), width: item_w, height: item_w))
-                mine.control = self
+                let mine = MXSMineItemView.init(control: self)
+                mine.frame = CGRect.init(x: (item_w+space)*CGFloat(col), y: (item_w+space)*CGFloat(row), width: item_w, height: item_w)
                 mine.info = ["row":row, "col":col]
                 mineGround.addSubview(mine)
                 minePackage.append(mine)
@@ -275,8 +192,6 @@ class MXSMinerController: MXSViewController {
                 }
             }
         }
-        
-        mineSumLabel.text = String(S_mine)
     }
     
     @objc func didDirectionBtnClick(btn:UIButton) {
@@ -308,18 +223,11 @@ class MXSMinerController: MXSViewController {
     @objc func didSignBtnClick() {
         guard mineHolder != nil else { return }
         
-        if mineHolder?.state == .mark { //undo
-            mineHolder?.setupState(.unknown)
-            C_mark = C_mark-1
-            if mineHolder!.isBoom {  C_mark_real -= 1 }
-            return
-        }
-        
         mineHolder?.setupState(.mark)
-        C_mark = C_mark+1
-        if mineHolder!.isBoom {  C_mark_real += 1
+        if mineHolder!.isBoom {
+            C_mark += 1
             
-            if C_mark_real == S_mine {
+            if C_mark == S_mine {
                 endMission(complete: true)
             }
         }
@@ -328,7 +236,7 @@ class MXSMinerController: MXSViewController {
         MXSLog("didCheckBtnClick")
         guard mineHolder != nil else { return }
         
-        if mineHolder?.state == .check || mineHolder?.state == .mark { return }
+        if mineHolder?.state == .check { return }
         
         if mineHolder!.isBoom {
             mineHolder?.setupState(.boom)
@@ -364,7 +272,7 @@ class MXSMinerController: MXSViewController {
                 }
                 else {
                     GroundMask.isHidden = false
-                    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(200)) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(250)) {
                         self.seekClueFromAround(view: mine)
                         self.GroundMask.isHidden = true
                     }
@@ -377,8 +285,6 @@ class MXSMinerController: MXSViewController {
     }
     
     @objc func didCheckAroundBtnClick() {
-        if mineHolder?.state != .check { return }
-        
         let neighbors = getNebghbors(mineHolder!)
         for neighbor in neighbors {
             if neighbor.state == .check || neighbor.state == .mark { continue }
@@ -397,28 +303,6 @@ class MXSMinerController: MXSViewController {
         }
     }
     
-    
-    func endMission(complete: Bool) {
-        mineHolder?.selected = false
-        mineHolder = nil
-        summaryLabel.text = complete ? "Mission Complete!" : "Mission Failed!"
-        summaryFace.text = complete ? "😊" : "😫"
-        
-        GroundMask.isHidden = false
-        
-        for mine in minePackage {
-            if mine.isBoom {
-                if (mine.state == .mark) {
-                    mine.setupState(.show)
-                }
-                else {
-                    mine.setupState(.boom)
-                }
-            }
-        }
-    }
-    
-    //MARK: - common
     func getNebghbors(_ view: MXSMineItemView) -> [MXSMineItemView] {
         let tupleArray = [(view.row-1, view.col-1), (view.row-1, view.col), (view.row-1, view.col+1),
                           (view.row, view.col-1), (view.row, view.col+1),
@@ -436,6 +320,30 @@ class MXSMinerController: MXSViewController {
             return nil
         }
         return minePackage[row*numberOfRow+col]
+    }
+    
+    func endMission(complete: Bool) {
+        mineHolder = nil
+        summaryLabel.text = complete ? "Mission Complete!" : "Mission Failed!"
+        summaryFace.text = complete ? "😊" : "😫"
+        summaryView.isHidden = false
+        GroundMask.isHidden = false
+        
+        for mine in minePackage {
+            if mine.isBoom {
+                if (mine.state == .mark) {
+                    mine.setupState(.show)
+                }
+                else {
+                    mine.setupState(.boom)
+                }
+            }
+        }
+    }
+    
+    //MARK: - notifies
+    @objc func collectionDidSelectedItem(args:Array<Any>) {
+        
     }
     
     
