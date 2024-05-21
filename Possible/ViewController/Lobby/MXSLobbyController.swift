@@ -138,6 +138,13 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate {
         view.addSubview(minerBtn)
         minerBtn.addTarget(self, action: #selector(minerBtnClick), for: .touchUpInside)
         
+        let RBlockBtn = UIButton("RBlock", fontSize: 614, textColor: .dullLine)
+        RBlockBtn.frame = CGRect.init(x: minerBtn.frame.maxX + 10, y: assemBtn.frame.minY, width: 96, height: 40)
+        RBlockBtn.layer.borderWidth = 1.0
+        RBlockBtn.layer.borderColor = UIColor.dullLine.cgColor
+        view.addSubview(RBlockBtn)
+        RBlockBtn.addTarget(self, action: #selector(RBlockBtnClick), for: .touchUpInside)
+        
 
         publishBtn.setTitleColor(.theme, for: .selected)
         publishBtn.frame = CGRect.init(x: mainTable!.frame.minX - 70, y: assemBtn.frame.minY, width: 60, height: 40)
@@ -160,6 +167,9 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate {
     }
     @objc func minerBtnClick() {
         self.navigationController?.pushViewController(MXSMinerController(), animated: false)
+    }
+    @objc func RBlockBtnClick() {
+        self.navigationController?.pushViewController(MXSRBlockController(), animated: false)
     }
     
     @objc func deviceOffLine(btn:UIButton) {

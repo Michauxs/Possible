@@ -187,6 +187,14 @@ enum LosePokerWay : Int {
     case handover // = active give + responder gain
 }
 
+
+enum MoveDirection : Int {
+    case top = 0
+    case left = 1
+    case down = 2
+    case right = 3
+}
+
 //enum CycleState {
 //    case blank
 //    case leader
