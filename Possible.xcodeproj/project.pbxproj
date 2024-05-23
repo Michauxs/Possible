@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 51;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -17,6 +17,7 @@
 		76053E2024E68635001860E7 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 76053E1F24E68635001860E7 /* Default-568h@2x.png */; };
 		76053E2324E68722001860E7 /* MXSHeroView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76053E2224E68722001860E7 /* MXSHeroView.swift */; };
 		76053E2524E68BE8001860E7 /* SnapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 76053E2424E68BE8001860E7 /* SnapKit.framework */; };
+		7606BE7A2BFDEE0E005B9F55 /* MXSTimerCmd.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7606BE792BFDEE0E005B9F55 /* MXSTimerCmd.swift */; };
 		764B9DAC280EA3830003364B /* MXSEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 764B9DAB280EA3830003364B /* MXSEffect.swift */; };
 		764DE6492501F14700409586 /* MXSSkillAssemController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 764DE6482501F14700409586 /* MXSSkillAssemController.swift */; };
 		764DE64D25020B7C00409586 /* MXSLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 764DE64C25020B7C00409586 /* MXSLabel.swift */; };
@@ -112,6 +113,7 @@
 		76053E1F24E68635001860E7 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		76053E2224E68722001860E7 /* MXSHeroView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSHeroView.swift; sourceTree = "<group>"; };
 		76053E2424E68BE8001860E7 /* SnapKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SnapKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		7606BE792BFDEE0E005B9F55 /* MXSTimerCmd.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSTimerCmd.swift; sourceTree = "<group>"; };
 		764B9DAB280EA3830003364B /* MXSEffect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSEffect.swift; sourceTree = "<group>"; };
 		764DE6482501F14700409586 /* MXSSkillAssemController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSSkillAssemController.swift; sourceTree = "<group>"; };
 		764DE64C25020B7C00409586 /* MXSLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSLabel.swift; sourceTree = "<group>"; };
@@ -285,6 +287,14 @@
 			path = ViewController;
 			sourceTree = "<group>";
 		};
+		7606BE782BFDEDE8005B9F55 /* Timer */ = {
+			isa = PBXGroup;
+			children = (
+				7606BE792BFDEE0E005B9F55 /* MXSTimerCmd.swift */,
+			);
+			path = Timer;
+			sourceTree = "<group>";
+		};
 		764DE64A25020B1A00409586 /* Extension */ = {
 			isa = PBXGroup;
 			children = (
@@ -420,6 +430,7 @@
 		76AC2AF52514B34F005884CF /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				7606BE782BFDEDE8005B9F55 /* Timer */,
 				76AC2AF82514B34F005884CF /* Hero */,
 				76AC2AF72514B34F005884CF /* Poker */,
 				76AC2AF62514B34F005884CF /* Skill */,
@@ -750,6 +761,7 @@
 				765824D22509D64A00EB55E5 /* MXSTableView.swift in Sources */,
 				765824DB2509F8B500EB55E5 /* MXSSkillView.swift in Sources */,
 				7654CDD8251C4F640053B4F3 /* MXSFont.swift in Sources */,
+				7606BE7A2BFDEE0E005B9F55 /* MXSTimerCmd.swift in Sources */,
 				76053DAA24E39B4E001860E7 /* AppDelegate.swift in Sources */,
 				765824D62509D64A00EB55E5 /* MXSCollectionView.swift in Sources */,
 				76E9D0EA26453EF400D6E5C4 /* MXSPVESoloController.swift in Sources */,

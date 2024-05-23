@@ -34,8 +34,8 @@ class MXSRBlockUnitView: MXSBaseView {
         self.backgroundColor = .gray
         
         selectedView.frame = self.bounds
-        selectedView.backgroundColor = .clear
-        selectedView.setRaius(0, borderColor: .white, borderWitdh: 1.0)
+        selectedView.backgroundColor = .lightGray
+        selectedView.setRaius(0, borderColor: .black, borderWitdh: 0.5)
         addSubview(selectedView)
         selectedView.isHidden = true
         

@@ -13,6 +13,7 @@ class MXSRBlockController: MXSViewController {
     var numberOfRow = 16
     var numberOfCol = 12
     var velocity = 1.5
+    var isRun:Bool = false
     
     let blockGround: UIView = UIView()
     let GroundMask: UIView = UIView()
@@ -35,9 +36,26 @@ class MXSRBlockController: MXSViewController {
     let markCountLabel = UILabel(text: "0", fontSize: 314, textColor: .lightText, align: .left)
     let blockSumLabel = UILabel(text: "0", fontSize: 314, textColor: .lightText, align: .left)
     
-    var timer: Timer? = nil
     
     //MARK: - Method
+    override func packageFunctionName() {
+        functionMapVoid["timerCmdRunAction"] = timerCmdRunAction
+    }
+    var secondCount: Int = 0
+    func timerCmdRunAction() {
+        if isRun == false {
+            return
+        }
+        MXSLog("timer 0.5 second")
+        secondCount += 1
+        if secondCount == 2 {
+            MXSLog("========== timer 1 second ==========")
+            self.moveRBlockItem(.down)
+            self.refreshScreen()
+            secondCount = 0;
+        }
+    }
+    
     @objc func didCloseGameBtnClick() {
         self.navigationController?.popViewController(animated: false)
     }
@@ -72,12 +90,9 @@ class MXSRBlockController: MXSViewController {
         }
         
         generateRBlockItem()
+        isRun = true
         refreshScreen()
         
-        timer = Timer.scheduledTimer(withTimeInterval: velocity, repeats: true, block: { tm in
-            self.moveRBlockItem(.down)
-            self.refreshScreen()
-        })
     }
     func generateRBlockItem() {
         
@@ -205,6 +220,7 @@ class MXSRBlockController: MXSViewController {
         markBtn.addTarget(self, action: #selector(didSignBtnClick), for: .touchUpInside)
         
         /*--------------------------------------*/
+        MXSTimerCmd.cmd.monitor(self)
         clearGroundGoOn()
     }
     
