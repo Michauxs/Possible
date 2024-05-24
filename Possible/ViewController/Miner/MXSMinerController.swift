@@ -51,7 +51,7 @@ class MXSMinerController: MXSViewController {
         mineHolder = view
     }
     override func packageFunctionName() {
-        functionMapPara["mineViewTaped:"] = mineViewTaped
+        functionMapCmd?.functionMapPara["mineViewTaped:"] = mineViewTaped
     }
     
     @objc func didGradeBtnClick() {

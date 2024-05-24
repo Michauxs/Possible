@@ -113,7 +113,7 @@ class MXSMineItemView: MXSBaseView {
     }
     
     override func selfTaped() {
-        self.control?.callFunction(byName: "mineViewTaped:", withPara: self)
+        self.control?.functionMapCmd?.callFunction(byName: "mineViewTaped:", withPara: self)
     }
     
     

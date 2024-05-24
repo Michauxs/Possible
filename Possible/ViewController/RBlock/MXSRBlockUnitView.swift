@@ -12,6 +12,7 @@ import UIKit
 class MXSRBlockUnitView: MXSBaseView {
     
     var idx = 0
+    /**(row, col)**/
     var coordinate = (0, 0) {
         didSet {
             idx = coordinate.0*100 + coordinate.1

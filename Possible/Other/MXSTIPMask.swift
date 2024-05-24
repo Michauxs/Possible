@@ -17,7 +17,7 @@ class MXSTIPMaskCmd {
         return single
     }()
     
-    public func showMaskWithTip(_ title:String, auto:Bool) {
+    public func showMaskWithTip(_ title:String, auto:Bool = true) {
         let mask = MXSTIPMask.init(frame: CGRect.init(x: 0, y: 0, width: MXSSize.Sw, height: MXSSize.Sh))
         mask.titleLabel.text = title
         

@@ -57,6 +57,8 @@
 		7697A5C824ECBD1500FB93A6 /* MXSBaseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7697A5C724ECBD1500FB93A6 /* MXSBaseView.swift */; };
 		7697A5CD24ECF4C100FB93A6 /* MXSSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7697A5CC24ECF4C100FB93A6 /* MXSSize.swift */; };
 		7697A5CF24EE453100FB93A6 /* MXSPokerCmd.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7697A5CE24EE453100FB93A6 /* MXSPokerCmd.swift */; };
+		769FBF332C008A9800134E2A /* MXSGobangController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 769FBF322C008A9800134E2A /* MXSGobangController.swift */; };
+		769FBF352C008D2700134E2A /* MXSFunctionMapCmd.swift in Sources */ = {isa = PBXBuildFile; fileRef = 769FBF342C008D2700134E2A /* MXSFunctionMapCmd.swift */; };
 		76A038B8251D82CD0056C214 /* KT_GB2312 Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 76A038B7251D82CC0056C214 /* KT_GB2312 Bold.ttf */; };
 		76A0D29F264A7EE100768AA7 /* MXSNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76A0D29E264A7EE100768AA7 /* MXSNavigationController.swift */; };
 		76AC2AF4250F6DC1005884CF /* MXSSkillBtn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76AC2AF3250F6DC1005884CF /* MXSSkillBtn.swift */; };
@@ -153,6 +155,8 @@
 		7697A5C724ECBD1500FB93A6 /* MXSBaseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSBaseView.swift; sourceTree = "<group>"; };
 		7697A5CC24ECF4C100FB93A6 /* MXSSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSSize.swift; sourceTree = "<group>"; };
 		7697A5CE24EE453100FB93A6 /* MXSPokerCmd.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSPokerCmd.swift; sourceTree = "<group>"; };
+		769FBF322C008A9800134E2A /* MXSGobangController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSGobangController.swift; sourceTree = "<group>"; };
+		769FBF342C008D2700134E2A /* MXSFunctionMapCmd.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSFunctionMapCmd.swift; sourceTree = "<group>"; };
 		76A038B7251D82CC0056C214 /* KT_GB2312 Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "KT_GB2312 Bold.ttf"; sourceTree = "<group>"; };
 		76A0D29E264A7EE100768AA7 /* MXSNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSNavigationController.swift; sourceTree = "<group>"; };
 		76AC2AF3250F6DC1005884CF /* MXSSkillBtn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSSkillBtn.swift; sourceTree = "<group>"; };
@@ -336,9 +340,9 @@
 		7653AFB62BC91A7600725AC6 /* RBlock */ = {
 			isa = PBXGroup;
 			children = (
-				76CEB0232BD9065600BB2625 /* MXSRBlockUnitView.swift */,
 				76CEB0212BD903DE00BB2625 /* MXSRBlockCmd.swift */,
 				7653AFB72BC91C1400725AC6 /* MXSRBlockItem.swift */,
+				76CEB0232BD9065600BB2625 /* MXSRBlockUnitView.swift */,
 				7653AFB82BC91C1400725AC6 /* MXSRBlockController.swift */,
 			);
 			path = RBlock;
@@ -421,6 +425,7 @@
 		7697A5C924ECD22F00FB93A6 /* BaseController */ = {
 			isa = PBXGroup;
 			children = (
+				769FBF342C008D2700134E2A /* MXSFunctionMapCmd.swift */,
 				76053DDA24E39C90001860E7 /* MXSViewController.swift */,
 				76A0D29E264A7EE100768AA7 /* MXSNavigationController.swift */,
 			);
@@ -502,6 +507,7 @@
 		76CEB0202BD8EA4D00BB2625 /* Gobang */ = {
 			isa = PBXGroup;
 			children = (
+				769FBF322C008A9800134E2A /* MXSGobangController.swift */,
 			);
 			path = Gobang;
 			sourceTree = "<group>";
@@ -732,6 +738,7 @@
 				765C8BF128091B2F00A77293 /* MXSGraspPokerView.swift in Sources */,
 				7697A5C824ECBD1500FB93A6 /* MXSBaseView.swift in Sources */,
 				76CEB0242BD9065600BB2625 /* MXSRBlockUnitView.swift in Sources */,
+				769FBF352C008D2700134E2A /* MXSFunctionMapCmd.swift in Sources */,
 				7697A5CF24EE453100FB93A6 /* MXSPokerCmd.swift in Sources */,
 				76CB0A6127A1232500F7D56E /* MXSHeroAI.swift in Sources */,
 				76AC2AF4250F6DC1005884CF /* MXSSkillBtn.swift in Sources */,
@@ -773,6 +780,7 @@
 				7653AFB92BC91C1400725AC6 /* MXSRBlockItem.swift in Sources */,
 				76CB0A5F27A0F2A400F7D56E /* MXSHero.swift in Sources */,
 				7697A5C424ECB8F100FB93A6 /* MXSEnumDefines.swift in Sources */,
+				769FBF332C008A9800134E2A /* MXSGobangController.swift in Sources */,
 				76B4E9542507769000AD5CA3 /* MXSView.swift in Sources */,
 				764DE64F25020F8700409586 /* MXSButton.swift in Sources */,
 				76F92F4C24F788990039478D /* MXSCodeNote.swift in Sources */,

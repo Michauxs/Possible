@@ -10,15 +10,16 @@ import UIKit
 
 class MXSRBlockController: MXSViewController {
     
-    var numberOfRow = 16
-    var numberOfCol = 12
-    var velocity = 1.5
+    let RBlockCmd :MXSRBlockCmd = MXSRBlockCmd(Sum_row: 16, Sum_col: 12)
+    
+    /**0.5s / v**/
+    var velocity: Int = 5
     var isRun:Bool = false
     
     let blockGround: UIView = UIView()
     let GroundMask: UIView = UIView()
-    var blockPackage = [MXSRBlockUnitView]()
-    var filledTable = [Int:Bool]()
+    var blockViewPackage = [MXSRBlockUnitView]()
+    
     var blockHolder: MXSRBlockItem?
     
     let summaryView: UIView = UIView()
@@ -26,12 +27,7 @@ class MXSRBlockController: MXSViewController {
     
     var S_block = 0
     var C_mark_real = 0
-    var C_mark = 0 {
-        didSet {
-            MXSLog("block mark count: " + "\(C_mark)")
-            markCountLabel.text = String(C_mark)
-        }
-    }
+    
     var C_check = 0
     let markCountLabel = UILabel(text: "0", fontSize: 314, textColor: .lightText, align: .left)
     let blockSumLabel = UILabel(text: "0", fontSize: 314, textColor: .lightText, align: .left)
@@ -39,91 +35,73 @@ class MXSRBlockController: MXSViewController {
     
     //MARK: - Method
     override func packageFunctionName() {
-        functionMapVoid["timerCmdRunAction"] = timerCmdRunAction
+        functionMapCmd?.functionMapVoid["timerCmdRunAction"] = timerCmdRunAction
     }
     var secondCount: Int = 0
     func timerCmdRunAction() {
-        if isRun == false {
-            return
-        }
-        MXSLog("timer 0.5 second")
+        if isRun == false { return }
+        
+        //MXSLog("----- timer 0.5 second -----")
         secondCount += 1
-        if secondCount == 2 {
-            MXSLog("========== timer 1 second ==========")
-            self.moveRBlockItem(.down)
-            self.refreshScreen()
+        if secondCount == velocity {
+            MXSLog("=============== timer 1 second ===============")
+            self.sendRBlockItemMove(.down)
+            
             secondCount = 0;
         }
     }
     
-    @objc func didCloseGameBtnClick() {
-        self.navigationController?.popViewController(animated: false)
-    }
-    @objc func didRestartBtnClick() {
-        clearGroundGoOn()
-    }
-    
-    @objc func didGradeBtnClick() {
-        let alert = UIAlertController.init(title: "Grade", message: "", preferredStyle: .alert)
-        alert.addAction(UIAlertAction.init(title: "Primary", style: .default, handler: { (act) in
-            self.resetGrade(v: 2.0)
-        }))
-        alert.addAction(UIAlertAction.init(title: "Middle", style: .default, handler: { (act) in
-            self.resetGrade(v: 1.5)
-        }))
-        alert.addAction(UIAlertAction.init(title: "High", style: .default, handler: { (act) in
-            self.resetGrade(v: 1.0)
-        }))
-        alert.addAction(UIAlertAction.init(title: "Cancel", style: .cancel, handler: { (act) in
-            
-        }))
-        self.present(alert, animated: true, completion: nil)
-    }
-
-    func resetGrade(v: CGFloat) {
-        velocity = v
-        clearGroundGoOn()
-    }
     func clearGroundGoOn() {
-        for key in Array(filledTable.keys) {
-            filledTable[key] = false
-        }
+        RBlockCmd.clearAllFilled()
+        isRun = true
         
         generateRBlockItem()
-        isRun = true
+    }
+    func gameOver() {
+        isRun = false
+        MXSTIPMaskCmd.shared.showMaskWithTip("Game Over!")
+    }
+        
+    func generateRBlockItem() {
+        secondCount = 0
+        //Int.random(in: 1...7)
+        blockHolder = MXSRBlockItem.randomRBlock()
+        
+        guard let holder = blockHolder else { return }
+        holder.coordinate = (0, 5)
+        RBlockCmd.fillRBlock(holder)
         refreshScreen()
         
-    }
-    func generateRBlockItem() {
-        
-        blockHolder = MXSRBlockItem(item: .armLeft)
-        guard let holder = blockHolder else { return }
-        
-        holder.coordinate = (0, 5)
-        
-        for coor in holder.unitSet {
-            let unit = (holder.coordinate.0 + coor.0, holder.coordinate.1 + coor.1)
-            filledTable[unit.0*100+unit.1] = true
+        if RBlockCmd.supposingRBlockMove(RBlock: holder, move: .stay, judge: { direction, result in
+            if result == .shutdown {
+                gameOver()
+            }
+        }) {
+            
         }
     }
+    
     func refreshScreen() {
-        for unit in blockPackage {
-            unit.setSelect(filledTable[unit.idx]!)
+        for unit in blockViewPackage {
+            unit.setSelect(RBlockCmd.filledTable[unit.idx]!)
         }
     }
-    func moveRBlockItem(_ direction: MoveDirection) {
+    
+    func sendRBlockItemMove(_ direction: MoveDirection) {
         guard let holder = blockHolder else { return }
         
-        for coor in holder.unitSet {
-            let unit = (holder.coordinate.0 + coor.0, holder.coordinate.1 + coor.1)
-            filledTable[unit.0*100+unit.1] = false
-        }
-        
-        holder.move(direction)
-        
-        for coor in holder.unitSet {
-            let unit = (holder.coordinate.0 + coor.0, holder.coordinate.1 + coor.1)
-            filledTable[unit.0*100+unit.1] = true
+        if RBlockCmd.supposingRBlockMove(RBlock: holder, move: direction, judge: { direction, result in
+            switch result {
+            case .driftdown:
+                holder.move(direction)
+                RBlockCmd.fillRBlock(holder)
+            case .settledown:
+                self.generateRBlockItem()
+            case .shutdown, .barrier:
+                break
+            }
+        }) {
+            self.refreshScreen()
         }
     }
     
@@ -153,8 +131,8 @@ class MXSRBlockController: MXSViewController {
         super.viewDidLoad()
         
         let groundH = MXSSize.Sh
-        let block_w_h = groundH / CGFloat(numberOfRow)
-        let groundW = block_w_h * CGFloat(numberOfCol)
+        let block_w_h = groundH / CGFloat(RBlockCmd.Sum_row)
+        let groundW = block_w_h * CGFloat(RBlockCmd.Sum_col)
         
         let margin_left = (MXSSize.Sw-groundW)*0.5
         
@@ -220,52 +198,85 @@ class MXSRBlockController: MXSViewController {
         markBtn.addTarget(self, action: #selector(didSignBtnClick), for: .touchUpInside)
         
         /*--------------------------------------*/
+        MXSLog(self, "MXSRBlockController")
         MXSTimerCmd.cmd.monitor(self)
         clearGroundGoOn()
+    }
+    deinit {
+        MXSLog("MXSRBlockController deinit")
     }
     
     func layoutblock() {
         
         summaryLabel.text = "Mission..."
         GroundMask.isHidden = true
-        C_mark = 0
+        
         C_check = 0
         S_block = 0
         C_mark_real = 0
         
         let space = 0.5
-        let item_w = (blockGround.frame.size.height - space*CGFloat(numberOfRow-1)) / CGFloat(numberOfRow)
-        for row in 0..<numberOfRow {
-            for col in 0..<numberOfCol {
+        let item_w = (blockGround.frame.size.height - space*CGFloat(RBlockCmd.Sum_row-1)) / CGFloat(RBlockCmd.Sum_row)
+        for row in 0..<RBlockCmd.Sum_row {
+            for col in 0..<RBlockCmd.Sum_col {
                 let block = MXSRBlockUnitView(frame: CGRect(x: (item_w+space)*CGFloat(col), y: (item_w+space)*CGFloat(row), width: item_w, height: item_w))
                 block.control = self
                 block.coordinate = (row, col)
                 blockGround.addSubview(block)
-                blockPackage.append(block)
-                filledTable[block.idx] = false
+                blockViewPackage.append(block)
+                RBlockCmd.filledTable[block.idx] = false
             }
         }
         
         blockSumLabel.text = String(S_block)
     }
     
+    func endMission(complete: Bool) {
+        
+    }
+    
+    //MARK: - actions
     @objc func didDirectionBtnClick(btn:UIButton) {
-        MXSLog("didDirecionBtnClick:")
+        MXSLog("didDirecionBtnClick:" + "\(btn.tag)")
+        if btn.tag == 0 {//up
+            return
+        }
         
-        
+        let direct = MoveDirection(rawValue: btn.tag)
+        self.sendRBlockItemMove(direct!)
     }
     
     @objc func didSignBtnClick() {
         guard blockHolder != nil else { return }
         
-        
     }
     
-    func endMission(complete: Bool) {
-        
+    @objc func didCloseGameBtnClick() {
+        self.navigationController?.popViewController(animated: false)
+    }
+    @objc func didRestartBtnClick() {
+        clearGroundGoOn()
     }
     
-    //MARK: - common
-    
+    @objc func didGradeBtnClick() {
+        let alert = UIAlertController.init(title: "Grade", message: "", preferredStyle: .alert)
+        alert.addAction(UIAlertAction.init(title: "Primary", style: .default, handler: { (act) in
+            self.resetGrade(v: 3)
+        }))
+        alert.addAction(UIAlertAction.init(title: "Middle", style: .default, handler: { (act) in
+            self.resetGrade(v: 2)
+        }))
+        alert.addAction(UIAlertAction.init(title: "High", style: .default, handler: { (act) in
+            self.resetGrade(v: 1)
+        }))
+        alert.addAction(UIAlertAction.init(title: "Cancel", style: .cancel, handler: { (act) in
+            
+        }))
+        self.present(alert, animated: true, completion: nil)
+    }
+    func resetGrade(v: Int) {
+        velocity = v
+        clearGroundGoOn()
+    }
     
 }

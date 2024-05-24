@@ -11,7 +11,7 @@ import UIKit
 
 class MXSRBlockItem {
     
-    enum RBlockItem : Int {
+    enum RBlockType : Int {
         case unknown = 0
         case single = 1
         case double = 2
@@ -29,13 +29,31 @@ class MXSRBlockItem {
         case landscapeRight = 3
     }
     
-    var item: RBlockItem = .unknown
-    var coordinate = (0, 0)
+    var item: RBlockType = .unknown
+    /**(row, col)**/
+    var coordinate = (0, 0) {
+        didSet {
+            for index in 0..<unitSet.count {
+                
+//                let coor = coordinateSet[index]
+                let unit = unitSet[index]
+                coordinateSet[index].0 = coordinate.0 + unit.0
+                coordinateSet[index].1 = coordinate.1 + unit.1
+            }
+            MXSLog(coordinateSet, "coordinateSet")
+        }
+    }
     var unitSet: [(Int, Int)] = [(0, 0)]
+    var coordinateSet: [(Int, Int)] = [(0, 0)]
     var form: RBlockItemForm = .portrait
     
     
-    convenience init(item: RBlockItem) {
+    class func randomRBlock() -> MXSRBlockItem {
+        let type = RBlockType.init(rawValue: Int.random(in: 1...7))
+        return MXSRBlockItem(item: type!)
+    }
+    
+    convenience init(item: RBlockType) {
         self.init()
         self.item = item
         switch item {
@@ -56,6 +74,8 @@ class MXSRBlockItem {
         case .tee:
             unitSet = [(0, 1), (1, 0), (1, 1), (1, 2)]
         }
+        
+        coordinateSet = [(0, 0), (0, 0), (0, 0), (0, 0)]
     }
     
     
@@ -73,17 +93,22 @@ class MXSRBlockItem {
     }
     
     func move(_ direction: MoveDirection) {
-        
+        var coor = coordinate
         switch direction {
         case .top:
-            coordinate.0 = coordinate.0 - 1
+            coor.0 = coordinate.0 - 1
         case .left:
-            coordinate.1 = coordinate.1 - 1
+            coor.1 = coordinate.1 - 1
         case .down:
-            coordinate.0 = coordinate.0 + 1
+            coor.0 = coordinate.0 + 1
         case .right:
-            coordinate.1 = coordinate.1 + 1
+            coor.1 = coordinate.1 + 1
+        case .stay:
+            break
         }
+        
+        self.coordinate = coor
+        
     }
     
 }
