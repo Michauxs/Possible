@@ -9,6 +9,7 @@
 import UIKit
 
 class MXSMineItemView: MXSBaseView {
+    weak var owner: MXSMinerController?
     
     enum MineState : Int {
         case unknown = 0
@@ -113,7 +114,8 @@ class MXSMineItemView: MXSBaseView {
     }
     
     override func selfTaped() {
-        self.control?.functionMapCmd?.callFunction(byName: "mineViewTaped:", withPara: self)
+//        self.control?.MXSFuncMapCmd.callFunction(byName: "mineViewTaped:", withPara: self)
+        self.owner?.mineViewTaped(args: self)
     }
     
     

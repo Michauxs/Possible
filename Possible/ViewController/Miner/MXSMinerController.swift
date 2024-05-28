@@ -51,7 +51,7 @@ class MXSMinerController: MXSViewController {
         mineHolder = view
     }
     override func packageFunctionName() {
-        functionMapCmd?.functionMapPara["mineViewTaped:"] = mineViewTaped
+        MXSFuncMapCmd.functionMapPara["mineViewTaped:"] = mineViewTaped
     }
     
     @objc func didGradeBtnClick() {
@@ -256,7 +256,7 @@ class MXSMinerController: MXSViewController {
         for row in 0..<numberOfRow {
             for col in 0..<numberOfRow {
                 let mine = MXSMineItemView(frame: CGRect(x: (item_w+space)*CGFloat(col), y: (item_w+space)*CGFloat(row), width: item_w, height: item_w))
-                mine.control = self
+                mine.owner = self
                 mine.info = ["row":row, "col":col]
                 mineGround.addSubview(mine)
                 minePackage.append(mine)

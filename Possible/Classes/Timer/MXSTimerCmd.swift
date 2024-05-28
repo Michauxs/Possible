@@ -31,9 +31,9 @@ class MXSTimerCmd {
     var monitors:[MXSWeakNote] = [MXSWeakNote]()
     
     lazy var cadlink: CADisplayLink = {
-        let tr = CADisplayLink(target: self, selector: #selector(self.handleDisplayLink))
-        tr.add(to: RunLoop.current, forMode: RunLoopMode.defaultRunLoopMode)
-        return tr
+        let dlick = CADisplayLink(target: self, selector: #selector(self.handleDisplayLink))
+        dlick.add(to: RunLoop.current, forMode: RunLoopMode.defaultRunLoopMode)
+        return dlick
     }()
     
 //    lazy var timer: Timer = {
@@ -53,18 +53,23 @@ class MXSTimerCmd {
     }
     
     func timerRun() {
-//        MXSLog(self.textVC)
         
         var has_note = false
         for note in monitors {
             if let vc = note.vc {
                 MXSLog(vc, "Timer.note.vc")
-                vc.functionMapCmd?.callFunction(byName: "timerCmdRunAction")
+                vc.timerCmdRunAction()
+//                let func1 = vc.MXSFuncMapCmd.functionVoid1
+//                func1!()
+//                vc.MXSFuncMapCmd.callFunction(byName: "timerCmdRunAction")
+//                (MXSRBlockController*)vc.run
                 has_note = true
             }
         }
         
         if has_note == false {
+            monitors.removeAll()
+            self.cadlink.isPaused = true
 //            self.timer.fireDate = Date.distantFuture
         }
     }
@@ -73,9 +78,13 @@ class MXSTimerCmd {
         let note = MXSWeakNote(vc: vc)
         monitors.append(note)
         
+        monitors.removeAll { note in
+            note.vc == nil
+        }
+        
 //        textVC = vc
 //        self.timer.fireDate = Date.distantPast
-        let _ = self.cadlink
+        self.cadlink.isPaused = false
     }
     weak var textVC: MXSViewController?
 }

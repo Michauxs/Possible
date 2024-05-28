@@ -21,10 +21,6 @@ class MXSGobangController: MXSViewController {
         
     }
     
-    deinit {
-        MXSLog("MXSGobangController deinit")
-    }
-    
     @objc func didCloseGameBtnClick() {
         self.navigationController?.popViewController(animated: false)
     }

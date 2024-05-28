@@ -18,7 +18,6 @@ class MXSRBlockController: MXSViewController {
     
     let blockGround: UIView = UIView()
     let GroundMask: UIView = UIView()
-    var blockViewPackage = [MXSRBlockUnitView]()
     
     var blockHolder: MXSRBlockItem?
     
@@ -35,10 +34,13 @@ class MXSRBlockController: MXSViewController {
     
     //MARK: - Method
     override func packageFunctionName() {
-        functionMapCmd?.functionMapVoid["timerCmdRunAction"] = timerCmdRunAction
+//        MXSFuncMapCmd.functionMapVoid["timerCmdRunAction"] = timerCmdRunAction
+//        MXSFuncMapCmd.functionVoid1 = timerCmdRunAction
     }
     var secondCount: Int = 0
-    func timerCmdRunAction() {
+    
+    
+    override func timerCmdRunAction() {
         if isRun == false { return }
         
         //MXSLog("----- timer 0.5 second -----")
@@ -46,44 +48,7 @@ class MXSRBlockController: MXSViewController {
         if secondCount == velocity {
             MXSLog("=============== timer 1 second ===============")
             self.sendRBlockItemMove(.down)
-            
             secondCount = 0;
-        }
-    }
-    
-    func clearGroundGoOn() {
-        RBlockCmd.clearAllFilled()
-        isRun = true
-        
-        generateRBlockItem()
-    }
-    func gameOver() {
-        isRun = false
-        MXSTIPMaskCmd.shared.showMaskWithTip("Game Over!")
-    }
-        
-    func generateRBlockItem() {
-        secondCount = 0
-        //Int.random(in: 1...7)
-        blockHolder = MXSRBlockItem.randomRBlock()
-        
-        guard let holder = blockHolder else { return }
-        holder.coordinate = (0, 5)
-        RBlockCmd.fillRBlock(holder)
-        refreshScreen()
-        
-        if RBlockCmd.supposingRBlockMove(RBlock: holder, move: .stay, judge: { direction, result in
-            if result == .shutdown {
-                gameOver()
-            }
-        }) {
-            
-        }
-    }
-    
-    func refreshScreen() {
-        for unit in blockViewPackage {
-            unit.setSelect(RBlockCmd.filledTable[unit.idx]!)
         }
     }
     
@@ -102,6 +67,34 @@ class MXSRBlockController: MXSViewController {
             }
         }) {
             self.refreshScreen()
+        }
+    }
+        
+    func generateRBlockItem() {
+        secondCount = 0
+        //Int.random(in: 1...7)
+        blockHolder = MXSRBlockItem.randomRBlock()
+        
+        guard let holder = blockHolder else { return }
+        holder.coordinate = (0, 5)
+        RBlockCmd.fillRBlock(holder)
+        refreshScreen()
+        
+        if RBlockCmd.supposingRBlockMove(RBlock: holder, move: .stay, judge: { direction, result in
+            if result == .shutdown {
+                //Game Over
+                isRun = false
+                MXSTIPMaskCmd.shared.showMaskWithTip("Game Over!")
+            }
+        }) {
+            
+        }
+    }
+    
+    var blockViewPackage = [MXSRBlockUnitView]()
+    func refreshScreen() {
+        for unit in blockViewPackage {
+            unit.setSelect(RBlockCmd.filledTable[unit.idx]!)
         }
     }
     
@@ -198,12 +191,9 @@ class MXSRBlockController: MXSViewController {
         markBtn.addTarget(self, action: #selector(didSignBtnClick), for: .touchUpInside)
         
         /*--------------------------------------*/
-        MXSLog(self, "MXSRBlockController")
+        
         MXSTimerCmd.cmd.monitor(self)
         clearGroundGoOn()
-    }
-    deinit {
-        MXSLog("MXSRBlockController deinit")
     }
     
     func layoutblock() {
@@ -277,6 +267,11 @@ class MXSRBlockController: MXSViewController {
     func resetGrade(v: Int) {
         velocity = v
         clearGroundGoOn()
+    }
+    func clearGroundGoOn() {
+        RBlockCmd.clearAllFilled()
+        isRun = true
+        generateRBlockItem()
     }
     
 }

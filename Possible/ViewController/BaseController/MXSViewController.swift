@@ -22,7 +22,11 @@ class MXSViewController: UIViewController {
     }
     
 //    let functionMapCmd: MXSFunctionMapCmd = MXSFunctionMapCmd()
-    weak var functionMapCmd = MXSFunctionMapCmd()
+    let MXSFuncMapCmd = MXSFunctionMapCmd()
+    
+    deinit {
+        MXSLog("\(self)" + " deinit")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -45,7 +49,6 @@ class MXSViewController: UIViewController {
     }
     
     
-    
     /**------------------------------------**/
     func function1() {
         print("Function 1 called")
@@ -60,9 +63,11 @@ class MXSViewController: UIViewController {
     }
     public func packageFunctionName() {
         // 将函数作为闭包存储在字典中
-        weak var weakself = self
-        functionMapCmd?.functionMapVoid["function1"] = weakself?.function1
-        functionMapCmd?.functionMapPara["function11"] = weakself?.function11
+//        weak var weakself = self
+//        MXSFuncMapCmd.functionMapVoid["function1"] = weakself?.function1
+//        MXSFuncMapCmd.functionMapPara["function11"] = weakself?.function11
+        
+//        MXSFuncMapCmd.functionVoid1 = function1
     }
     
     /**------------------------------------**/
@@ -88,7 +93,11 @@ class MXSViewController: UIViewController {
     }
     
     
-    // MARK: - NetServ
+    //MARK: - Common Function
+    func timerCmdRunAction() {}
+    
+    
+    //MARK: - NetServ
     /***/
     func havesomeMessage(_ dict:Dictionary<String, Any>) {
         MXSLog(dict)

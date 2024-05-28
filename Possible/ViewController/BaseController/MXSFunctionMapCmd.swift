@@ -17,10 +17,11 @@ class MXSFunctionMapCmd {
     }
     
     // 定义一个闭包字典，用于映射字符串到具体的闭包
-    var functionMapVoid: [String: () -> Void] = [:]
-    var functionMapPara: [String: (Any) -> Void] = [:]
-    var functionMapDict: [String: ([String:Any]) -> Void] = [:]
+    var functionMapVoid: [String: (() -> Void)?] = [:]
+    var functionMapPara: [String: ((Any) -> Void)?] = [:]
+    var functionMapDict: [String: (([String:Any]) -> Void)?] = [:]
     
+//    weak var functionVoid1: (() -> Void)?
     
 //    func packageFunction
     
@@ -28,21 +29,21 @@ class MXSFunctionMapCmd {
     // 通过字符串调用对应的函数
     func callFunction(byName functionName: String) {
         if let function = functionMapVoid[functionName] {
-            function()
+            function!()
         } else {
             print("Function not found")
         }
     }
     func callFunction(byName functionName: String, withPara args: Any) {
         if let function = functionMapPara[functionName] {
-            function(args)
+            function!(args)
         } else {
             print("Function not found")
         }
     }
     func callFunction(byName functionName: String, withDict args: [String:Any]) {
         if let function = functionMapDict[functionName] {
-            function(args)
+            function!(args)
         } else {
             print("Function not found")
         }

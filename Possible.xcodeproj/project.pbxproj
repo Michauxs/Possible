@@ -280,8 +280,8 @@
 		76053DD924E39C90001860E7 /* ViewController */ = {
 			isa = PBXGroup;
 			children = (
-				76CEB0202BD8EA4D00BB2625 /* Gobang */,
 				7697A5C924ECD22F00FB93A6 /* BaseController */,
+				76CEB0202BD8EA4D00BB2625 /* Gobang */,
 				7653AFB62BC91A7600725AC6 /* RBlock */,
 				7653AFAD2BC4EB0A00725AC6 /* Miner */,
 				76AC2AF92514B3F5005884CF /* Ground */,
