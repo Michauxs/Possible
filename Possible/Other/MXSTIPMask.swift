@@ -35,15 +35,24 @@ class MXSTIPMaskCmd {
         if maskLayer.count < 1 {
             return
         }
-        let mask = maskLayer.last
-        mask?.isHidden = true
-        maskLayer.removeLast()
+        
+        if let mask = maskLayer.last(where: { one in
+            one.autoDispear == true
+        }) {
+//            mask?.isHidden = true
+            mask.removeFromSuperview()
+            maskLayer.removeLast()
+        }
+        
+        
     }
     
 }
 
 class MXSTIPMask: MXSBaseView {
 
+    let autoDispear: Bool = true
+    
     lazy var titleLabel:UILabel = {
         return UILabel.init()
     }()

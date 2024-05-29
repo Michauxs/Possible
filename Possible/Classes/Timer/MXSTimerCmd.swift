@@ -74,7 +74,7 @@ class MXSTimerCmd {
         }
     }
     
-    func monitor(_ vc:MXSViewController) {
+    func monitor(_ vc: MXSViewController) {
         let note = MXSWeakNote(vc: vc)
         monitors.append(note)
         
@@ -86,7 +86,14 @@ class MXSTimerCmd {
 //        self.timer.fireDate = Date.distantPast
         self.cadlink.isPaused = false
     }
-    weak var textVC: MXSViewController?
+    func unMonitor(_ vc: MXSViewController) {
+        monitors.removeAll { one in
+            one.vc == vc
+        }
+        if monitors.count == 0 {
+            self.cadlink.isPaused = true
+        }
+    }
 }
 
 

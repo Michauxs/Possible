@@ -193,7 +193,6 @@ enum MoveDirection : Int {
     case left = 1
     case down = 2
     case right = 3
-    case stay = 4
 }
 
 //enum CycleState {
