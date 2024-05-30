@@ -58,7 +58,7 @@ class MXSRBlockItem {
                 coordinateSet[index].0 = coordinate.0 + unitSet[index].0
                 coordinateSet[index].1 = coordinate.1 + unitSet[index].1
             }
-            MXSLog(coordinateSet, "coordinateSet")
+            //MXSLog(coordinateSet, "coordinateSet")
         }
     }
     

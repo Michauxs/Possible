@@ -38,15 +38,18 @@ class MXSRBlockController: MXSViewController {
 //        MXSFuncMapCmd.functionVoid1 = timerCmdRunAction
     }
     
-    
     var secondCount: Int = 0
     override func timerCmdRunAction() {
+        if longPressLink == true {
+            
+        }
+        
         if isRun == false { return }
         
         //MXSLog("----- timer 0.5 second -----")
         secondCount += 1
         if secondCount == velocity {
-            MXSLog("=============== timer 1 second ===============")
+            //MXSLog("=============== timer 1 second ===============")
             self.sendRBlockItemMove(.down)
             secondCount = 0;
         }
@@ -185,7 +188,7 @@ class MXSRBlockController: MXSViewController {
         let sk_width: CGFloat = 44.0
         let title = ["⬆️", "⬅️", "⬇️", "➡️"]
         for index in 0..<title.count {
-            let dirtionBtn = UIButton.init(title[index], fontSize: 14, textColor: .white, backgColor: .darkGray)
+            let dirtionBtn = UIButton.init(title[index], fontSize: 18, textColor: .white, backgColor: .darkGray)
             dirtionBtn.tag = index
             self.view.addSubview(dirtionBtn)
             let x = CGFloat(sin(Double.pi/2 * Double(index)))
@@ -193,10 +196,16 @@ class MXSRBlockController: MXSViewController {
             dirtionBtn.bounds = CGRect.init(x: 0, y: 0, width: sk_width, height: sk_width)
             dirtionBtn.center = CGPoint(x: centerPoint.x - (sk_width+5.0)*x, y: centerPoint.y - (sk_width+5.0)*y)
             dirtionBtn.addTarget(self, action: #selector(didDirectionBtnClick(btn:)), for: .touchUpInside)
+            
+            // 添加手势识别器来处理双击
+            let longPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(didDirectionBtnLongPress(press:)))
+            longPressGestureRecognizer.minimumPressDuration = 0.5
+            longPressGestureRecognizer.allowableMovement = sk_width
+            dirtionBtn.addGestureRecognizer(longPressGestureRecognizer)
         }
         /*--------------------------------------*/
         let btn_w_h = 64.0
-        let markBtn = UIButton.init("@", fontSize: 625, textColor: .white, backgColor: .darkGray)
+        let markBtn = UIButton.init("🔄", fontSize: 625, textColor: .white, backgColor: .darkGray)
         markBtn.frame = CGRect.init(x: MXSSize.Sw - (margin_left + btn_w_h)*0.5, y: centerPoint.y - btn_w_h*0.5, width: btn_w_h, height: btn_w_h)
         self.view.addSubview(markBtn)
         markBtn.addTarget(self, action: #selector(didTransformBtnClick), for: .touchUpInside)
@@ -230,7 +239,7 @@ class MXSRBlockController: MXSViewController {
     //MARK: - actions
     @objc func didDirectionBtnClick(btn:UIButton) {
         MXSLog("didDirecionBtnClick:" + "\(btn.tag)")
-        if isRun == false { return }
+        if canUserInterface == false { return }
         if btn.tag == 0 {//up
             return
         }
@@ -240,9 +249,47 @@ class MXSRBlockController: MXSViewController {
         let direct = MoveDirection(rawValue: btn.tag)
         self.sendRBlockItemMove(direct!)
     }
+    @objc func didDirectionBtnLongPress(press: UILongPressGestureRecognizer) {
+        if canUserInterface == false { return }
+        
+        guard let btn = press.view else { return }
+        if btn.tag == 0 {//up
+            return
+        }
+        
+        if press.state == .began {
+            MXSLog("didDirectionBtnLongPress begin : " + "\(btn.tag)")
+            isRun = false
+            
+            longPressLink = true
+            let direction = MoveDirection(rawValue: btn.tag)
+            self.dLickMove(direction!)
+        }
+        else if press.state == .changed {
+            MXSLog("nothing todo")
+        }
+        else {
+            MXSLog("didDirectionBtnLongPress end : " + "\(btn.tag)")
+            isRun = true
+            secondCount = 0
+            longPressLink = false
+        }
+    }
+    
+    
+    var longPressLink = false
+    func dLickMove(_ direction: MoveDirection) {
+        self.sendRBlockItemMove(direction)
+        
+        if longPressLink {
+            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(250), execute: DispatchWorkItem(block: {
+                self.dLickMove(direction)
+            }))
+        }
+    }
     
     @objc func didTransformBtnClick() {
-        if isRun == false { return }
+        if canUserInterface == false { return }
         
         guard let holder = blockHolder else { return }
         if RBlockCmd.supposingRBlockTransform(RBlock: holder) {
@@ -260,14 +307,17 @@ class MXSRBlockController: MXSViewController {
     @objc func didRestartBtnClick() {
         clearGroundGoOn()
     }
+    var canUserInterface =  true
     @objc func didPauseBtnClick(btn:UIButton) {
         btn.isSelected = !btn.isSelected
         if btn.isSelected {
             isRun = false
             secondCount = 0
+            canUserInterface = false
         }
         else {
             isRun = true
+            canUserInterface = true
         }
     }
     
