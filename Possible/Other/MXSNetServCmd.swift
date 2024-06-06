@@ -37,6 +37,15 @@ enum ServiceStatus : Int {
     case stop
 }
 
+class MessageModel {
+    var type: MessageType = .unknown
+    var content: Any
+    init(type: MessageType, content: Any) {
+        self.type = type
+        self.content = content
+    }
+}
+
 class MXSNetServ: NetService, NetServiceDelegate, StreamDelegate {
     weak var belong: MXSViewController?
     
@@ -234,11 +243,18 @@ class MXSNetServ: NetService, NetServiceDelegate, StreamDelegate {
     }
     
     //MARK:notifies msg
-    func receiveMessage(_ msg:Dictionary<String, Any>) {
-        self.belong!.havesomeMessage(msg)
+    func receiveMessage(_ message:Dictionary<String, Any>) {
+        if let type: MessageType = MessageType.init(rawValue: message[kMsgType] as! Int), let content: Any = message[kMsgValue] {
+            
+            let model: MessageModel = .init(type: type, content: content)
+            self.belong!.haveAmessage(model)
+        }
     }
     
-    func sendMsg(_ message:Dictionary<String, Any>) {
+    func sendMessage(_ model: MessageModel) {
+        var message:Dictionary<String, Any> = [String:Any]()
+        message[kMsgType] = model.type.rawValue
+        message[kMsgValue] = model.content
         MXSLog(message, "send message 123: ")
         let data = try? JSONSerialization.data(withJSONObject: message, options: .prettyPrinted)
         if (data != nil) {

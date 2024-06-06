@@ -52,6 +52,8 @@ class MXSGraspPokerView: UIScrollView  {
                 poker.concreteView!.frame = CGRect(x: margin_base * CGFloat(index), y: self.PPedMargin, width: MXSSize.Pw, height: MXSSize.Ph)
                 poker.concreteView?.showWidth = poker === belong?.ownPokers.last ? MXSSize.Pw : margin_base
             }
+            
+            if complete != nil { complete!() }
         }
         else {
             
@@ -131,9 +133,11 @@ class MXSGraspPokerView: UIScrollView  {
         }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(500)) {
-            self.layoutPokerView(complete: nil)
+            self.layoutPokerView {
+                
+                complete?()
+            }
 //            if complete != nil { complete!() }
-            complete?()
         }
         
     }

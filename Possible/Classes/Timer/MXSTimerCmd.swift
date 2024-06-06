@@ -142,10 +142,10 @@ class MXSTimerCmd {
             note.vc == nil
         }
         
-//        textVC = vc
 //        self.timer.fireDate = Date.distantPast
         self.cadlink.isPaused = false
     }
+    
     func unMonitor(_ vc: MXSViewController) {
         monitors.removeAll { one in
             one.vc == vc
@@ -154,6 +154,7 @@ class MXSTimerCmd {
             self.cadlink.isPaused = true
         }
     }
+    
 }
 
 

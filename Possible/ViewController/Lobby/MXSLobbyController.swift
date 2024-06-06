@@ -21,24 +21,23 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate {
         if MXSNetServ.shared.connectToService(server) {
 //            stopBrowser()
             
-            MXSNetServ.shared.sendMsg([kMsgType:MessageType.request.rawValue, kMsgValue:"请求接连，来自：" + MXSNetServ.shared.name])
+            MXSNetServ.shared.sendMessage(.init(type: .request, content: "请求接连，来自：" + MXSNetServ.shared.name))
             MXSTIPMaskCmd.shared.showMaskWithTip("Waiting...", auto: false)
         }
     }
     
-    override func havesomeMessage(_ dict:Dictionary<String, Any>) {
-        super.havesomeMessage(dict)
+    override func haveAmessage(_ model: MessageModel) {
+        super.haveAmessage(model)
         
-        let type:MessageType = MessageType.init(rawValue: dict[kMsgType] as! Int)!
-        switch type {
+        switch model.type {
         case .request:
-            let name = dict[kMsgValue] as! String
+            let name = model.content as! String
             let alert = UIAlertController.init(title: "接连请求", message: name, preferredStyle: .alert)
             alert.addAction(UIAlertAction.init(title: "拒绝", style: .cancel, handler: { (act) in
-                MXSNetServ.shared.sendMsg([kMsgType:MessageType.replyRequest.rawValue, kMsgValue:0])
+                MXSNetServ.shared.sendMessage(.init(type: .replyRequest, content: 0))
             }))
             alert.addAction(UIAlertAction.init(title: "接受", style: .default, handler: { (act) in
-                MXSNetServ.shared.sendMsg([kMsgType:MessageType.replyRequest.rawValue, kMsgValue:1])
+                MXSNetServ.shared.sendMessage(.init(type: .replyRequest, content: 1))
                 let vc = MXSPVPServiceController()
                 self.navigationController?.pushViewController(vc, animated: true)
             }))
@@ -46,7 +45,7 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate {
             
         case .replyRequest:
             MXSTIPMaskCmd.shared.dispearMaskTip()
-            let value = dict[kMsgValue] as! Int
+            let value = model.content as! Int
             if value == 0 {
                 MXSTIPMaskCmd.shared.showMaskWithTip("connect be refused", auto:true)
                 

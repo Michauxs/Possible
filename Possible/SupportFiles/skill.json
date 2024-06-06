@@ -2,39 +2,31 @@
     "skill_000":{
         "name": "unknown",
         "image": "skill_000",
-        "power": 0,
-        "mode": 0,
-        "desc": "desc"
-    },
-    "skill_001":{
-        "name": "lock",
-        "image": "skill_001",
-        "power": 1,
-        "mode": 0,
-        "desc": "desc"
+        "text": "未知",
+        "requirement": 0,
+        "desc": ""
     },
     "skill_002":{
         "name": "blank",
         "image": "skill_002",
-        "power": 2,
-        "mode": 0,
-        "desc": "desc"
+        "text": "空",
+        "requirement": 0,
+        "desc": ""
     },
     
     "skill_010":{
         "name": "RedA",
         "image": "skill_010",
-        "power": 10,
-        "mode": 1,
+        "text": "傲剑",
+        "requirement": 1,
         "desc": "desc"
     },
     "skill_011":{
         "name": "XiaDan",
         "image": "skill_011",
-        "power": 11,
-        "mode": 1,
-        "step_key":["need", "judge", "success", "field"],
-        "need":{"target":1, "poker_grasp":1,"poker_pick":0,"poker_color":1},
+        "text": "侠胆",
+        "requirement":{"target":1, "poker_grasp":1,"poker_pick":0,"poker_color":1},
+        
         "waiting":{"who":3,"poker_pick":1},
         "judge":{"according":1,"order_by":1},
         "effect":{"self":{"count_attack":2,"numb_aim":2,"deepen":0,"hp":0}, "opponent":{"count_attack":2,"numb_aim":2,"deepen":0,"hp":0}},
@@ -44,31 +36,30 @@
     "skill_012":{
         "name": "Wolf_St",
         "image": "skill_012",
-        "power": 12,
-        "mode": 2,
+        "text": "天狼",
+        "requirement": 2,
         "effect":{"count_attack":-1},
         "desc": "desc"
     },
     "skill_013":{
         "name": "Drink",
         "image": "skill_013",
-        "power": 13,
-        "mode": 1,
+        "text": "醉酒",
+        "requirement": 1,
         "desc": "desc"
     },
     "skill_014":{
         "name": "AllOfMe",
         "image": "skill_014",
-        "power": 14,
-        "mode": 2,
+        "text": "集权",
+        "requirement": 2,
         "desc": "desc"
     },
     "skill_015":{
         "name": "SanBF",
         "image": "skill_015",
-        "power": 14,
-        "mode": 1,
-        "step_key":["need", "judge", "success", "field"],
+        "text": "三板斧",
+        "requirement": 1,
         "need":{"target":1,"poker_grasp":1,"poker_pick":1,"poker_action":1, "next_key":"waiting"},
         "waiting":{"who":2,"poker_pick":1, "next_key":"judge"},
         "judge":{"according":1,"order_by":1},

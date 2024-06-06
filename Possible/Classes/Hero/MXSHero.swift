@@ -9,7 +9,26 @@
 import Foundation
 import UIKit
 
+enum HeroRoundCycle {
+    case unknow
+    case begin
+    case getCrad
+    case active
+    case willEnd
+    case end
+}
+
+enum HeroMonitorAction {
+    case none
+    case discard
+    case freecard
+    case random
+    case randomResult
+    case skill
+}
+
 class MXSHero {
+    //monitor: discard  freecard  random  randomResult  skill
     
     // MARK: - property only note
     var isAxle: Bool = false
@@ -172,7 +191,7 @@ class MXSHero {
     
     //offensive/defensive
     /**只做 修正\前置判定\补充指定\记录 等前置操作 -> 反馈有无pokerView及其处置方式*/
-    func discardPoker(reBlock:(_ needWaiting:Bool, _ type:LosePokerWay, _ poker:[MXSPoker]) -> Void) {
+    func discardPoker(reBlock:(_ needWaiting:Bool, _ type:PokerLoseType, _ pokeres:[MXSPoker]) -> Void) {
         
         let pickedPokers = self.picked
         let action = holdAction?.action
@@ -276,7 +295,13 @@ class MXSHero {
             reBlock(.gain, pokers, .handover)
         }
         else {
-            reBlock(.operate, nil, nil)
+            if leader.isAxle {
+                
+            }
+            else {
+                //replyer is axle: operate
+                reBlock(.operate, nil, nil)
+            }
         }
     }
     

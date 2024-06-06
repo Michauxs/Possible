@@ -123,7 +123,7 @@ class MXSPVESoloController: MXSGroundController {
             return
         }
         
-        if MXSJudge.cmd.leader!.isAxle {
+        if replyer.isAxle {
             replyer.parryAttack { parry, pokers, pokerWay in
                 if parry == .recover { }
                 else if parry == .gain { }
@@ -146,7 +146,7 @@ class MXSPVESoloController: MXSGroundController {
     }
     
     var playerParryAttackBlock : HeroParryResult?
-    func defensiverParryAttack(hero:MXSHero, parry:ParryType, pokers:[MXSPoker]?, pokerWay:LosePokerWay?) {
+    func defensiverParryAttack(hero:MXSHero, parry:ParryType, pokers:[MXSPoker]?, pokerWay:PokerLoseType?) {
         if parry == .failed {
             MXSJudge.cmd.responderSufferConsequence { spoils, pokers in
                 if spoils == .destroy {
@@ -188,10 +188,10 @@ class MXSPVESoloController: MXSGroundController {
 //        self.playerParryAttackBlock?(.unneed, nil, nil)
         
         let responder = MXSJudge.cmd.responder.first
-        responder?.discardPoker(reBlock: { needWaiting, type, poker in
+        responder?.discardPoker(reBlock: { needWaiting, type, pokeres in
             if type == .passed {
-                MXSLog(poker, "player discard poker")
-                passedView.collectPoker(poker)
+                MXSLog(pokeres, "player discard poker")
+                passedView.collectPoker(pokeres)
             }
             else if type == .handover {// = active give + responder gain
                 //TODO: - animate P->P
@@ -214,10 +214,10 @@ class MXSPVESoloController: MXSGroundController {
         leader.hasPokerDoAttack(reBlock: { has, pokers, skill in
             if has {
                 leader.pickPoker(pokers!.first!)
-                leader.discardPoker(reBlock: { needWaiting, type, poker in
+                leader.discardPoker(reBlock: { needWaiting, type, pokeres in
                     
                     if type == .passed {
-                        passedView.collectPoker(poker)
+                        passedView.collectPoker(pokeres)
                     }
                     else if type == .handover {
                         // TODO: - animate P->P

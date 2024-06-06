@@ -12,7 +12,7 @@ class MXSPVPController: MXSGroundController {
     
     override func didCloseGameBtnClick() {
         MXSPokerCmd.shared.packagePoker()
-        MXSNetServ.shared.sendMsg([kMsgType:MessageType.endGame.rawValue, kMsgValue:1])
+        MXSNetServ.shared.sendMessage(.init(type: .endGame, content: 1))
         self.navigationController?.popViewController(animated: true)
     }
     
@@ -35,15 +35,13 @@ class MXSPVPController: MXSGroundController {
         
         player.joingame()
         pickHeroView.isHidden = true
-        MXSNetServ.shared.sendMsg([kMsgType:MessageType.pickHero.rawValue, kMsgValue:hero.photo])
-        
+        MXSNetServ.shared.sendMessage(.init(type: .pickHero, content: hero.photo))
     }
     
-    override func havesomeMessage(_ dict: Dictionary<String, Any>) {
-        super.havesomeMessage(dict)
+    override func haveAmessage(_ model: MessageModel) {
+        super.haveAmessage(model)
         
-        let type:MessageType = MessageType.init(rawValue: dict[kMsgType] as! Int)!
-        switch type {
+        switch model.type {
         case .joined:
             MXSLog("some one joined game")
             var div_hero:Array<String> = Array<String>()
@@ -51,10 +49,9 @@ class MXSPVPController: MXSGroundController {
                 div_hero.append(h.photo)
             }
             //TODO：客户端加入时，主机端还没有准备好数据
-            MXSNetServ.shared.sendMsg([kMsgType:MessageType.showHero.rawValue, kMsgValue:div_hero])
-            
+            MXSNetServ.shared.sendMessage(.init(type: .showHero, content: div_hero))
         case .pickHero:
-            let hero_name = dict[kMsgValue] as! String
+            let hero_name = model.content as! String
             if let hero = MXSHeroCmd.shared.someoneFromName(hero_name) {
 //                opponter = hero
 //                opponter.concreteView = oppontView
@@ -63,7 +60,7 @@ class MXSPVPController: MXSGroundController {
             }
             
         case .discard:
-            let poker_uid_arr = dict[kMsgValue] as! Array<Int>
+            let poker_uid_arr = model.content as! Array<Int>
             let poker_arr = MXSPokerCmd.shared.getPokersFromUids(poker_uid_arr)
             for p in poker_arr {
                 p.state = .pass
@@ -93,8 +90,7 @@ class MXSPVPController: MXSGroundController {
         for p in player.picked {
             div_p.append(p.uid)
         }
-        MXSNetServ.shared.sendMsg([kMsgType:MessageType.discard.rawValue, kMsgValue:div_p])
-        
+        MXSNetServ.shared.sendMessage(.init(type: .discard, content: div_p))
         player.ownPokers.removeAll(where: {$0 === poker})
         poker.state = .pass
         
@@ -106,7 +102,7 @@ class MXSPVPController: MXSGroundController {
         passedView.fadeout()
         
         player.signStatus = .blank
-        MXSNetServ.shared.sendMsg([kMsgType:MessageType.turnOver.rawValue, kMsgValue:0])
+        MXSNetServ.shared.sendMessage(.init(type: .turnOver, content: 0))
     }
     public override func defensiveCertain() {
         MXSJudge.cmd.leaderReactive()

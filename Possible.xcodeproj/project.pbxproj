@@ -14,7 +14,6 @@
 		76053DCC24E39B5C001860E7 /* PossibleUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76053DCB24E39B5C001860E7 /* PossibleUITests.swift */; };
 		76053DDC24E39C90001860E7 /* MXSViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76053DDA24E39C90001860E7 /* MXSViewController.swift */; };
 		76053DDD24E39C90001860E7 /* MXSGroundController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76053DDB24E39C90001860E7 /* MXSGroundController.swift */; };
-		76053E2024E68635001860E7 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 76053E1F24E68635001860E7 /* Default-568h@2x.png */; };
 		76053E2324E68722001860E7 /* MXSHeroView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76053E2224E68722001860E7 /* MXSHeroView.swift */; };
 		76053E2524E68BE8001860E7 /* SnapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 76053E2424E68BE8001860E7 /* SnapKit.framework */; };
 		7606BE7A2BFDEE0E005B9F55 /* MXSTimerCmd.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7606BE792BFDEE0E005B9F55 /* MXSTimerCmd.swift */; };
@@ -74,7 +73,6 @@
 		76E9D0EA26453EF400D6E5C4 /* MXSPVESoloController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76E9D0E926453EF400D6E5C4 /* MXSPVESoloController.swift */; };
 		76E9D0EF26463FF700D6E5C4 /* MXSPVPServiceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76E9D0EE26463FF700D6E5C4 /* MXSPVPServiceController.swift */; };
 		76E9D0F42646401400D6E5C4 /* MXSPVPCustomerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76E9D0F32646401400D6E5C4 /* MXSPVPCustomerController.swift */; };
-		76F92F4324F397C50039478D /* LaunchImage-Landscape-667h~iPhone.png in Resources */ = {isa = PBXBuildFile; fileRef = 76F92F4224F397C50039478D /* LaunchImage-Landscape-667h~iPhone.png */; };
 		76F92F4524F3D8860039478D /* MXSHeroCmd.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76F92F4424F3D8850039478D /* MXSHeroCmd.swift */; };
 		76F92F4724F3D8E80039478D /* MXSSkillCmd.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76F92F4624F3D8E80039478D /* MXSSkillCmd.swift */; };
 		76F92F4A24F4A5D20039478D /* MXSColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76F92F4924F4A5D20039478D /* MXSColor.swift */; };
@@ -112,7 +110,6 @@
 		76053DCD24E39B5C001860E7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		76053DDA24E39C90001860E7 /* MXSViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MXSViewController.swift; sourceTree = "<group>"; };
 		76053DDB24E39C90001860E7 /* MXSGroundController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MXSGroundController.swift; sourceTree = "<group>"; };
-		76053E1F24E68635001860E7 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		76053E2224E68722001860E7 /* MXSHeroView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSHeroView.swift; sourceTree = "<group>"; };
 		76053E2424E68BE8001860E7 /* SnapKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SnapKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7606BE792BFDEE0E005B9F55 /* MXSTimerCmd.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSTimerCmd.swift; sourceTree = "<group>"; };
@@ -172,7 +169,6 @@
 		76E9D0E926453EF400D6E5C4 /* MXSPVESoloController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSPVESoloController.swift; sourceTree = "<group>"; };
 		76E9D0EE26463FF700D6E5C4 /* MXSPVPServiceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSPVPServiceController.swift; sourceTree = "<group>"; };
 		76E9D0F32646401400D6E5C4 /* MXSPVPCustomerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSPVPCustomerController.swift; sourceTree = "<group>"; };
-		76F92F4224F397C50039478D /* LaunchImage-Landscape-667h~iPhone.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "LaunchImage-Landscape-667h~iPhone.png"; sourceTree = "<group>"; };
 		76F92F4424F3D8850039478D /* MXSHeroCmd.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSHeroCmd.swift; sourceTree = "<group>"; };
 		76F92F4624F3D8E80039478D /* MXSSkillCmd.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSSkillCmd.swift; sourceTree = "<group>"; };
 		76F92F4924F4A5D20039478D /* MXSColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSColor.swift; sourceTree = "<group>"; };
@@ -242,8 +238,6 @@
 		76053DA824E39B4E001860E7 /* Possible */ = {
 			isa = PBXGroup;
 			children = (
-				76F92F4224F397C50039478D /* LaunchImage-Landscape-667h~iPhone.png */,
-				76053E1F24E68635001860E7 /* Default-568h@2x.png */,
 				765824C62509D64A00EB55E5 /* Common */,
 				76F92F4824F4A5970039478D /* Other */,
 				76AC2AF52514B34F005884CF /* Classes */,
@@ -655,8 +649,6 @@
 				76053DB324E39B5A001860E7 /* Assets.xcassets in Resources */,
 				765824DF250A08E300EB55E5 /* skill.json in Resources */,
 				76D036D726B39ACF00D312F9 /* Launch Screen.storyboard in Resources */,
-				76053E2024E68635001860E7 /* Default-568h@2x.png in Resources */,
-				76F92F4324F397C50039478D /* LaunchImage-Landscape-667h~iPhone.png in Resources */,
 				76DEB05825303E5300D954FC /* XK.ttf in Resources */,
 				76A038B8251D82CD0056C214 /* KT_GB2312 Bold.ttf in Resources */,
 				765824DE250A08E300EB55E5 /* hero.json in Resources */,

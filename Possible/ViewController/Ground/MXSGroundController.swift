@@ -65,7 +65,8 @@ class MXSGroundController: MXSViewController {
             else {
                 //frameArray = []
             }
-            
+            // frame:     | 0 | 1 | 2 |
+            //  view: | 0 | 1 | 2 | 3 |
             for index in 0..<frameArray.count {
                 let someoneView = self.heroConcreteView[index+1]
                 view.addSubview(someoneView)
@@ -177,15 +178,16 @@ class MXSGroundController: MXSViewController {
     public func offensiveCertain() {
         leadingView.hide()
         
-        MXSJudge.cmd.leader?.discardPoker(reBlock: { needWaiting, type, poker in
+        MXSJudge.cmd.leader?.discardPoker(reBlock: { needWaiting, type, pokeres in
             if type == .passed {
-//                passedView.collectPoker(poker)
+                graspPokerView.losePokerView(pokeres) {
+                    self.passedView.collectPoker(pokeres)
+                    self.checkResponderAndWaitReply()
+                }
             }
             else if type == .handover {//= active give + responder gain
-                
+                self.checkResponderAndWaitReply()
             }
-            
-            self.checkResponderAndWaitReply()
         })
     }
     public func checkResponderAndWaitReply() { //sub object

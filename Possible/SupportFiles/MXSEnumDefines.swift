@@ -9,7 +9,7 @@
 import UIKit
 
 
-typealias HeroParryResult = (_ parry:ParryType, _ pokers:[MXSPoker]?, _ pokerWay:LosePokerWay?) -> Void
+typealias HeroParryResult = (_ parry:ParryType, _ pokers:[MXSPoker]?, _ pokerWay:PokerLoseType?) -> Void
 
 func MXSLog(_ args:Any, _ sign:String = "MXSSwift") {
     #if DEBUG
@@ -58,7 +58,7 @@ let kStringSkillMode: String = "mode"
 let kStringUnknown: String = "Unknown"
 
 
-//MARK:- Hero
+// MARK: -- Poker - hero
 enum PickHeroType {
     case PVE
     case PVP
@@ -71,7 +71,41 @@ enum HeroSignStatus {
     case selected
     case focus
 }
-//MARK:- Poker
+
+//战利类型
+enum SpoilsType {
+    case nothing
+    case destroy
+    case wrest
+    case gain
+    case injured
+    case recover
+}
+//招架
+enum ParryType : Int {
+    case unknown = 0
+    case unneed = 1
+    case success
+    case failed
+    case gain
+    case recover
+    case operate
+}
+
+enum PokerLoseType : Int {
+    case unknown = 0
+    case passed = 1
+    case handover // = active give + responder gain
+}
+enum PokerGainType : Int {
+    case unknown = 0
+    case dealcards = 1
+    case beGiven
+    case wrest
+    case salvage
+}
+
+// MARK: -- Poker - poker
 enum PokerColor : Int {
     case unknown = 0
     case heart
@@ -104,7 +138,7 @@ enum PokerAction : Int {
     case gain
 }
 
-//MARK:- Skill
+// MARK: -- Poker - skill
 enum SkillPower : Int {
     case unKnown = 0
     case lock
@@ -162,32 +196,8 @@ enum SkillMode : Int {
 }
 
 
-enum SpoilsType {
-    case nothing
-    case destroy
-    case wrest
-    case gain
-    case injured
-    case recover
-}
-enum ParryType : Int {
-    case unknown = 0
-    case unneed = 1
-    case success
-    case failed
-    case gain
-    case recover
-    case operate
-}
 
-
-enum LosePokerWay : Int {
-    case unknown = 0
-    case passed = 1
-    case handover // = active give + responder gain
-}
-
-
+// MARK: -- RBlock
 enum MoveDirection : Int {
     case top = 0
     case left = 1

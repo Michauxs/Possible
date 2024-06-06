@@ -1,48 +1,48 @@
 [{
     "name": "Gen. Yang",
-    "image": "hero_026",
+    "image": "hero_0",
     "hp": 4,
     "skill": ["skill_012"],
     "desc": "desc"
 }, {
     "name": "Xia Ren",
-    "image": "hero_034",
+    "image": "hero_0",
     "hp": 4,
     "skill": ["skill_011"],
     "desc": "desc"
 }, {
     "name": "Moster Tan",
-    "image": "hero_016",
+    "image": "hero_0",
     "hp": 4,
     "skill": ["skill_010"],
     "desc": "desc"
 }, {
     "name": "Walker Wu",
-    "image": "hero_012",
+    "image": "hero_0",
     "hp": 4,
     "skill": ["skill_013"],
     "desc": "desc"
 }, {
     "name": "King Li",
-    "image": "hero_013",
+    "image": "hero_0",
     "hp": 4,
     "skill": ["skill_013"],
     "desc": "desc"
 }, {
     "name": "King Liu",
-    "image": "hero_014",
+    "image": "hero_0",
     "hp": 4,
     "skill": ["skill_013"],
     "desc": "desc"
 }, {
     "name": "Dancer Li",
-    "image": "hero_015",
+    "image": "hero_0",
     "hp": 3,
     "skill": ["skill_013"],
     "desc": "desc"
 }, {
     "name": "King Qin",
-    "image": "hero_022",
+    "image": "hero_0",
     "hp": 4,
     "skill": ["skill_014"],
     "desc": "desc"

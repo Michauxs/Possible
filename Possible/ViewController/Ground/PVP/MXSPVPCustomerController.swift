@@ -12,7 +12,7 @@ class MXSPVPCustomerController: MXSPVPController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        MXSNetServ.shared.sendMsg([kMsgType:MessageType.joined.rawValue, kMsgValue:1])
+        MXSNetServ.shared.sendMessage(.init(type: .joined, content: 1))
     }
     
     override func pickedHero(_ hero: MXSHero, chairNumb: Int = 0) {
@@ -22,16 +22,15 @@ class MXSPVPCustomerController: MXSPVPController {
         
         player.joingame()
         pickHeroView.isHidden = true
-        MXSNetServ.shared.sendMsg([kMsgType:MessageType.pickHero.rawValue, kMsgValue:hero.photo])
+        MXSNetServ.shared.sendMessage(.init(type: .pickHero, content: hero.photo))
     }
     
-    override func havesomeMessage(_ dict: Dictionary<String, Any>) {
-        super.havesomeMessage(dict)
+    override func haveAmessage(_ model: MessageModel) {
+        super.haveAmessage(model)
         
-        let type:MessageType = MessageType.init(rawValue: dict[kMsgType] as! Int)!
-        switch type {
+        switch model.type {
         case .showHero:
-            let names = dict[kMsgValue] as! Array<String>
+            let names = model.content as! Array<String>
             var div_hero:Array<MXSHero> = Array<MXSHero>()
             for name in names {
                 if let h = MXSHeroCmd.shared.someoneFromName(name) {
@@ -41,7 +40,7 @@ class MXSPVPCustomerController: MXSPVPController {
             pickHeroView.heroData = div_hero
             
         case .pickHero:
-            let hero_name = dict[kMsgValue] as! String
+            let hero_name = model.content as! String
             if let hero = MXSHeroCmd.shared.someoneFromName(hero_name) {
                 
 //                opponter = hero
@@ -50,7 +49,7 @@ class MXSPVPCustomerController: MXSPVPController {
             }
             
         case .dealcard:
-            let poker_uid_arr = dict[kMsgValue] as! Array<Int>
+            let poker_uid_arr = model.content as! Array<Int>
             var poker_arr:Array<MXSPoker> = Array<MXSPoker>()
             for uid in poker_uid_arr {
                 if let p = MXSPokerCmd.shared.someoneFromUid(uid) {
@@ -62,7 +61,7 @@ class MXSPVPCustomerController: MXSPVPController {
             
             
         case .discard:
-            let poker_uid_arr = dict[kMsgValue] as! Array<Int>
+            let poker_uid_arr = model.content as! Array<Int>
             let poker_arr = MXSPokerCmd.shared.getPokersFromUids(poker_uid_arr)
             for p in poker_arr {
                 p.state = .pass
