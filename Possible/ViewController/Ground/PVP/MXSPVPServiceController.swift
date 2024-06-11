@@ -33,10 +33,14 @@ class MXSPVPServiceController: MXSPVPController {
         if MXSPokerCmd.shared.shuffle() {
             let pokers = MXSPokerCmd.shared.push(6)
             player.getPokers(pokers)
+            player.GraspView?.collectPoker(pokers)
+            player.concreteView?.getPokerAnimate(pokers, complete: {
+                self.player.concreteView?.pokerCount = self.player.ownPokers.count
+            })
             
             
             let arr_p = MXSPokerCmd.shared.push(6)
-//            opponter.getPokers(arr_p)
+            
             var poker_uid_arr:Array<Int> = Array<Int>()
             for poker in arr_p {
                 poker_uid_arr.append(poker.uid)

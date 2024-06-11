@@ -63,7 +63,12 @@ class MXSJudge {
     }
     func dealcardForGameStart(offensive:(_ hero:MXSHero)->Void) {
         for hero in subject {
-            hero.getPokers(MXSPokerCmd.shared.push(4))
+            let pokers = MXSPokerCmd.shared.push(4)
+            hero.getPokers(pokers)
+            hero.GraspView?.collectPoker(pokers)
+            hero.concreteView?.getPokerAnimate(pokers, complete: {
+                hero.concreteView?.pokerCount = hero.ownPokers.count
+            })
         }
         dealcardForNextLeader { hero, pokers in
             offensive(hero)
@@ -94,6 +99,11 @@ class MXSJudge {
         
         let pokers = MXSPokerCmd.shared.push(leader!.collectNumb)
         leader!.getPokers(pokers)
+        leader!.GraspView?.collectPoker(pokers)
+        leader!.concreteView?.getPokerAnimate(pokers, complete: {
+            self.leader!.concreteView?.pokerCount = self.leader!.ownPokers.count
+        })
+        
         reBlock(leader!, pokers)
         
     }
@@ -169,7 +179,7 @@ class MXSJudge {
         }
         MXSLog("MXSJudge ----------------------> leader call group")
     }
-    func theHeroHasReplyed() {
+    func responderHaveReplyed() {
         let hero:MXSHero = responder.first!
         hero.signStatus = .blank
         self.responder.removeFirst()
@@ -199,53 +209,6 @@ class MXSJudge {
         return hero.ownPokers.count > 0
     }
     
-    func AIReplyAsResponder(reBlock:(_ type :ParryType, _ pokers:[MXSPoker]?) -> Void) {
-        
-        let action_reply: PokerAction = self.leader!.holdAction!.reply.act
-        if let responder_one = responder.first { //expect
-            responder_one.holdAction = MXSOneAction(axle: responder_one, fensive: .defensive)
-            diary.append(responder_one.holdAction!)
-            
-            if action_reply == .recover {
-                let _ = responder_one.plusHP()
-                reBlock(.unneed, nil)
-            }
-            else if action_reply == .gain {
-                responder_one.getPokers(leader!.holdAction!.pokers)
-                reBlock(.gain, leader?.holdAction?.pokers)
-            }
-            else {// need
-                
-                if let idx = responder_one.ownPokers.firstIndex(where: { poker in
-                    poker.actionGuise == action_reply
-                }) {
-                    let contain = responder_one.ownPokers[idx]
-                    responder_one.losePokers([contain])
-                    if leader?.holdAction?.action == .warFire || leader?.holdAction?.action == .arrowes {
-                        MXSLog("MXSJudge set responder ---------------------->  reply group")
-                    }
-                    reBlock(.success, [contain])
-                }
-                else {
-                    if leader?.holdAction?.action == .warFire || leader?.holdAction?.action == .arrowes {
-                        MXSLog("MXSJudge set responder ----------------------> can't reply group")
-                    }
-                    reBlock(.failed, nil) }
-            }
-        }
-        else { // no aim
-            
-            let categy = self.leader!.holdAction!.aimType
-            if categy == .aoe {
-                self.selectAllPlayer()
-                //TODO: group, taketurns = one by one
-//                takeTurnsReply()
-                MXSLog("MXSJudge set responder ------ >>")
-                AIReplyAsResponder(reBlock: reBlock)
-            }
-        }
-    }
-    
     //MARK: - group = taketurns
 //    func findOneByOneResponder() -> MXSHero? {
 //        return responder.first
@@ -256,34 +219,30 @@ class MXSJudge {
 //        }
 //    }
     
-    func responderSufferConsequence(reBlock:(_ spoils :SpoilsType, _ pokers :[MXSPoker]?) -> Void) {
+    func responderSufferConsequence(reBlock:HeroSufferResult) {
         //let conseq = leader?.holdAction?.consequence
         let hero:MXSHero = responder.first!
         
         let action = MXSJudge.cmd.leader?.holdAction?.action
         switch action {
-        case .unknown, .dodge, .detect, .give, .recover, .gain:
-            reBlock(.nothing, nil)
+        case .unknown, .dodge, .detect, .give, .recover, .gain, .remedy:
+            reBlock(.nothing, nil, nil)
             
         case .attack, .warFire, .arrowes, .duel:
             hero.minsHP()
-            reBlock(.injured, nil)
+            reBlock(.injured, nil, nil)
             
         case .steal:
             let random = hero.rollRandomPoker()
-            MXSLog(random, "The poker will handover")
+            MXSLog(random, "The poker will comefrom ")
             hero.losePokers([random])
             MXSJudge.cmd.leader?.getPokers([random])
-            reBlock(.wrest, [random])
+            reBlock(.wrest, [random], .awayfrom)
             
         case .destroy:
             let random = hero.rollRandomPoker()
             hero.losePokers([random])
-            reBlock(.destroy, [random])
-            
-        case .remedy:
-            let _ = hero.plusHP()
-            reBlock(.recover, nil)
+            reBlock(.destroy, [random], .passed)
             
         case .none:
             break
@@ -294,6 +253,10 @@ class MXSJudge {
     func responderGainPoker(_ pokers:[MXSPoker]) -> Void {
         let responder_one = responder.first!
         responder_one.getPokers(pokers)
+        responder_one.GraspView?.collectPoker(pokers)
+        responder_one.concreteView?.getPokerAnimate(pokers, complete: {
+            responder_one.concreteView?.pokerCount = responder_one.ownPokers.count
+        })
     }
     
     //MARK: - judge

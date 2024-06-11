@@ -121,38 +121,4 @@ extension MXSHero {
         reBlock(hasPoker, nil, nil)
     }
     
-    
-    public func AIParryAttack(reBlock:HeroParryResult) {
-        let leader = MXSJudge.cmd.leader!
-        let pokers: [MXSPoker] = leader.holdAction!.pokers
-        let action_reply: PokerAction = leader.holdAction!.reply.act
-        
-        MXSJudge.cmd.diary.append(self.holdAction!)
-        
-        if action_reply == .recover {
-            let _ = self.plusHP()
-            reBlock(.unneed, nil, nil)
-        }
-        else if action_reply == .gain {
-            self.getPokers(pokers)
-            reBlock(.gain, pokers, .handover)
-        }
-        else {
-            //AI
-            if let index = self.ownPokers.firstIndex(where: { poker in poker.actionGuise == action_reply }) {
-                let contain = self.ownPokers[index]
-                self.losePokers([contain])
-                reBlock(.success, [contain], .passed)
-                
-                if leader.holdAction?.aimType == .aoe { MXSLog(self.name + "responder -->  reply group") }
-            }
-            else {
-                reBlock(.failed, nil, nil)
-                
-                if leader.holdAction?.aimType == .aoe { MXSLog(self.name + "responder --> can't reply group") }
-            }
-        }
-        
-    }
-    
 }

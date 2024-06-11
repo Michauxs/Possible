@@ -118,9 +118,9 @@ class MXSHero {
             concreteView?.pokerCount = graspCount
         }
     }
-    weak var oneGraspPokerView: MXSGraspPokerView? {
+    weak var GraspView: MXSGraspPokerView? {
         didSet {
-            oneGraspPokerView?.belong = self
+            GraspView?.belong = self
         }
     }
     weak var leadingView: MXSLeadingView? {
@@ -168,9 +168,7 @@ class MXSHero {
             poker.state = .pass
             MXSLog(poker, name+" lose poker = ")
         }
-//        oneGraspPokerView?.losePokerView(pokers, complete: {
-//
-//        })
+        
         self.graspCount = ownPokers.count
     }
     func getPokers(_ pokers:[MXSPoker]) {
@@ -181,17 +179,11 @@ class MXSHero {
             MXSLog(poker, self.name + " get poker = ")
         }
         
-        //纯粹UIAnimate
-        self.oneGraspPokerView?.collectPoker(pokers)
-        self.concreteView?.getPokerAnimate(pokers, complete: {
-            self.concreteView?.pokerCount = self.ownPokers.count
-        })
-        
     }
     
     //offensive/defensive
     /**只做 修正\前置判定\补充指定\记录 等前置操作 -> 反馈有无pokerView及其处置方式*/
-    func discardPoker(reBlock:(_ needWaiting:Bool, _ type:PokerLoseType, _ pokeres:[MXSPoker]) -> Void) {
+    func discardPoker(reBlock:(_ needWaiting:Bool, _ type:PokerViewWay, _ pokeres:[MXSPoker]) -> Void) {
         
         let pickedPokers = self.picked
         let action = holdAction?.action
@@ -207,7 +199,7 @@ class MXSHero {
         if holdAction?.fensive == .defensive {
             MXSLog(holdAction?.pokers as Any, "after ActivePicked be remove, the markAction'pokers")
             if holdAction?.action == .steal {
-                reBlock(false, .handover, pickedPokers)
+                reBlock(false, .comefrom, pickedPokers)
             }
             else {
                 reBlock(false, .passed, pickedPokers)
@@ -228,7 +220,7 @@ class MXSHero {
             }
             else if holdAction?.aimType == .ptp {
                 if action == .give {
-                    reBlock(true, .handover, pickedPokers)
+                    reBlock(true, .awayfrom, pickedPokers)
                 }
                 else {
                     if action == .attack {
@@ -282,6 +274,8 @@ class MXSHero {
     public func parryAttack(reBlock:HeroParryResult) { //(_ parry:ParryType, _ pokers:[MXSPoker]?, _ pokerWay:LosePokerWay?)
         let leader = MXSJudge.cmd.leader!
         let pokers: [MXSPoker] = leader.holdAction!.pokers
+        
+        let action_leader = leader.holdAction!.action
         let action_reply: PokerAction = leader.holdAction!.reply.act
         
         MXSJudge.cmd.diary.append(self.holdAction!)
@@ -292,17 +286,37 @@ class MXSHero {
         }
         else if action_reply == .gain {
             self.getPokers(pokers)
-            reBlock(.gain, pokers, .handover)
+            reBlock(.receive, pokers, .comefrom)
         }
+//        else if action_reply == .detect {
+//            
+//        }
         else {
-            if leader.isAxle {
-                
-            }
-            else {
+            if self.isAxle {
                 //replyer is axle: operate
                 reBlock(.operate, nil, nil)
             }
+            else {
+                if let index = self.ownPokers.firstIndex(where: { poker in poker.actionGuise == action_reply }) {
+                    let contain = self.ownPokers[index]
+                    self.losePokers([contain])
+                    reBlock(.answered, [contain], .passed)
+                    
+                    if leader.holdAction?.aimType == .aoe { MXSLog(self.name + "responder -->  reply group") }
+                }
+                else {
+                    if action_leader == .steal {
+                        reBlock(.mismatch, nil, nil)
+                    }
+                    else {
+                        reBlock(.mismatch, nil, nil)
+                    }
+                    
+                    if leader.holdAction?.aimType == .aoe { MXSLog(self.name + "responder --> can't reply group") }
+                }
+            }
         }
+        
     }
     
     //MARK: - skill

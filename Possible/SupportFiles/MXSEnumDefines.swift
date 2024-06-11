@@ -9,7 +9,8 @@
 import UIKit
 
 
-typealias HeroParryResult = (_ parry:ParryType, _ pokers:[MXSPoker]?, _ pokerWay:PokerLoseType?) -> Void
+typealias HeroParryResult = (_ parry:ParryType, _ pokers:[MXSPoker]?, _ pokerWay:PokerViewWay?) -> Void
+typealias HeroSufferResult = (_ spoils :SpoilsType, _ pokers :[MXSPoker]?, _ pokerWay:PokerViewWay?) -> Void
 
 func MXSLog(_ args:Any, _ sign:String = "MXSSwift") {
     #if DEBUG
@@ -85,24 +86,11 @@ enum SpoilsType {
 enum ParryType : Int {
     case unknown = 0
     case unneed = 1
-    case success
-    case failed
-    case gain
+    case answered
+    case mismatch
+    case receive
     case recover
     case operate
-}
-
-enum PokerLoseType : Int {
-    case unknown = 0
-    case passed = 1
-    case handover // = active give + responder gain
-}
-enum PokerGainType : Int {
-    case unknown = 0
-    case dealcards = 1
-    case beGiven
-    case wrest
-    case salvage
 }
 
 // MARK: -- Poker - poker
@@ -137,6 +125,16 @@ enum PokerAction : Int {
     case give
     case gain
 }
+
+enum PokerViewWay : Int {
+    case unknown = 0
+    case dealcards = 1
+    case passed = 2
+    case salvage
+    case comefrom
+    case awayfrom
+}
+
 
 // MARK: -- Poker - skill
 enum SkillPower : Int {

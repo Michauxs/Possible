@@ -50,14 +50,18 @@ class MXSPVPCustomerController: MXSPVPController {
             
         case .dealcard:
             let poker_uid_arr = model.content as! Array<Int>
-            var poker_arr:Array<MXSPoker> = Array<MXSPoker>()
+            var pokers:Array<MXSPoker> = Array<MXSPoker>()
             for uid in poker_uid_arr {
                 if let p = MXSPokerCmd.shared.someoneFromUid(uid) {
                     p.state = .handOn
-                    poker_arr.append(p)
+                    pokers.append(p)
                 }
             }
-            player.getPokers(poker_arr)
+            player.getPokers(pokers)
+            player.GraspView?.collectPoker(pokers)
+            player.concreteView?.getPokerAnimate(pokers, complete: {
+                self.player.concreteView?.pokerCount = self.player.ownPokers.count
+            })
             
             
         case .discard:

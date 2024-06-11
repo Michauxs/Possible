@@ -185,8 +185,11 @@ class MXSGroundController: MXSViewController {
                     self.checkResponderAndWaitReply()
                 }
             }
-            else if type == .handover {//= active give + responder gain
-                self.checkResponderAndWaitReply()
+            else if type == .awayfrom {//= active give + responder gain
+                graspPokerView.losePokerView(pokeres) {
+                    
+                    self.checkResponderAndWaitReply()
+                }
             }
         })
     }
@@ -231,6 +234,10 @@ class MXSGroundController: MXSViewController {
         
     override func playerCollectPoker(_ poker: MXSPoker) {
         player.getPokers([poker])
+        player.GraspView?.collectPoker([poker])
+        player.concreteView?.getPokerAnimate([poker], complete: {
+            self.player.concreteView?.pokerCount = self.player.ownPokers.count
+        })
         poker.state = .handOn
 //        newAndGraspMoreViews([poker])
     }
@@ -313,6 +320,21 @@ class MXSGroundController: MXSViewController {
             self.didCloseGameBtnClick()
         }))
         self.present(alert, animated: true, completion: nil)
+    }
+    
+    // MARK: - animate
+    func pokerHandover(from: MXSHero, to: MXSHero, completion:()->Void) {
+        let tmpView = MXSPokerView()
+        let fromFrame = from.concreteView!.frame
+//        tmpView.frame = CGRect(x: fromFrame.minX + (MXSSize.Hw - MXSSize.Pw) * 0.5, y: fromFrame.minY + (MXSSize.Hh - MXSSize.Ph) * 0.5, width: MXSSize.Pw, height: MXSSize.Ph)
+        tmpView.center = from.concreteView!.center
+        view.addSubview(tmpView)
+        UIView.animate(withDuration: 1.0) {
+            tmpView.center = to.concreteView!.center
+        } completion: { success in
+            tmpView.isHidden = true
+        }
+
     }
     
     //MARK: - application
