@@ -107,7 +107,9 @@ class MXSGroundController: MXSViewController {
         /*--------------------------------------------*/
         let margin: CGFloat = MXSSize.Pw + 30.0
         passedView.frame = CGRect.init(x: margin, y: MXSSize.Hh + 5, width: MXSSize.Sw - margin * CGFloat(2), height: MXSSize.Ph)
+        passedView.control = self
         view.addSubview(passedView)
+        passedView.clearPokersView()
         /*--------------------------------------------*/
         let enterfaceView = UIView.init()
         enterfaceView.backgroundColor = UIColor.init(75, 80, 100)
@@ -181,19 +183,22 @@ class MXSGroundController: MXSViewController {
         MXSJudge.cmd.leader?.discardPoker(reBlock: { needWaiting, type, pokeres in
             if type == .passed {
                 graspPokerView.losePokerView(pokeres) {
-                    self.passedView.collectPoker(pokeres)
-                    self.checkResponderAndWaitReply()
+                    self.passedView.depositPoker(pokeres, fromHero: MXSJudge.cmd.leader!) {
+                        
+                        self.checkResponderWaitReplyOrReactive()
+                    }
                 }
             }
             else if type == .awayfrom {//= active give + responder gain
+//                self.pokerHandover(from: <#T##MXSHero#>, to: <#T##MXSHero#>, completion: <#T##() -> Void#>)
                 graspPokerView.losePokerView(pokeres) {
                     
-                    self.checkResponderAndWaitReply()
+                    self.checkResponderWaitReplyOrReactive()
                 }
             }
         })
     }
-    public func checkResponderAndWaitReply() { //sub object
+    public func checkResponderWaitReplyOrReactive() { //sub object
         
     }
     
@@ -323,7 +328,7 @@ class MXSGroundController: MXSViewController {
     }
     
     // MARK: - animate
-    func pokerHandover(from: MXSHero, to: MXSHero, completion:()->Void) {
+    func pokerHandover(from: MXSHero, to: MXSHero, completion: @escaping ()->Void) {
         let tmpView = MXSPokerView()
         let fromFrame = from.concreteView!.frame
 //        tmpView.frame = CGRect(x: fromFrame.minX + (MXSSize.Hw - MXSSize.Pw) * 0.5, y: fromFrame.minY + (MXSSize.Hh - MXSSize.Ph) * 0.5, width: MXSSize.Pw, height: MXSSize.Ph)
@@ -333,9 +338,11 @@ class MXSGroundController: MXSViewController {
             tmpView.center = to.concreteView!.center
         } completion: { success in
             tmpView.isHidden = true
+            completion()
         }
 
     }
+    
     
     //MARK: - application
     override var prefersStatusBarHidden: Bool {

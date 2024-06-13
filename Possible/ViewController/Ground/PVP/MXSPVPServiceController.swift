@@ -16,7 +16,7 @@ class MXSPVPServiceController: MXSPVPController {
     
     override func pickedHero(_ hero: MXSHero, chairNumb: Int = 0) {
         player = hero
-        player.isAxle = true
+        player.isPlayer = true
         player.concreteView = playerView
         
         player.joingame()
@@ -81,7 +81,9 @@ class MXSPVPServiceController: MXSPVPController {
             for p in poker_arr {
                 p.state = .pass
             }
-            passedView.collectPoker(poker_arr)
+            passedView.depositPoker(poker_arr, fromHero: player) {
+                
+            }
             leadingView.state = .defenseUnPick
             
         case .turnOver:

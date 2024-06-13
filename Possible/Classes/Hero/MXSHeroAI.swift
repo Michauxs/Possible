@@ -13,7 +13,7 @@ extension MXSHero {
     /**AI 操作逻辑设定*/
     
     func replyAttack() -> MXSPoker? {
-        if isAxle { return nil }
+        if isPlayer { return nil }
         
         let action_attck = MXSJudge.cmd.leader?.holdAction?.action
         switch action_attck {

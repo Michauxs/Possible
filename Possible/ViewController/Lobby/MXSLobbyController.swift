@@ -165,8 +165,8 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate {
         self.navigationController?.pushViewController(MXSSkillAssemController(), animated: false)
     }
     @objc func minerBtnClick() {
-//        self.navigationController?.pushViewController(MXSGobangController(), animated: false)
-        self.navigationController?.pushViewController(MXSMinerController(), animated: false)
+        self.navigationController?.pushViewController(MXSGobangController(), animated: false)
+//        self.navigationController?.pushViewController(MXSMinerController(), animated: false)
     }
     @objc func RBlockBtnClick() {
         self.navigationController?.pushViewController(MXSRBlockController(), animated: false)

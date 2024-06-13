@@ -8,9 +8,14 @@
 
 import UIKit
 
+typealias DelayedBlock = (_ parry:ParryResultType) -> Void
+typealias DelayedBlockReturn = (_ parry:ParryResultType) -> MXSHero
 
-typealias HeroParryResult = (_ parry:ParryType, _ pokers:[MXSPoker]?, _ pokerWay:PokerViewWay?) -> Void
-typealias HeroSufferResult = (_ spoils :SpoilsType, _ pokers :[MXSPoker]?, _ pokerWay:PokerViewWay?) -> Void
+typealias CallbackBlock = () -> Void
+typealias ParryResultCallback = (_ parry:ParryResultType, _ pokers:[MXSPoker]?, _ pokerWay:PokerViewWay?, _ callback: @escaping CallbackBlock) -> Void
+
+typealias HeroParryResult = (_ parry:ParryResultType, _ pokers:[MXSPoker]?, _ pokerWay:PokerViewWay?) -> Void
+
 
 func MXSLog(_ args:Any, _ sign:String = "MXSSwift") {
     #if DEBUG
@@ -73,24 +78,21 @@ enum HeroSignStatus {
     case focus
 }
 
-//战利类型
-enum SpoilsType {
-    case nothing
-    case destroy
-    case wrest
-    case gain
-    case injured
-    case recover
-}
-//招架
-enum ParryType : Int {
+//招架+战利类型+
+enum ParryResultType : Int {
     case unknown = 0
-    case unneed = 1
-    case answered
-    case mismatch
-    case receive
     case recover
+    case receive
+    
+    case answered//
     case operate
+    
+    case mismatch//
+    case injured
+    case beDestroyed//
+    case beStolen
+    /***/
+    case gain
 }
 
 // MARK: -- Poker - poker
@@ -133,6 +135,10 @@ enum PokerViewWay : Int {
     case salvage
     case comefrom
     case awayfrom
+}
+enum PokerFromSource : Int {
+    case deck = 0
+    case hero = 1
 }
 
 

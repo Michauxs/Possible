@@ -62,7 +62,7 @@ class MXSPVESoloController: MXSGroundController {
         
         if chairNumb == 1 {
             player = hero
-            player.isAxle = true
+            player.isPlayer = true
             
             player.GraspView = self.graspPokerView;
             player.leadingView = self.leadingView
@@ -79,7 +79,7 @@ class MXSPVESoloController: MXSGroundController {
         if MXSPokerCmd.shared.shuffle() {
             
             MXSJudge.cmd.dealcardForGameStart { hero in
-                if hero.isAxle {
+                if hero.isPlayer {
                     leadingView.state = .attackUnPick
                 }
                 else {
@@ -106,63 +106,92 @@ class MXSPVESoloController: MXSGroundController {
     }
     
     // MARK: - leadingView
-    override func checkResponderAndWaitReply() {
+    override func checkResponderWaitReplyOrReactive() {
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(750)) {
             self.responerReplyAfterFewSecond()
         }
     }
     func responerReplyAfterFewSecond() {
-        guard let responder = MXSJudge.cmd.pleaseResponderReply() else {
+        guard let responder = MXSJudge.cmd.trySomeResponderReply(tryResult: { isPlayer, responder in
             // no one reply / all reply done
-            MXSJudge.cmd.leaderReactive()
-            
-            if MXSJudge.cmd.leader!.isAxle {
+            if isPlayer {
+                MXSLog("shuffle poker failed")
                 leadingView.state = .attackUnPick
             }
-            else { turnToAIAttack() }
+            else {
+                turnToAIAttack()
+            }
+        }) else {
             return
         }
         
-        responder.parryAttack { parry, pokers, pokerWay in
-            if parry == .recover { }
-            else if parry == .unneed { }
+        responder.parryAttack { parry, pokers, pokerWay, callback in
+            if parry == .recover {
+                let _ = responder.plusHP()
+            }
             else if parry == .receive {
-                
-                responder.GraspView?.collectPoker(pokers!)
-                responder.concreteView?.getPokerAnimate(pokers!, complete: {
-                    responder.concreteView?.pokerCount = responder.ownPokers.count
-                })
+                responder.getPokers(pokers!)
             }
-            else if parry == .mismatch {
-                MXSJudge.cmd.responderSufferConsequence { spoils, pokers, pokerWay in
-                    if spoils == .destroy {
-                        passedView.collectPoker(pokers!)
-                    }
-                    else if spoils == .wrest {
-                        self.pokerHandover(from: responder, to: MXSJudge.cmd.leader!) {
-                            MXSLog("poker handvoer complete")
-                        }
-                    }
-                    else if spoils == .injured {
-                        if responder.HPCurrent <= 0 {
-                            MXSLog("there need Return")
-                            return
-                        }
-                    }
+            else if parry == .beDestroyed || parry == .answered {
+                responder.losePokers(pokers!)
+            }
+            else if parry == .beStolen {
+                responder.losePokers(pokers!)
+                MXSJudge.cmd.leader!.getPokers(pokers!)
+            }
+            else if parry == .injured {
+                responder.minsHP()
+                if responder.HPCurrent <= 0 {
+                    MXSLog("some hero faied")
+                    return
                 }
-            }
-            else if parry == .answered {
-                passedView.collectPoker(pokers!)
             }
             else if parry == .operate {
                 leadingView.state = .defenseUnPick
-                MXSLog("there need Return")
+                MXSLog("player operate")
                 return
             }
             
+            /***/
+            if pokerWay == .passed {
+                passedView.depositPoker(pokers!, fromHero: responder) {
+                    callback()
+                }
+            }
+            else if pokerWay == .dealcards {
+                responder.GraspView?.collectPoker(pokers!)
+                responder.concreteView?.getPokerAnimate(pokers!, complete: {
+                    responder.concreteView?.pokerCount = responder.ownPokers.count
+                    callback()
+                })
+            }
+            else if pokerWay == .comefrom {
+                self.pokerHandover(from: MXSJudge.cmd.leader!, to: responder) {
+                    MXSLog("poker handvoer:come finished")
+                    
+                    responder.GraspView?.collectPoker(pokers!)
+                    responder.concreteView?.getPokerAnimate(pokers!, complete: {
+                        responder.concreteView?.pokerCount = responder.ownPokers.count
+                        callback()
+                    })
+                }
+                
+            }
+            else if pokerWay == .awayfrom {
+                self.pokerHandover(from: responder, to: MXSJudge.cmd.leader!) {
+                    MXSLog("poker handvoer:away finished")
+                    callback()
+                }
+            }
+            else {
+                callback()
+            }
+            
+        } next: { [self] in
+            
             MXSLog("step done")
             MXSJudge.cmd.responderHaveReplyed()
-            checkResponderAndWaitReply()
+            checkResponderWaitReplyOrReactive()
         }
         
     }
@@ -182,7 +211,9 @@ class MXSPVESoloController: MXSGroundController {
             if type == .passed {
                 MXSLog(pokeres, "player discard poker")
                 graspPokerView.losePokerView(pokeres) {
-                    self.passedView.collectPoker(pokeres)
+                    self.passedView.depositPoker(pokeres, fromHero: responder!) {
+                        
+                    }
                 }
             }
             else if type == .awayfrom {// = active give + responder gain
@@ -197,7 +228,7 @@ class MXSPVESoloController: MXSGroundController {
 //        AITurnToAttack()
         
         MXSJudge.cmd.responderHaveReplyed()
-        checkResponderAndWaitReply()
+        checkResponderWaitReplyOrReactive()
     }
     func turnToAIAttack() {
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(750)) {
@@ -210,16 +241,17 @@ class MXSPVESoloController: MXSGroundController {
             if has {
                 leader.pickPoker(pokers!.first!)
                 leader.discardPoker(reBlock: { needWaiting, type, pokeres in
-                    
                     if type == .passed {
-                        passedView.collectPoker(pokeres)
+                        passedView.depositPoker(pokeres, fromHero: leader) {
+                            
+                        }
                     }
                     else if type == .awayfrom {
                         // TODO: - animate P->P
                     }
                     
                     if needWaiting {
-                        checkResponderAndWaitReply()
+                        checkResponderWaitReplyOrReactive()
                     }
                     else {
                         turnToAIAttack()
@@ -230,7 +262,7 @@ class MXSPVESoloController: MXSGroundController {
                 MXSLog("AI cant attack")
                 passedView.fadeout()
                 leader.endCurrentCycle { hero in
-                    if hero.isAxle {
+                    if hero.isPlayer {
                         self.leadingView.state = .attackUnPick
                     }
                     else {
@@ -241,17 +273,18 @@ class MXSPVESoloController: MXSGroundController {
                 
         })
     }
-    
-    override func defensiveCancelSubject() {
         
+    override func defensiveCancelSubject() {
         MXSJudge.cmd.responderSufferConsequence { spoils, pokers, pokerWay in
             
-            if spoils == .destroy {
+            if spoils == .beDestroyed {
                 player.GraspView?.losePokerView(pokers!, complete: {
-                    self.passedView.collectPoker(pokers!)
+                    self.passedView.depositPoker(pokers!, fromHero: self.player) {
+                        
+                    }
                 })
             }
-            else if spoils == .wrest {
+            else if spoils == .beStolen {
                 player.GraspView?.losePokerView(pokers!, complete: {
                     self.pokerHandover(from: self.player, to: MXSJudge.cmd.leader!) {
                         MXSLog("poker handvoer complete")
@@ -268,7 +301,7 @@ class MXSPVESoloController: MXSGroundController {
             }
             
             MXSJudge.cmd.responderHaveReplyed()
-            self.checkResponderAndWaitReply()
+            self.checkResponderWaitReplyOrReactive()
         }
     }
     

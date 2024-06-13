@@ -25,6 +25,12 @@ class MXSPokerView: MXSBaseView {
                                                       .detect:"侦察"]
     
     var reverseView: UIImageView = UIImageView()
+    var reverse: Bool = false {
+        didSet {
+            reverseView.isHidden = !reverse
+        }
+    }
+    
     var contentView: UIView = UIView()
     var colorSign: UIImageView = UIImageView()
     var numberLabel: UILabel = UILabel.init(text: "0", fontSize: 614, textColor: .black, align: .center)

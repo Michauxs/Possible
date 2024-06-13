@@ -195,12 +195,20 @@ class MXSJudge {
      Activer <-note | aim-> Replyer <-note | next-> Next ...
      */
     
-    func pleaseResponderReply() -> MXSHero? {
+    func trySomeResponderReply(tryResult: (_ isPlayer: Bool, _ responder :MXSHero?) -> Void) -> MXSHero? {
+        let isPlayer = MXSJudge.cmd.leader!.isPlayer
+        
         var hero:MXSHero?
         if MXSJudge.cmd.responder.count > 0 {
             hero = MXSJudge.cmd.responder.first!
             hero!.holdAction = MXSOneAction(axle: hero!, fensive: .defensive)
         }
+        else {
+            // no one reply   /all reply done
+            MXSJudge.cmd.leaderReactive()
+        }
+        
+        tryResult(isPlayer, hero)
         return hero
     }
     
@@ -219,14 +227,14 @@ class MXSJudge {
 //        }
 //    }
     
-    func responderSufferConsequence(reBlock:HeroSufferResult) {
+    func responderSufferConsequence(reBlock:HeroParryResult) {
         //let conseq = leader?.holdAction?.consequence
         let hero:MXSHero = responder.first!
         
         let action = MXSJudge.cmd.leader?.holdAction?.action
         switch action {
         case .unknown, .dodge, .detect, .give, .recover, .gain, .remedy:
-            reBlock(.nothing, nil, nil)
+            reBlock(.unknown, nil, nil)
             
         case .attack, .warFire, .arrowes, .duel:
             hero.minsHP()
@@ -237,12 +245,12 @@ class MXSJudge {
             MXSLog(random, "The poker will comefrom ")
             hero.losePokers([random])
             MXSJudge.cmd.leader?.getPokers([random])
-            reBlock(.wrest, [random], .awayfrom)
+            reBlock(.beStolen, [random], .awayfrom)
             
         case .destroy:
             let random = hero.rollRandomPoker()
             hero.losePokers([random])
-            reBlock(.destroy, [random], .passed)
+            reBlock(.beDestroyed, [random], .passed)
             
         case .none:
             break

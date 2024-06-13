@@ -31,7 +31,7 @@ class MXSHero {
     //monitor: discard  freecard  random  randomResult  skill
     
     // MARK: - property only note
-    var isAxle: Bool = false
+    var isPlayer: Bool = false
     
     var name: String = "HeroName"
     var photo: String = "hero_000"
@@ -269,9 +269,14 @@ class MXSHero {
             if next != nil { next!(hero) }
         }
     }
-    
-    
-    public func parryAttack(reBlock:HeroParryResult) { //(_ parry:ParryType, _ pokers:[MXSPoker]?, _ pokerWay:LosePokerWay?)
+    /**(common: ParryResultType, one: ParryResultCallback, two: @escaping HeroParryResult) {
+     func cb() {
+         two(.receive, nil, nil)
+     }
+     one(.answered, nil, nil, cb)
+ }*/
+    //(_ parry:ParryResultType, _ pokers:[MXSPoker]?, _ pokerWay:LosePokerWay?)
+    public func parryAttack(parryResult: ParryResultCallback, next: @escaping CallbackBlock) {
         let leader = MXSJudge.cmd.leader!
         let pokers: [MXSPoker] = leader.holdAction!.pokers
         
@@ -280,36 +285,41 @@ class MXSHero {
         
         MXSJudge.cmd.diary.append(self.holdAction!)
         
+        /**在调用方法中callback**/
+        func callback() {
+            next()
+        }
+        
         if action_reply == .recover {
-            let _ = self.plusHP()
-            reBlock(.recover, nil, nil)
+            parryResult(.recover, nil, nil, callback)
         }
         else if action_reply == .gain {
-            self.getPokers(pokers)
-            reBlock(.receive, pokers, .comefrom)
+            parryResult(.receive, pokers, .comefrom, callback)
         }
-//        else if action_reply == .detect {
-//            
-//        }
         else {
-            if self.isAxle {
+            if self.isPlayer {
                 //replyer is axle: operate
-                reBlock(.operate, nil, nil)
+                parryResult(.operate, nil, nil, callback)
             }
             else {
                 if let index = self.ownPokers.firstIndex(where: { poker in poker.actionGuise == action_reply }) {
                     let contain = self.ownPokers[index]
-                    self.losePokers([contain])
-                    reBlock(.answered, [contain], .passed)
+                    parryResult(.answered, [contain], .passed, callback)
                     
                     if leader.holdAction?.aimType == .aoe { MXSLog(self.name + "responder -->  reply group") }
                 }
                 else {
                     if action_leader == .steal {
-                        reBlock(.mismatch, nil, nil)
+                        let random = self.rollRandomPoker()
+                        MXSLog(random, "The poker will awayfrom ")
+                        parryResult(.mismatch, [random], .awayfrom, callback)
                     }
-                    else {
-                        reBlock(.mismatch, nil, nil)
+                    else if action_reply == .destroy {
+                        let random = self.rollRandomPoker()
+                        parryResult(.beDestroyed, [random], .passed, callback)
+                    }
+                    else if action_reply == .attack || action_reply == .arrowes || action_reply == .warFire {
+                        parryResult(.injured, nil, nil, callback)
                     }
                     
                     if leader.holdAction?.aimType == .aoe { MXSLog(self.name + "responder --> can't reply group") }
@@ -354,11 +364,54 @@ class MXSHero {
     
     /*--------------------------------------------*/
     //MARK: - hero->Judge
-    func joingame(){
+    func joingame() {
         MXSJudge.cmd.subject.append(self)
     }
     
     func distakeAllAim() {
         holdAction?.aim.removeAll()
     }
+    
+    
+    //MARK: -- Test
+    func delayedFunc(dely: DelayedBlock) -> MXSHero {
+        MXSLog("delayedFunc block")
+        dely(.answered)
+        return self
+    }
+    func directFunc() {
+        MXSLog("directFunc")
+    }
+    
+    
+    func delayedFuncReturnBlock(_ sign: ParryResultType) -> DelayedBlockReturn {
+        MXSLog(sign, "delayedFuncReturnBlock block")
+        return { (sign: ParryResultType) in
+            return self
+        }
+
+
+    }
+    
+    
+    //(_ parry:ParryResultType, _ pokers:[MXSPoker]?, _ pokerWay:PokerViewWay?, callback: CallbackBlock)
+    func twoBlockMethod(common: ParryResultType, one: ParryResultCallback, two: @escaping HeroParryResult) {
+        func cb() {
+            two(.receive, nil, nil)
+        }
+        one(.answered, nil, nil, cb)
+    }
+    
+    /**
+     
+     func makeIncrementer(amount: Int) -> ((Int) -> Int) {
+         return { (value: Int) in
+             return value + amount
+         }
+     }
+      
+     let incrementByTen = makeIncrementer(amount: 10)
+     let newValue = incrementByTen(5) // 返回 15
+     
+     */
 }
