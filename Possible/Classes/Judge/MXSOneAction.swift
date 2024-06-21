@@ -76,6 +76,7 @@ class MXSOneAction {
     var cycleSign:CycleType = .start
     
     weak var belong:MXSHero?
+    /**攻守之势**/
     var fensive:ActionFensive = .offensive
     var categy:ActionCategy = .alive
     var aimType:ActionAimType = .unknown

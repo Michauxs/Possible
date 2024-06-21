@@ -28,12 +28,23 @@ class MXSGraspPokerView: UIScrollView  {
     
     let layoutAnimateDuration:Double = 0.35
     /**丢牌定义reverse = lose+layout动画同步进行，0...reverse...*/
-    func layoutPokerView(_ reverse:[Int] = [Int](), complete:(()->Void)?) {
+    func layoutPokerView( complete:(()->Void)?) {
+        let count_poker = belong!.ownPokers.count
+        if count_poker < 1 {
+            complete?()
+            return
+        }
         
-        let count_poker = belong?.ownPokers.count ?? 0
+        if count_poker == 1 {
+            let poker = belong!.ownPokers.first!
+            poker.concreteView!.frame = CGRect(x: 0, y: self.PPedMargin, width: MXSSize.Pw, height: MXSSize.Ph)
+            poker.concreteView?.showWidth = MXSSize.Pw
+            complete?()
+            return
+        }
         
-        let count = PokerViewArray.count
-        let need_width = MXSSize.Pw * CGFloat(count)
+        
+        let need_width = MXSSize.Pw * CGFloat(count_poker)
         let box_width = self.bounds.size.width
         
         var margin_base = MXSSize.Pw
@@ -45,48 +56,18 @@ class MXSGraspPokerView: UIScrollView  {
         self.contentSize = CGSize.init(width: margin_base*CGFloat(count_poker-1) + MXSSize.Pw, height: 0)
         /*--------------------------*/
         
-        if reverse.count == 0 {
-            for index in 0..<count {
-                let poker = belong!.ownPokers[index]
+        for index in 0..<count_poker {
+            let poker = belong!.ownPokers[index]
+            UIView.animate(withDuration: layoutAnimateDuration) {
                 poker.concreteView!.frame = CGRect(x: margin_base * CGFloat(index), y: self.PPedMargin, width: MXSSize.Pw, height: MXSSize.Ph)
-                poker.concreteView?.showWidth = poker === belong?.ownPokers.last ? MXSSize.Pw : margin_base
+                poker.concreteView?.showWidth = (index == count_poker-1) ? MXSSize.Pw : margin_base
             }
-            
-            if complete != nil {
-                complete!()
-            }
+            offset_x = poker.concreteView!.frame.minX
         }
-        else {
-            MXSLog(reverse, "pick poker.reverse")
-            var count_resv: Int = 0
-            
-            for index in 0..<count {
-                let pokerView = PokerViewArray[index]
-                // 0...index...reverse...index..<count
-                if reverse.contains(index) {
-                    //up
-                    count_resv += 1
-                }
-                else {
-                    UIView.animate(withDuration: layoutAnimateDuration) {
-                        pokerView.frame = CGRect(x: margin_base * CGFloat(index-count_resv), y: self.PPedMargin, width: MXSSize.Pw, height: MXSSize.Ph)
-                    } completion: { complete in
-                        
-                    }
-                }
-                pokerView.showWidth = (index == count-1) ? MXSSize.Pw : margin_base
-            }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(Int(layoutAnimateDuration*1000)), execute: DispatchWorkItem(block: { [self] in
-                for resv in reverse {
-                    let pokerView = PokerViewArray[resv]
-                    pokerView.removeFromSuperview()
-                    PokerViewArray.remove(at: resv)
-                }
-                
-                if complete != nil { complete!() }
-            }))
-        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(Int(layoutAnimateDuration*1000)), execute: DispatchWorkItem(block: { [self] in
+            complete?()
+        }))
     }
     
 //    let dispGroup = DispatchGroup.init()
@@ -94,49 +75,26 @@ class MXSGraspPokerView: UIScrollView  {
 //    dispGroup.leave()
 //    dispGroup.notify(queue: .main) { [self] in
 //    }
-    var PokerViewArray:[MXSPokerView] = [MXSPokerView]()
-    public func collectPoker( _ pokers:[MXSPoker]) {
-//        if !belong?.isAxle { return }
+    
+    var offset_x: CGFloat = 0.0
+    public func holdPokerView( _ pokers:[MXSPoker], complete:(()->Void)?) {
         
         for poker in pokers {
             if poker.concreteView == nil {
-                //poker.concreteView = MXSPokerView.init(poker: poker, controller: self.controller)
-//                poker.concreteView = MXSPokerView.init(controller: self.controller)
                 poker.concreteView = MXSPokerView.init(control: self.controller!)
-                //poker.concreteView!.controller = self.controller
-                poker.concreteView!.frame = CGRect(x: 0, y: self.PPedMargin, width: MXSSize.Pw, height: MXSSize.Ph)
-                self.addSubview(poker.concreteView!)
-                PokerViewArray.append(poker.concreteView!)
             }
+            poker.concreteView!.frame = CGRect(x: offset_x, y: -MXSSize.Ph, width: MXSSize.Pw, height: MXSSize.Ph)
+            self.addSubview(poker.concreteView!)
         }
         
-        layoutPokerView(complete: nil)
+        layoutPokerView(complete: complete)
     }
-    func delayExc() {
-        
-    }
+    
     public func losePokerView( _ pokers:[MXSPoker], complete:(()->Void)?) {
-        
-        var indexSet = [Int]()
-        for poker in pokers {
-            
-            if let index = PokerViewArray.firstIndex(of: poker.concreteView!) {
-                indexSet.append(index)
-            }
-            
-            let frame = poker.concreteView!.frame
-            UIView.animate(withDuration: layoutAnimateDuration) {
-                poker.concreteView!.frame = CGRect(x: frame.origin.x, y: -MXSSize.Ph, width: MXSSize.Pw, height: MXSSize.Ph)
-            }
-        }
-        
-        self.layoutPokerView(indexSet) {
-            complete?()
-        }
-//        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(500)) {
-//            
-//        }
-        
+        /**由接收处管理pokerView的动画和转移**/
+        ///其他完全不用管，包括移除view  ——view在的上层frame，需要此时的子frame转换。所以此时不能移除
+        ///此处只负责动画剩下的view
+        self.layoutPokerView(complete: complete)
     }
     
 }

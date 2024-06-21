@@ -105,7 +105,7 @@ class MXSHeroView: MXSBaseView {
     
     // MARK: Poker
     let pok_view = MXSPokerView()
-    func getPokerAnimate(_ pokers:[MXSPoker], complete:@escaping ()->Void ) -> Void {
+    func getPokerAnimate(_ pokers:[MXSPoker], complete: @escaping ()->Void ) -> Void {
         
         let p_w = MXSSize.Hw*0.5
         let p_h = p_w * MXSSize.Ph / MXSSize.Pw
@@ -113,11 +113,16 @@ class MXSHeroView: MXSBaseView {
         self.addSubview(pok_view)
         
         UIView.animate(withDuration: 0.5) {
-            self.pok_view.frame = CGRect(x: 5, y: 5, width: 0, height: 0)
+            //self.pok_view.frame = CGRect(x: 5, y: 5, width: 0, height: 0)
+            
+            self.pok_view.bounds = CGRect(x: 0, y: 0, width: 0, height: 0)
+            self.pok_view.center = CGPoint(x: 5, y: 5)
+            
 //            self.pok_view.layoutIfNeeded()
 //            self.pok_view.transform = CGAffineTransform.init(scaleX: 0, y: 0)
         } completion: { _ in
             self.pok_view.removeFromSuperview()
+            self.pokerCount = self.belong!.ownPokers.count
             complete()
         }
 

@@ -106,6 +106,11 @@ class MXSPVPController: MXSGroundController {
         player.signStatus = .blank
         MXSNetServ.shared.sendMessage(.init(type: .turnOver, content: 0))
     }
+    
+//    override func offensiveEndActiveSubject() {
+//        
+//    }
+    
     public override func defensiveCertain() {
         MXSJudge.cmd.leaderReactive()
         leadingView.hide()

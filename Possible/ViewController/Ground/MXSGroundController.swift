@@ -180,19 +180,16 @@ class MXSGroundController: MXSViewController {
     public func offensiveCertain() {
         leadingView.hide()
         
-        MXSJudge.cmd.leader?.discardPoker(reBlock: { needWaiting, type, pokeres in
-            if type == .passed {
-                graspPokerView.losePokerView(pokeres) {
-                    self.passedView.depositPoker(pokeres, fromHero: MXSJudge.cmd.leader!) {
-                        
-                        self.checkResponderWaitReplyOrReactive()
-                    }
+        MXSJudge.cmd.leader?.discardPoker(reBlock: { target, pokerWay, pokeres in
+            if pokerWay == .passed {
+                graspPokerView.losePokerView(pokeres, complete: nil)
+                self.passedView.depositPoker(pokeres, fromHero: MXSJudge.cmd.leader!) {
+                    self.checkResponderWaitReplyOrReactive()
                 }
             }
-            else if type == .awayfrom {//= active give + responder gain
-//                self.pokerHandover(from: <#T##MXSHero#>, to: <#T##MXSHero#>, completion: <#T##() -> Void#>)
-                graspPokerView.losePokerView(pokeres) {
-                    
+            else if pokerWay == .awayfrom {//= active give + responder gain
+                graspPokerView.losePokerView(pokeres, complete: nil)
+                self.pokerHandover(pokers: pokeres, from: player, to: target!) {
                     self.checkResponderWaitReplyOrReactive()
                 }
             }
@@ -218,7 +215,7 @@ class MXSGroundController: MXSViewController {
         offensiveEndActiveSubject()
     }
     func offensiveEndActiveSubject() { //sub object
-        player.endCurrentCycle(next: nil)
+        
     }
     
     public func defensiveCertain() {
@@ -239,10 +236,9 @@ class MXSGroundController: MXSViewController {
         
     override func playerCollectPoker(_ poker: MXSPoker) {
         player.getPokers([poker])
-        player.GraspView?.collectPoker([poker])
-        player.concreteView?.getPokerAnimate([poker], complete: {
-            self.player.concreteView?.pokerCount = self.player.ownPokers.count
-        })
+        player.holdHisPokersView([poker]) {
+            
+        }
         poker.state = .handOn
 //        newAndGraspMoreViews([poker])
     }
@@ -328,7 +324,7 @@ class MXSGroundController: MXSViewController {
     }
     
     // MARK: - animate
-    func pokerHandover(from: MXSHero, to: MXSHero, completion: @escaping ()->Void) {
+    func pokerHandover(pokers:[MXSPoker], from: MXSHero, to: MXSHero, completion: @escaping ()->Void) {
         let tmpView = MXSPokerView()
         let fromFrame = from.concreteView!.frame
 //        tmpView.frame = CGRect(x: fromFrame.minX + (MXSSize.Hw - MXSSize.Pw) * 0.5, y: fromFrame.minY + (MXSSize.Hh - MXSSize.Ph) * 0.5, width: MXSSize.Pw, height: MXSSize.Ph)

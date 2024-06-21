@@ -61,18 +61,15 @@ class MXSJudge {
             leader?.signStatus = .active
         }
     }
-    func dealcardForGameStart(offensive:(_ hero:MXSHero)->Void) {
+    func dealcardForGameStart(ready:(_ heroArray: [MXSHero], _ pokersArray: [[MXSPoker]]) -> Void) {
+        var pokers_array = [[MXSPoker]]()
         for hero in subject {
             let pokers = MXSPokerCmd.shared.push(4)
             hero.getPokers(pokers)
-            hero.GraspView?.collectPoker(pokers)
-            hero.concreteView?.getPokerAnimate(pokers, complete: {
-                hero.concreteView?.pokerCount = hero.ownPokers.count
-            })
+            pokers_array.append(pokers)
         }
-        dealcardForNextLeader { hero, pokers in
-            offensive(hero)
-        }
+        
+        ready(subject, pokers_array)
     }
     func gameOver() {
         leader = nil
@@ -82,7 +79,7 @@ class MXSJudge {
         responder.removeAll()
     }
     
-    func dealcardForNextLeader(reBlock:(_ hero :MXSHero, _ pokers :[MXSPoker]?) -> Void) {
+    func turnLeaderAndDealcard(reBlock:(_ leader: MXSHero, _ pokers: [MXSPoker]?) -> Void) {
         
         if leader != nil {
             leader!.endActiveByClearStatus()
@@ -99,10 +96,6 @@ class MXSJudge {
         
         let pokers = MXSPokerCmd.shared.push(leader!.collectNumb)
         leader!.getPokers(pokers)
-        leader!.GraspView?.collectPoker(pokers)
-        leader!.concreteView?.getPokerAnimate(pokers, complete: {
-            self.leader!.concreteView?.pokerCount = self.leader!.ownPokers.count
-        })
         
         reBlock(leader!, pokers)
         
@@ -146,7 +139,7 @@ class MXSJudge {
     }
     
     
-    func record(discardPokers pokers:[MXSPoker], toAction holdAction:MXSOneAction) {
+    func record(pokers:[MXSPoker], toAction holdAction:MXSOneAction) {
         leader?.holdAction?.pokers.append(contentsOf: leader!.picked)
         MXSLog(leader?.holdAction?.pokers as Any, "action note pokers")
     }
@@ -158,18 +151,12 @@ class MXSJudge {
     }
     
     /**⚠️默认不包括自己**/
-    func selectAllPlayer(exceptSelf:Bool = true) {
-//        let others = self.subject.filter { hero in
-//            //hero.cycleState == .blank
-//        }
-        
+    func selectAllPlayer(includeSelf:Bool = false) {
         responder.removeAll()
         
-        var byone = 0
-        var except:Int = 0
-        if exceptSelf { except = 1 }
-        while byone < subject.count-except {
-            let next_index = (flowNote + byone + 1)%subject.count
+        var byone = includeSelf ? 0 : 1
+        while byone < subject.count {
+            let next_index = (flowNote + byone)%subject.count
             let hero = subject[next_index]
             responder.append(hero)
             
@@ -195,20 +182,24 @@ class MXSJudge {
      Activer <-note | aim-> Replyer <-note | next-> Next ...
      */
     
-    func trySomeResponderReply(tryResult: (_ isPlayer: Bool, _ responder :MXSHero?) -> Void) -> MXSHero? {
-        let isPlayer = MXSJudge.cmd.leader!.isPlayer
-        
+    func trySomeResponderReply() -> MXSHero? {        
         var hero:MXSHero?
         if MXSJudge.cmd.responder.count > 0 {
             hero = MXSJudge.cmd.responder.first!
             hero!.holdAction = MXSOneAction(axle: hero!, fensive: .defensive)
         }
         else {
-            // no one reply   /all reply done
-            MXSJudge.cmd.leaderReactive()
+            if self.leader!.holdAction!.reply.act == .recover {//+hp no aim = self +hp
+                self.appendResponder(self.leader!)
+                hero = self.leader!
+                hero!.holdAction = MXSOneAction(axle: hero!, fensive: .defensive)
+            }
+            else {
+                // no one reply   /all reply done
+                MXSJudge.cmd.leaderReactive()
+            }
         }
         
-        tryResult(isPlayer, hero)
         return hero
     }
     
@@ -237,7 +228,7 @@ class MXSJudge {
             reBlock(.unknown, nil, nil)
             
         case .attack, .warFire, .arrowes, .duel:
-            hero.minsHP()
+            hero.HPDecrease()
             reBlock(.injured, nil, nil)
             
         case .steal:
@@ -261,10 +252,9 @@ class MXSJudge {
     func responderGainPoker(_ pokers:[MXSPoker]) -> Void {
         let responder_one = responder.first!
         responder_one.getPokers(pokers)
-        responder_one.GraspView?.collectPoker(pokers)
-        responder_one.concreteView?.getPokerAnimate(pokers, complete: {
-            responder_one.concreteView?.pokerCount = responder_one.ownPokers.count
-        })
+        responder_one.holdHisPokersView(pokers) {
+            
+        }
     }
     
     //MARK: - judge

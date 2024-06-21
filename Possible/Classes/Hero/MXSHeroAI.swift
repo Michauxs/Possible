@@ -49,7 +49,7 @@ extension MXSHero {
             return poker
         }
         else {
-            self.minsHP()
+            self.HPDecrease()
             return nil
         }
     }
@@ -68,57 +68,88 @@ extension MXSHero {
         }
     }
     
+    
     //MARK: - AI leader
-    public func hasPokerDoAttack(reBlock:(_ has :Bool, _ pokers :[MXSPoker]?, _ skill:MXSSkill?) -> Void) {
+    typealias AttackResultCallback = (_ target: MXSHero?, _ action: PokerAction, _ pokers: [MXSPoker]?, _ pokerWay: PokerViewWay?, _ callback: @escaping CallbackBlock) -> Void
+    public func canAttack(attackResult: AttackResultCallback, next:@escaping CallbackBlock) -> Bool {
         if self.ownPokers.count == 0 {
-            reBlock(false, nil, nil)
-            return
+            return false
+        }
+        /**在调用方法中callback**/
+        func callback() {
+            next()
         }
         
+        if self.HPCurrent < self.HPSum {
+            if let index = self.ownPokers.firstIndex(where: { (item) -> Bool in item.actionGuise == .remedy }) {
+                let poker = self.ownPokers[index]
+                MXSJudge.cmd.appendResponder(self)
+                self.pickPoker(poker)
+                attackResult(self, .remedy, [poker], .passed, callback)
+                return true
+            }
+        }
         
-        var hasPoker:Bool = false
+        var target = MXSJudge.cmd.returnMinHero()
+        if target == nil {
+            return false
+        }
+        
+        var action_note: PokerAction?
+        var pokers = [MXSPoker]()
+        var pokWay: PokerViewWay?
+        
+        //[.steal, .destroy, .warFire, .arrowes, .duel, .attack]
         for action in MXSPokerCmd.shared.priority {
             if let index = self.ownPokers.firstIndex(where: { (item) -> Bool in item.actionGuise == action }) {
                 let poker = self.ownPokers[index]
+                action_note = action
                 switch action {
-                case .unknown, .dodge, .detect, .recover, .gain:
-                    hasPoker = false
                 case .steal, .destroy:
-                    if let target = MXSJudge.cmd.returnMinHero() {
-                        MXSJudge.cmd.appendResponder(target)
-                        hasPoker = MXSJudge.cmd.aimHavingPoker()
-                    }
+                    if target!.ownPokers.count == 0 { continue }
+                    pokers.append(poker)
+                    pokWay = .passed
+                    break
+                    
                 case .attack:
-                    if let target = MXSJudge.cmd.returnMinHero() {
-                        MXSJudge.cmd.appendResponder(target)
-                        hasPoker = attackCount < attackLimit
-                    }
+                    if attackCount >= attackLimit { continue }
+                    pokers.append(poker)
+                    pokWay = .passed
+                    break
+                    
                 case .warFire, .arrowes:
-                    hasPoker = true
+                    target = nil;
+                    pokers.append(poker)
+                    pokWay = .passed
+                    break
+                    
                 case .duel:
-                    if let target = MXSJudge.cmd.returnMinHero() {
-                        MXSJudge.cmd.appendResponder(target)
-                        hasPoker = true
-                    }
-                case .remedy:
-                    if let target = MXSJudge.cmd.returnMinHero() {
-                        MXSJudge.cmd.appendResponder(target)
-                        hasPoker = target.canRecover()
-                    }
-                    else { hasPoker = self.canRecover() }
-                case .give:
-                    hasPoker = false
-                }
+                    pokers.append(poker)
+                    pokWay = .passed
+                    break
+                    
+                default: continue
+                }//switch
+            }//index
+        }//for
+        
+        if pokers.count > 0 {
+            if target == nil {
+                MXSJudge.cmd.selectAllPlayer()
+            }
+            else {
+                MXSJudge.cmd.appendResponder(target!)
+            }
                 
-                if hasPoker {
-                    reBlock(hasPoker, [poker], nil)
-                    return
-                }
-            }//
-                
+            self.pickPokers(pokers)
+            self.losePokers(self.picked)
+            MXSJudge.cmd.diary.append(self.holdAction!)
+            
+            attackResult(target, action_note!, pokers, pokWay!, callback)
+            return true
         }
         
-        reBlock(hasPoker, nil, nil)
+        return false
     }
     
 }
