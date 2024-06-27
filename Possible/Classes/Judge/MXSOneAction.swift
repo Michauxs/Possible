@@ -79,8 +79,11 @@ class MXSOneAction {
     /**攻守之势**/
     var fensive:ActionFensive = .offensive
     var categy:ActionCategy = .alive
-    var aimType:ActionAimType = .unknown
     var skill:MXSSkill?
+    
+    var aimType:ActionAimType = .unknown
+    var aim:[MXSHero] = [MXSHero]()
+    
     var action:PokerAction = .unknown {
         didSet {
             switch action {
@@ -111,7 +114,13 @@ class MXSOneAction {
             case .remedy:
                 reply.count = 0
                 reply.act = .recover
-                aimType = .ptp
+                if aim.count == 0 {
+                    aimType = .oneself
+                }
+                else {
+                    aimType = .ptp
+                }
+                    
             case .give:
                 reply.count = 0
                 reply.act = .gain
@@ -122,11 +131,38 @@ class MXSOneAction {
         }
     }
     lazy var pokers:Array<MXSPoker> = Array<MXSPoker>()
-    lazy var aim:Array<MXSHero> = Array<MXSHero>()
     
     lazy var reply:ActionReply = ActionReply()
     lazy var effect:ActionEffect = ActionEffect()
     lazy var consequence:ActionConsequence = ActionConsequence()
+    
+    func aimAppend(_ hero:MXSHero) {
+        if aim.contains(where: { one in
+            one === hero
+        }) {
+            return
+        }
+        
+        aim.append(hero)
+        if action == .remedy {
+            aimType = .ptp
+        }
+    }
+    func aimRemove(_ hero:MXSHero) {
+        if let index = aim.firstIndex(where: { one in
+            one === hero
+        }) {
+            aim.remove(at: index)
+            if action == .remedy {
+                if aim.count == 0 {
+                    aimType = .oneself
+                }
+                else {
+                    aimType = .ptp
+                }
+            }
+        }
+    }
     
     func reset() {
         reply.reset()

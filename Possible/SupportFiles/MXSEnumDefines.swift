@@ -135,6 +135,8 @@ enum PokerViewWay : Int {
     case salvage
     case comefrom
     case awayfrom
+    
+    case handle
 }
 enum PokerFromSource : Int {
     case deck = 0

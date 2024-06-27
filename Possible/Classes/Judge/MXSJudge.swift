@@ -31,14 +31,14 @@ class MXSJudge {
     func appendResponder(_ hero:MXSHero) {
         hero.signStatus = .selected
         self.responder.append(hero)
-//        leader?.holdAction?.aim.append(hero)
+        leader?.holdAction?.aimAppend(hero)
     }
     func removeResponder(_ hero:MXSHero) {
         if let index = self.responder.firstIndex(where: { one in hero.name == one.name }) {
             hero.signStatus = .blank
             self.responder.remove(at: index)
-//            leader?.holdAction?.aim.remove(at: index)
         }
+        leader?.holdAction?.aimRemove(hero)
     }
     
     func clearResponder() {
@@ -166,7 +166,7 @@ class MXSJudge {
         }
         MXSLog("MXSJudge ----------------------> leader call group")
     }
-    func responderHaveReplyed() {
+    func currentResponderDone() {
         let hero:MXSHero = responder.first!
         hero.signStatus = .blank
         self.responder.removeFirst()
@@ -182,24 +182,16 @@ class MXSJudge {
      Activer <-note | aim-> Replyer <-note | next-> Next ...
      */
     
-    func trySomeResponderReply() -> MXSHero? {        
+    func trySomeoneAsResponderToReply() -> MXSHero? {
         var hero:MXSHero?
         if MXSJudge.cmd.responder.count > 0 {
             hero = MXSJudge.cmd.responder.first!
             hero!.holdAction = MXSOneAction(axle: hero!, fensive: .defensive)
         }
         else {
-            if self.leader!.holdAction!.reply.act == .recover {//+hp no aim = self +hp
-                self.appendResponder(self.leader!)
-                hero = self.leader!
-                hero!.holdAction = MXSOneAction(axle: hero!, fensive: .defensive)
-            }
-            else {
-                // no one reply   /all reply done
-                MXSJudge.cmd.leaderReactive()
-            }
+            // no one reply   /all reply done
+            MXSJudge.cmd.leaderReactive()
         }
-        
         return hero
     }
     
@@ -218,36 +210,6 @@ class MXSJudge {
 //        }
 //    }
     
-    func responderSufferConsequence(reBlock:HeroParryResult) {
-        //let conseq = leader?.holdAction?.consequence
-        let hero:MXSHero = responder.first!
-        
-        let action = MXSJudge.cmd.leader?.holdAction?.action
-        switch action {
-        case .unknown, .dodge, .detect, .give, .recover, .gain, .remedy:
-            reBlock(.unknown, nil, nil)
-            
-        case .attack, .warFire, .arrowes, .duel:
-            hero.HPDecrease()
-            reBlock(.injured, nil, nil)
-            
-        case .steal:
-            let random = hero.rollRandomPoker()
-            MXSLog(random, "The poker will comefrom ")
-            hero.losePokers([random])
-            MXSJudge.cmd.leader?.getPokers([random])
-            reBlock(.beStolen, [random], .awayfrom)
-            
-        case .destroy:
-            let random = hero.rollRandomPoker()
-            hero.losePokers([random])
-            reBlock(.beDestroyed, [random], .passed)
-            
-        case .none:
-            break
-        }
-        
-    }
     
     func responderGainPoker(_ pokers:[MXSPoker]) -> Void {
         let responder_one = responder.first!

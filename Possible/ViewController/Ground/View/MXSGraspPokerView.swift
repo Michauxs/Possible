@@ -59,7 +59,7 @@ class MXSGraspPokerView: UIScrollView  {
         for index in 0..<count_poker {
             let poker = belong!.ownPokers[index]
             UIView.animate(withDuration: layoutAnimateDuration) {
-                poker.concreteView!.frame = CGRect(x: margin_base * CGFloat(index), y: self.PPedMargin, width: MXSSize.Pw, height: MXSSize.Ph)
+                poker.concreteView?.frame = CGRect(x: margin_base * CGFloat(index), y: self.PPedMargin, width: MXSSize.Pw, height: MXSSize.Ph)
                 poker.concreteView?.showWidth = (index == count_poker-1) ? MXSSize.Pw : margin_base
             }
             offset_x = poker.concreteView!.frame.minX

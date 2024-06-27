@@ -122,11 +122,11 @@ class MXSPVESoloController: MXSGroundController {
         checkCanCertainAction()
     }
     
-    // MARK: - leadingView
+    // MARK: - offensive
     override func checkResponderWaitReplyOrReactive() {
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(750)) { [self] in
             
-            guard let responder = MXSJudge.cmd.trySomeResponderReply() else {
+            guard let responder = MXSJudge.cmd.trySomeoneAsResponderToReply() else {
                 MXSLog("find responder failed")
                 if MXSJudge.cmd.leader!.isPlayer {
                     leadingView.state = .attackUnPick
@@ -200,7 +200,7 @@ class MXSPVESoloController: MXSGroundController {
                 
             } next: { [self] in
                 MXSLog("step done")
-                MXSJudge.cmd.responderHaveReplyed()
+                MXSJudge.cmd.currentResponderDone()
                 checkResponderWaitReplyOrReactive()
             }
             
@@ -221,33 +221,6 @@ class MXSPVESoloController: MXSGroundController {
         }
     }
     
-    override func defensiveCertainSubject() {
-        
-        let responder = MXSJudge.cmd.responder.first
-        responder?.discardPoker(reBlock: { target, pokerWay, pokers in
-            
-            if pokerWay == .passed {
-                MXSLog(pokers, "player discard poker")
-                graspPokerView.losePokerView(pokers) {
-                    self.passedView.depositPoker(pokers, fromHero: responder!) {
-                        self.checkResponderWaitReplyOrReactive()
-                    }
-                }
-            }
-            else if pokerWay == .awayfrom {// = active give + responder gain
-                //TODO : -- animate P->P
-                self.pokerHandover(pokers: pokers, from: responder!, to: target!) {
-                    self.checkResponderWaitReplyOrReactive()
-                }
-            }
-        })
-        
-//        MXSJudge.cmd.leaderReactive()
-//        AITurnToAttack()
-        
-        MXSJudge.cmd.responderHaveReplyed()
-        checkResponderWaitReplyOrReactive()
-    }
     func turnToAIAttack() {
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(750)) { [self] in
             let leader = MXSJudge.cmd.leader!
@@ -281,36 +254,82 @@ class MXSPVESoloController: MXSGroundController {
             }//if
         }//after
     }
-        
-    override func defensiveCancelSubject() {
-        MXSJudge.cmd.responderSufferConsequence { spoils, pokers, pokerWay in
+    
+    //MARK: -- defensive
+    override func defensiveCertainSubject() {
             
-            if spoils == .beDestroyed {
-                player.GraspView?.losePokerView(pokers!, complete: {
-                    self.passedView.depositPoker(pokers!, fromHero: self.player) {
-                        
+        let responder = MXSJudge.cmd.responder.first
+        responder?.discardPoker(reBlock: { target, pokerWay, pokers in
+            if pokerWay == .passed {
+                MXSLog(pokers, "player discard poker")
+                graspPokerView.losePokerView(pokers) {
+                    self.passedView.depositPoker(pokers, fromHero: responder!) {
+                        MXSJudge.cmd.currentResponderDone()
+                        self.checkResponderWaitReplyOrReactive()
                     }
-                })
+                }
             }
-            else if spoils == .beStolen {
-                player.GraspView?.losePokerView(pokers!, complete: {
-                    self.pokerHandover(pokers: pokers!, from: self.player, to: MXSJudge.cmd.leader!) {
-                        MXSLog("poker handvoer complete")
-                    }
-                })
+            else if pokerWay == .awayfrom {// = active give + responder gain
+                self.pokerHandover(pokers: pokers, from: responder!, to: target!) {
+                    MXSJudge.cmd.currentResponderDone()
+                    self.checkResponderWaitReplyOrReactive()
+                }
             }
-            else if spoils == .injured {
-                if player.HPCurrent <= 0 {
+        })
+    }
+    
+    override func defensiveCancelSubject() {
+        let responder = MXSJudge.cmd.responder.first!
+        responder.sufferConsequence(reBlock: { parry, pokers, pokerWay, callback in
+            if parry == .beDestroyed {
+                responder.losePokers(pokers!)
+            }
+            else if parry == .beStolen {
+                responder.losePokers(pokers!)
+                MXSJudge.cmd.leader!.getPokers(pokers!)
+            }
+            else if parry == .injured {
+                responder.HPDecrease()
+                MXSLog(responder.name, "HP mins")
+                if responder.HPCurrent <= 0 {
+                    MXSLog("player faied")
                     return
                 }
-                else {
-                    
+            }
+            MXSLog(responder.name + " palyer'block not return")
+            
+            /***/
+            if pokerWay == .passed {
+                passedView.depositPoker(pokers!, fromHero: responder) {
+                    callback()
                 }
             }
+            else if pokerWay == .dealcards {
+                responder.holdHisPokersView(pokers!) {
+                    callback()
+                }
+            }
+            else if pokerWay == .handle {
+                MXSLog("poker handvoer finished: handle...")
+                responder.holdHisPokersView(pokers!) {
+                    callback()
+                }
+            }
+            else if pokerWay == .awayfrom {
+                self.pokerHandover(pokers: pokers!, from: responder, to: MXSJudge.cmd.leader!) {
+                    MXSLog("poker handvoer: away finished")
+                    callback()
+                }
+            }
+            else {
+                callback()
+            }
             
-            MXSJudge.cmd.responderHaveReplyed()
-            self.checkResponderWaitReplyOrReactive()
-        }
+        }, next: { [self] in
+            MXSLog("=== step done ===")
+            MXSJudge.cmd.currentResponderDone()
+            checkResponderWaitReplyOrReactive()
+        })
     }
     
     

@@ -160,6 +160,7 @@ class MXSHero {
         if picked.count > 0 {
             let pok = picked.first!
             holdAction?.action = pok.actionGuise
+            holdAction?.aimType = .oneself
         }
         else {
             holdAction?.reset()
@@ -216,34 +217,43 @@ class MXSHero {
         else {
             //note onestep active action
             lastActiveAction = holdAction
-            MXSLog(picked, name + " Active with pokers")
             
+            MXSLog(picked, name + " Active with pokers")
+            /**需要补充的**/
             if holdAction?.aimType == .aoe {
                 MXSJudge.cmd.selectAllPlayer()
-                reBlock(nil, .passed, pokers)
             }
             else if holdAction?.aimType == .all {
                 MXSJudge.cmd.selectAllPlayer(includeSelf: true)
-                reBlock(nil, .passed, pokers)
             }
-            else if holdAction?.aimType == .ptp {
-                let hero = MXSJudge.cmd.responder.first!
-                if action == .give {
-                    reBlock(hero, .awayfrom, pokers)
-                }
-                else {//.duel .steal .destroy  .attack
-                    if action == .attack {
-                        attackCount+=1
+            
+            /**直接生效的**/
+            if MXSJudge.cmd.responder.count > 0 {
+                var need_return = false
+                for hero in MXSJudge.cmd.responder {
+                    if action == .give {
+                        need_return = true
+                        reBlock(hero, .awayfrom, pokers)
                     }
-                    reBlock(hero, .passed, pokers)
+                    else {//.duel .steal .destroy  .attack
+                        if action == .attack {
+                            attackCount+=1
+                        }
+                    }
+                }
+                
+                if need_return == true { return }
+            }
+            else {//remedy self or unknow
+                /**需要修正的**/
+                if action == .remedy {
+                    MXSLog(self.name, "remedy self")
+                    MXSJudge.cmd.appendResponder(self)
                 }
             }
-            else if holdAction?.aimType == .oneself {
-                reBlock(self, .passed, pokers)
-            }
-            else {
-                
-            }
+            
+            //默认passed，其他way，要提前return
+            reBlock(nil, .passed, pokers)
         }
         
         func disPokerOnDefensive() {
@@ -318,7 +328,7 @@ class MXSHero {
                         let random = self.rollRandomPoker()
                         parryResult(.beDestroyed, [random], .passed, callback)
                     }
-                    else if action_leader == .attack || action_leader == .arrowes || action_leader == .warFire {
+                    else if action_leader == .attack || action_leader == .duel || action_leader == .arrowes || action_leader == .warFire {
                         parryResult(.injured, nil, nil, callback)
                     }
                     
@@ -327,7 +337,44 @@ class MXSHero {
             }
             
         }//
+    }
+    
+    func sufferConsequence(reBlock:ParryResultCallback, next: @escaping CallbackBlock) {
+        //let conseq = leader?.holdAction?.consequence
+        let hero:MXSHero = MXSJudge.cmd.responder.first!
         
+        /**在调用方法中callback**/
+        func callback() {
+            next()
+        }
+        
+//        let action_reply = MXSJudge.cmd.leader!.holdAction!.reply.act
+        let action = MXSJudge.cmd.leader?.holdAction?.action
+        switch action {
+        case .unknown, .dodge, .detect, .recover, .gain, .remedy, .give:
+            break
+            
+        /**无此操作**/
+//        case .give:
+//            let pokers = MXSJudge.cmd.leader?.lastActiveAction?.pokers
+//            MXSLog(pokers, "The poker will comefrom ")
+//            reBlock(.receive, pokers, .handle, callback)
+            
+        case .attack, .warFire, .arrowes, .duel:
+            reBlock(.injured, nil, nil, callback)
+            
+        case .steal:
+            let random = hero.rollRandomPoker()
+            MXSLog(random, "The poker will awayfrom ")
+            reBlock(.beStolen, [random], .awayfrom, callback)
+            
+        case .destroy:
+            let random = hero.rollRandomPoker()
+            reBlock(.beDestroyed, [random], .passed, callback)
+            
+        case .none:
+            break
+        }
     }
     
     //MARK: - skill
