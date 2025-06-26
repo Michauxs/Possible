@@ -16,13 +16,31 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate {
     
     /*---------------------------------------------*/
     @objc func tableDidSelectedRow(args:Array<Any>) {
+        let table:MXSTableView = args[0] as! MXSTableView
         let ip:IndexPath = args[1] as! IndexPath
-        let server = services[ip.row]
-        if MXSNetServ.shared.connectToService(server) {
-//            stopBrowser()
-            
-            MXSNetServ.shared.sendMessage(.init(type: .request, content: "请求接连，来自：" + MXSNetServ.shared.name))
-            MXSTIPMaskCmd.shared.showMaskWithTip("Waiting...", auto: false)
+        
+        if table == mainTable {
+            let server = services[ip.row]
+            if MXSNetServ.shared.connectToService(server) {
+                //            stopBrowser()
+                
+                MXSNetServ.shared.sendMessage(.init(type: .request, content: "请求接连，来自：" + MXSNetServ.shared.name))
+                MXSTIPMaskCmd.shared.showMaskWithTip("Waiting...", auto: false)
+            }
+        }
+        else {
+            if ip.row == 0 {
+                self.navigationController?.pushViewController(MXSMinerController(), animated: false)
+            }
+            else if ip.row == 1 {
+                self.navigationController?.pushViewController(MXSRBlockController(), animated: false)
+            }
+            else if ip.row == 2 {
+                self.navigationController?.pushViewController(MXSGobangController(), animated: false)
+            }
+            else if ip.row == 3 {
+                self.navigationController?.pushViewController(MXSBlobController(), animated: false)
+            }
         }
     }
     
@@ -71,16 +89,16 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate {
     
     var services: Array<NetService> = Array<NetService>.init()
     var mainTable: MXSTableView?
-    
+    var leftTable: MXSTableView?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         let width = MXSSize.Sw * 0.25
 //        let textSign = "情深不寿，慧极必伤"
-        let textSign = "sometimes ever，\n          sometimes never."
+        let textSign = "Sometimes ever，\n      Sometimes never."
         let textLabel = UILabel.init(text: textSign, fontSize: 1034, textColor: .darkText, align: .left)
         textLabel.sizeToFit()
-        textLabel.frame = CGRect(x: 45, y: 90, width: textLabel.bounds.width, height: textLabel.bounds.height)
+        textLabel.frame = CGRect(x: 125, y: 90, width: textLabel.bounds.width, height: textLabel.bounds.height)
         view.addSubview(textLabel)
         
         let shadow = NSShadow.init()
@@ -114,6 +132,10 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate {
         self.view.addSubview(mainTable!)
         mainTable?.dlg?.dlgData = services
         
+        leftTable = MXSTableView.init(frame: CGRect(x: 10, y: label_height, width: 100.0, height: MXSSize.Sh-label_height*3), style: .plain)
+        leftTable?.register(cellNames: ["MXSGameNameCell"], delegate: MXSTableDlg(), vc: self)
+        self.view.addSubview(leftTable!)
+        leftTable?.dlg?.dlgData = ["Miner", "RBlock", "Gobang", "10 Blob"]
         /*---------------------------------------------*/
         
         let pveBtn = UIButton.init("PVE", fontSize: 14, textColor: .black, backgColor: .darkGray)
@@ -129,20 +151,6 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate {
         assemBtn.layer.borderColor = UIColor.dullLine.cgColor
         view.addSubview(assemBtn)
         assemBtn.addTarget(self, action: #selector(assemBtnClick), for: .touchUpInside)
-        
-        let minerBtn = UIButton("Miner", fontSize: 614, textColor: .dullLine)
-        minerBtn.frame = CGRect.init(x: assemBtn.frame.maxX + 10, y: assemBtn.frame.minY, width: 96, height: 40)
-        minerBtn.layer.borderWidth = 1.0
-        minerBtn.layer.borderColor = UIColor.dullLine.cgColor
-        view.addSubview(minerBtn)
-        minerBtn.addTarget(self, action: #selector(minerBtnClick), for: .touchUpInside)
-        
-        let RBlockBtn = UIButton("RBlock", fontSize: 614, textColor: .dullLine)
-        RBlockBtn.frame = CGRect.init(x: minerBtn.frame.maxX + 10, y: assemBtn.frame.minY, width: 96, height: 40)
-        RBlockBtn.layer.borderWidth = 1.0
-        RBlockBtn.layer.borderColor = UIColor.dullLine.cgColor
-        view.addSubview(RBlockBtn)
-        RBlockBtn.addTarget(self, action: #selector(RBlockBtnClick), for: .touchUpInside)
         
 
         publishBtn.setTitleColor(.theme, for: .selected)
@@ -163,13 +171,6 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate {
     }
     @objc func assemBtnClick() {
         self.navigationController?.pushViewController(MXSSkillAssemController(), animated: false)
-    }
-    @objc func minerBtnClick() {
-        self.navigationController?.pushViewController(MXSGobangController(), animated: false)
-//        self.navigationController?.pushViewController(MXSMinerController(), animated: false)
-    }
-    @objc func RBlockBtnClick() {
-        self.navigationController?.pushViewController(MXSRBlockController(), animated: false)
     }
     
     @objc func deviceOffLine(btn:UIButton) {

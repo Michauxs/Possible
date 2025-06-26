@@ -63,6 +63,7 @@ class MXSViewController: UIViewController {
     }
     public func packageFunctionName() {
         // 将函数作为闭包存储在字典中
+        //⚠️:无法解决循环引用问题🌹
 //        weak var weakself = self
 //        MXSFuncMapCmd.functionMapVoid["function1"] = weakself?.function1
 //        MXSFuncMapCmd.functionMapPara["function11"] = weakself?.function11
