@@ -92,7 +92,7 @@ class MXSBlobController: MXSViewController {
     func puddleItemTaped(args: Any) {
         let item = args as! MXSPuddleItem
         puddleHolder = item
-        item.collect { boom, cross in
+        item.collectBlob { boom, cross in
             if boom {
                 self.nebghborsItemCollectBlob(item: item)
             }

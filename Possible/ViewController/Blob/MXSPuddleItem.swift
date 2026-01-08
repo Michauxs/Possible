@@ -18,37 +18,32 @@ enum FlowDirect : Int {
 class MXSPuddleItem: MXSBaseView {
     weak var owner: MXSBlobController?
     
-    let CenterToEdgeDuration:Double = 0.45
+    let CenterToEdgeDuration:Double = 0.25
     
-    func boom(finish:@escaping ()->Void) {
-        upLabel.center = CGPoint.init(x: self.frame.width*0.5, y: self.frame.height*0.5)
-        leftLabel.center = CGPoint.init(x: self.frame.width*0.5, y: self.frame.height*0.5)
-        downLabel.center = CGPoint.init(x: self.frame.width*0.5, y: self.frame.height*0.5)
-        rightLabel.center = CGPoint.init(x: self.frame.width*0.5, y: self.frame.height*0.5)
-        upLabel.isHidden = false
-        leftLabel.isHidden = false
-        downLabel.isHidden = false
-        rightLabel.isHidden = false
+    func isFilled(finish:@escaping ()->Void) {
+        
+        let tmp = [getIdelLabel(), getIdelLabel(), getIdelLabel(), getIdelLabel()]
+        for label in tmp {
+            label.center = point_center
+        }
         
         UIView.animate(withDuration: CenterToEdgeDuration) {
-            self.upLabel.center = CGPoint.init(x: self.frame.width*0.5, y: 0)
-            self.leftLabel.center = CGPoint.init(x: 0, y: self.frame.height*0.5)
-            self.downLabel.center = CGPoint.init(x: self.frame.width*0.5, y: self.frame.height)
-            self.rightLabel.center = CGPoint.init(x: self.frame.width, y: self.frame.height*0.5)
+            for index in 0...3 { //..<
+                tmp[index].center = self.edgePointArray[index]
+            }
         } completion: { comp in
-            self.upLabel.isHidden = true
-            self.leftLabel.isHidden = true
-            self.downLabel.isHidden = true
-            self.rightLabel.isHidden = true
+            for label in tmp {
+                label.isHidden = true
+            }
             finish()
         }
     }
     
-    func collect(result:@escaping (_ boom:Bool, _ cross:FlowDirect?)->Void) {
+    func collectBlob(result:@escaping (_ boom:Bool, _ cross:FlowDirect?)->Void) {
         self.state = self.state + 1
         if self.state == 5 {
             self.state = 0
-            self.boom {
+            self.isFilled {
                 result(true, nil)
             }
         }
@@ -64,57 +59,54 @@ class MXSPuddleItem: MXSBaseView {
 //        }
     }
     
-    //MARK: - 流入
+    var edgePointArray:[CGPoint] = []
+    
+    //MARK: - 流入/经
     func inflow(from:MXSPuddleItem, finish:@escaping (_ boom:Bool, _ cross:FlowDirect?)->Void) {
         let direct = direct(forItem: from) //水流向
         
+        let idleLabel = getIdelLabel()
         switch direct {
         case .up:
-            upLabel.center = CGPoint.init(x: self.frame.width*0.5, y: self.frame.height)
-            upLabel.isHidden = false
+            idleLabel.center = edgePointArray[2]
         case .left:
-            leftLabel.center = CGPoint.init(x: self.frame.width, y: self.frame.height*0.5)
-            leftLabel.isHidden = false
+            idleLabel.center = edgePointArray[3]
         case .down:
-            downLabel.center = CGPoint.init(x: self.frame.width*0.5, y: 0)
-            downLabel.isHidden = false
+            idleLabel.center = edgePointArray[0]
         case .right:
-            rightLabel.center = CGPoint.init(x: 0, y: self.frame.height*0.5)
-            rightLabel.isHidden = false
+            idleLabel.center = edgePointArray[1]
         }
-        UIView.animate(withDuration: CenterToEdgeDuration) {
+        idleLabel.isHidden = false
+        
+        if self.state == 0 {//空水洼->outflow
+            var point_cross = CGPointZero
             switch direct {
             case .up:
-                self.upLabel.center = CGPoint.init(x: self.frame.width*0.5, y: self.frame.height*0.5)
+                point_cross = edgePointArray[0]
             case .left:
-                self.leftLabel.center = CGPoint.init(x: self.frame.width*0.5, y: self.frame.height*0.5)
+                point_cross = edgePointArray[1]
             case .down:
-                self.downLabel.center = CGPoint.init(x: self.frame.width*0.5, y: self.frame.height*0.5)
+                point_cross = edgePointArray[2]
             case .right:
-                self.rightLabel.center = CGPoint.init(x: self.frame.width*0.5, y: self.frame.height*0.5)
+                point_cross = edgePointArray[3]
             }
-        } completion: { comp in
-            switch direct {
-            case .up:
-                self.upLabel.isHidden = true
-            case .left:
-                self.leftLabel.isHidden = true
-            case .down:
-                self.downLabel.isHidden = true
-            case .right:
-                self.rightLabel.isHidden = true
+            UIView.animate(withDuration: CenterToEdgeDuration*2) {
+                idleLabel.center = point_cross
+            } completion: { comp in
+                idleLabel.isHidden = true
+                finish(false, direct)
             }
-            
-            if self.state == 0 {//空水洼->outflow
-                self.outflow(direct: direct) {
-                    finish(false, direct)
-                }
-            }
-            else {
+        }
+        else {
+            UIView.animate(withDuration: CenterToEdgeDuration) {
+                idleLabel.center = self.point_center
+            } completion: { comp in
+                idleLabel.isHidden = true
+                
                 self.state = self.state + 1
                 if self.state == 5 {
                     self.state = 0
-                    self.boom {
+                    self.isFilled {
                         finish(true, nil)
                     }
                 }
@@ -122,52 +114,29 @@ class MXSPuddleItem: MXSBaseView {
                     finish(false, nil)
                 }
             }
-            
         }
     }
     
-    //MARK: - 流出
-    func outflow(direct:FlowDirect, outed:@escaping ()->Void) {
-        switch direct {
-        case .up:
-            upLabel.center = CGPoint.init(x: self.frame.width*0.5, y: self.frame.height*0.5)
-            upLabel.isHidden = false
-        case .left:
-            leftLabel.center = CGPoint.init(x: self.frame.width*0.5, y: self.frame.height*0.5)
-            leftLabel.isHidden = false
-        case .down:
-            downLabel.center = CGPoint.init(x: self.frame.width*0.5, y: self.frame.height*0.5)
-            downLabel.isHidden = false
-        case .right:
-            rightLabel.center = CGPoint.init(x: self.frame.width*0.5, y: self.frame.height*0.5)
-            rightLabel.isHidden = false
+    func getIdelLabel()->UILabel {
+        if let index = dropArray.firstIndex(where: { (label) -> Bool in label.isHidden == true }) {
+            let label = dropArray[index]
+            label.isHidden = false
+            return label
         }
-        UIView.animate(withDuration: CenterToEdgeDuration) {
-            switch direct {
-            case .up:
-                self.upLabel.center = CGPoint.init(x: self.frame.width*0.5, y: 0)
-            case .left:
-                self.leftLabel.center = CGPoint.init(x: 0, y: self.frame.height*0.5)
-            case .down:
-                self.downLabel.center = CGPoint.init(x: self.frame.width*0.5, y: self.frame.height)
-            case .right:
-                self.rightLabel.center = CGPoint.init(x: self.frame.width, y: self.frame.height*0.5)
-            }
-        } completion: { comp in
-            switch direct {
-            case .up:
-                self.upLabel.isHidden = true
-            case .left:
-                self.leftLabel.isHidden = true
-            case .down:
-                self.downLabel.isHidden = true
-            case .right:
-                self.rightLabel.isHidden = true
-            }
-            outed()
-        }
+//        let attributedString = NSAttributedString(string: "*", attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 14)])
+//        let size = CGSize(width: 200, height: 200)
+//        let options: NSStringDrawingOptions = [.usesLineFragmentOrigin, .usesFontLeading]
+//        let boundingRect = attributedString.boundingRect(with: size, options: options, context: nil).size
+        /** '*' fontsize:14
+         - width : 6.453125
+         - height : 16.70703125
+         */
+        let label = UILabel.init(text: "*" + String(dropArray.count), fontSize: 614, textColor: .white, align: .center)
+        label.frame = CGRect(x: 0, y: 0, width: 16.46, height: 16.71)
+        addSubview(label)
+        dropArray.append(label)
+        return label
     }
-    
     //MARK: - tools method
     /**水流向**/
     func direct(forItem:MXSPuddleItem)->FlowDirect {
@@ -196,42 +165,22 @@ class MXSPuddleItem: MXSBaseView {
         }
     }
     
-    let upLabel = UILabel.init(text: "*", fontSize: 614, textColor: .white, align: .center)
-    let leftLabel = UILabel.init(text: "*", fontSize: 614, textColor: .white, align: .center)
-    let downLabel = UILabel.init(text: "*", fontSize: 614, textColor: .white, align: .center)
-    let rightLabel = UILabel.init(text: "*", fontSize: 614, textColor: .white, align: .center)
     
+    var dropArray:[UILabel] = []
     let titleLabel = UILabel.init(text: "", fontSize: 614, textColor: .darkText, align: .center)
+    var point_center = CGPointZero
+    
     override func setupSubviews() {
         
         self.backgroundColor = .gray
         addSubview(titleLabel)
         titleLabel.frame = self.bounds
-//        titleLabel.snp.makeConstraints({ make in
-//            make.center.equalTo(self)
-//        })
         
-//        let attributedString = NSAttributedString(string: "*", attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 14)])
-//        let size = CGSize(width: 200, height: 200)
-//        let options: NSStringDrawingOptions = [.usesLineFragmentOrigin, .usesFontLeading]
-//        let boundingRect = attributedString.boundingRect(with: size, options: options, context: nil).size
-        /**
-         - width : 6.453125
-         - height : 16.70703125
-         */
-        let frame = CGRect(x: 0, y: 0, width: 6.46, height: 16.71)
-        upLabel.frame = frame
-        leftLabel.frame = frame
-        downLabel.frame = frame
-        rightLabel.frame = frame
-        addSubview(upLabel)
-        addSubview(leftLabel)
-        addSubview(downLabel)
-        addSubview(rightLabel)
-        self.upLabel.isHidden = true
-        self.leftLabel.isHidden = true
-        self.downLabel.isHidden = true
-        self.rightLabel.isHidden = true
+        point_center = CGPoint.init(x: self.frame.width*0.5, y: self.frame.height*0.5)
+        edgePointArray.append(CGPoint.init(x: self.frame.width*0.5, y: 0))
+        edgePointArray.append(CGPoint.init(x: 0, y: self.frame.height*0.5))
+        edgePointArray.append(CGPoint.init(x: self.frame.width*0.5, y: self.frame.height))
+        edgePointArray.append(CGPoint.init(x: self.frame.width, y: self.frame.height*0.5))
         
         self.setUserInteraction()
         self.clipsToBounds = false;
@@ -255,65 +204,5 @@ class MXSPuddleItem: MXSBaseView {
             self.idx = row * 10 + col
         }
     }
-    /**
-     func inflow(from:MXSPoolWaterItem, finish:@escaping (_ cross:DropDirect?)->Void) {
-         let direct = diret(forItem: from)
-         
-         switch direct {
-         case .up:
-             upLabel.center = CGPoint.init(x: self.frame.width*0.5, y: self.frame.height)
-             upLabel.isHidden = false
-         case .left:
-             leftLabel.center = CGPoint.init(x: self.frame.width, y: self.frame.height*0.5)
-             leftLabel.isHidden = false
-         case .down:
-             downLabel.center = CGPoint.init(x: self.frame.width*0.5, y: 0)
-             downLabel.isHidden = false
-         case .right:
-             rightLabel.center = CGPoint.init(x: 0, y: self.frame.height*0.5)
-             rightLabel.isHidden = false
-         case .all: break
-         }
-         UIView.animate(withDuration: CenterToEdgeDuration) {
-             switch direct {
-             case .up:
-                 if stay { self.upLabel.center = CGPoint.init(x: self.frame.width*0.5, y: self.frame.height*0.5) }
-                 else { self.upLabel.center = CGPoint.init(x: self.frame.width*0.5, y: 0) }
-                 
-             case .left:
-                 if stay { self.leftLabel.center = CGPoint.init(x: self.frame.width*0.5, y: self.frame.height*0.5) }
-                 else { self.leftLabel.center = CGPoint.init(x: 0, y: self.frame.height*0.5) }
-             case .down:
-                 if stay { self.downLabel.center = CGPoint.init(x: self.frame.width*0.5, y: self.frame.height*0.5) }
-                 else { self.downLabel.center = CGPoint.init(x: self.frame.width*0.5, y: self.frame.height) }
-             case .right:
-                 if stay { self.rightLabel.center = CGPoint.init(x: self.frame.width*0.5, y: self.frame.height*0.5) }
-                 else { self.rightLabel.center = CGPoint.init(x: self.frame.width, y: self.frame.height*0.5) }
-             case .all:
-                 break
-             }
-         } completion: { comp in
-             switch direct {
-             case .up:
-                 self.upLabel.isHidden = true
-             case .left:
-                 self.leftLabel.isHidden = true
-             case .down:
-                 self.downLabel.isHidden = true
-             case .right:
-                 self.rightLabel.isHidden = true
-             case .all: break
-             }
-             
-             if stay {
-                 finish(nil)
-             }
-             else {
-                 finish(direct)
-             }
-             
-         }
-     }
-     
-     */
+    
 }
