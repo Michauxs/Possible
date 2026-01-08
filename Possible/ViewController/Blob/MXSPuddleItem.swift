@@ -58,7 +58,7 @@ class MXSPuddleItem: MXSBaseView {
 //            }
 //        }
     }
-    
+    /**[上，左，下，右]**/
     var edgePointArray:[CGPoint] = []
     
     //MARK: - 流入/经
