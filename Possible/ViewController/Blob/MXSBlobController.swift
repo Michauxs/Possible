@@ -7,8 +7,10 @@
 //
 
 import UIKit
+import Foundation
 
 class MXSBlobController: MXSViewController {
+    let PuddleCmd: MXSPuddleCmd = MXSPuddleCmd()
     
     var numberOfRow = 6
     let groundView: UIView = UIView()
@@ -50,33 +52,33 @@ class MXSBlobController: MXSViewController {
         GroundMask.backgroundColor = .clear
         self.view.addSubview(GroundMask)
         
-        layoutPool()
+        layoutPool(false)
         
         /*--------------------------------------*/
+        PuddleCmd.owner = self
     }
     
-    func layoutPool() {
-        for puddle in puddlePackage {
-            puddle.removeFromSuperview()
-        }
-        puddlePackage.removeAll()
-        
+    func layoutPool(_ reset:Bool = true) {
         GroundMask.isHidden = true
-
-        let space = 1.0
-        let item_w = (groundView.frame.size.width - space*CGFloat(numberOfRow-1)) / CGFloat(numberOfRow)
-        for row in 0..<numberOfRow {
-            for col in 0..<numberOfRow {
-                let puddle = MXSPuddleItem(frame: CGRect(x: (item_w+space)*CGFloat(col), y: (item_w+space)*CGFloat(row), width: item_w, height: item_w))
-                puddle.owner = self
-                puddle.info = (row, col)
-                groundView.addSubview(puddle)
-                puddlePackage.append(puddle)
-                
-                puddle.state = Int.random(in: 0...4)
+        
+        if !reset {
+            let space = 1.0
+            let item_w = (groundView.frame.size.width - space*CGFloat(numberOfRow-1)) / CGFloat(numberOfRow)
+            for row in 0..<numberOfRow {
+                for col in 0..<numberOfRow {
+                    let puddle = MXSPuddleItem(frame: CGRect(x: (item_w+space)*CGFloat(col), y: (item_w+space)*CGFloat(row), width: item_w, height: item_w))
+                    puddle.info = (row, col)
+                    puddle.owner = self
+                    puddle.cmd = PuddleCmd
+                    groundView.addSubview(puddle)
+                    puddlePackage.append(puddle)
+                }
             }
         }
-        
+            
+        for puddle in puddlePackage {
+            puddle.state = Int.random(in: 0...4)
+        }
     }
     
     
@@ -88,6 +90,14 @@ class MXSBlobController: MXSViewController {
     @objc func didRestartBtnClick() {
         self.layoutPool()
     }
+    
+    func puddleEnable(args: Bool) {
+        GroundMask.isHidden = args
+    }
+    func missionComplete() {
+        MXSTIPMaskCmd.shared.showMaskWithTip("mission complete", auto:false)
+    }
+    
     
     func puddleItemTaped(args: Any) {
         let item = args as! MXSPuddleItem
@@ -131,12 +141,6 @@ class MXSBlobController: MXSViewController {
     func resetGradeLayoutMIne(row: Int, rang: Int) {
         numberOfRow = row
         layoutPool()
-    }
-    
-    func endMission(complete: Bool) {
-        
-        GroundMask.isHidden = false
-        
     }
     
     //MARK: - common

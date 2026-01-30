@@ -20,6 +20,8 @@ class MXSTIPMaskCmd {
     public func showMaskWithTip(_ title:String, auto:Bool = true) {
         let mask = MXSTIPMask.init(frame: CGRect.init(x: 0, y: 0, width: MXSSize.Sw, height: MXSSize.Sh))
         mask.titleLabel.text = title
+        mask.isUserInteractionEnabled = true
+        mask.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(selfTaped)))
         
         UIApplication.shared.keyWindow?.addSubview(mask)
         maskLayer.append(mask)
@@ -30,6 +32,12 @@ class MXSTIPMaskCmd {
             }
         }
     }
+    
+    
+    @objc func selfTaped() {
+        self.dispearMaskTip()
+    }
+    
         
     public func dispearMaskTip() {
         if maskLayer.count < 1 {

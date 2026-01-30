@@ -17,6 +17,7 @@ enum FlowDirect : Int {
 
 class MXSPuddleItem: MXSBaseView {
     weak var owner: MXSBlobController?
+    weak var cmd: MXSPuddleCmd?
     
     let CenterToEdgeDuration:Double = 0.25
     
@@ -27,11 +28,13 @@ class MXSPuddleItem: MXSBaseView {
             label.center = point_center
         }
         
+        cmd?.animateCountMins()
         UIView.animate(withDuration: CenterToEdgeDuration) {
             for index in 0...3 { //..<
                 tmp[index].center = self.edgePointArray[index]
             }
         } completion: { comp in
+            self.cmd?.animateCountMins(-1)
             for label in tmp {
                 label.isHidden = true
             }
@@ -39,10 +42,23 @@ class MXSPuddleItem: MXSBaseView {
         }
     }
     
+    
+    var unfairLock = os_unfair_lock()
+    func accessSharedResource() {
+        os_unfair_lock_lock(&unfairLock)
+        // 访问共享资源
+        print("访问共享资源")
+        // 修改共享资源
+        os_unfair_lock_unlock(&unfairLock)
+    }
+    
     func collectBlob(result:@escaping (_ boom:Bool, _ cross:FlowDirect?)->Void) {
+        
         self.state = self.state + 1
+        
         if self.state == 5 {
             self.state = 0
+            
             self.isFilled {
                 result(true, nil)
             }
@@ -78,39 +94,68 @@ class MXSPuddleItem: MXSBaseView {
         }
         idleLabel.isHidden = false
         
+        var point_cross = CGPointZero
+        switch direct {
+        case .up:
+            point_cross = edgePointArray[0]
+        case .left:
+            point_cross = edgePointArray[1]
+        case .down:
+            point_cross = edgePointArray[2]
+        case .right:
+            point_cross = edgePointArray[3]
+        }
         if self.state == 0 {//空水洼->outflow
-            var point_cross = CGPointZero
-            switch direct {
-            case .up:
-                point_cross = edgePointArray[0]
-            case .left:
-                point_cross = edgePointArray[1]
-            case .down:
-                point_cross = edgePointArray[2]
-            case .right:
-                point_cross = edgePointArray[3]
-            }
+            cmd?.animateCountMins()
             UIView.animate(withDuration: CenterToEdgeDuration*2) {
                 idleLabel.center = point_cross
             } completion: { comp in
+                self.cmd?.animateCountMins(-1)
                 idleLabel.isHidden = true
                 finish(false, direct)
             }
         }
         else {
+            cmd?.animateCountMins()
             UIView.animate(withDuration: CenterToEdgeDuration) {
                 idleLabel.center = self.point_center
             } completion: { comp in
-                idleLabel.isHidden = true
                 
-                self.state = self.state + 1
-                if self.state == 5 {
-                    self.state = 0
-                    self.isFilled {
-                        finish(true, nil)
+                var bound = false
+                os_unfair_lock_lock(&self.unfairLock)
+                if self.state == 0 {
+                    bound = true
+                }
+                else {
+                    self.state = self.state + 1
+                    if self.state == 5 {
+                        self.state = 0
+                    }
+                }
+                os_unfair_lock_unlock(&self.unfairLock)
+                
+                if self.state == 0 {
+                    if bound {//blank
+                        print("来晚了！")
+                        UIView.animate(withDuration: self.CenterToEdgeDuration*2) {
+                            idleLabel.center = point_cross
+                        } completion: { comp in
+                            self.cmd?.animateCountMins(-1)
+                            idleLabel.isHidden = true
+                            finish(false, direct)
+                        }
+                    }
+                    else { //boom
+                        self.cmd?.animateCountMins(-1)
+                        idleLabel.isHidden = true
+                        self.isFilled {
+                            finish(true, nil)
+                        }
                     }
                 }
                 else {
+                    self.cmd?.animateCountMins(-1)
+                    idleLabel.isHidden = true
                     finish(false, nil)
                 }
             }
@@ -162,6 +207,8 @@ class MXSPuddleItem: MXSBaseView {
         didSet {
             titleLabel.text = String(state)
             titleLabel.isHidden = state == 0
+            
+            cmd?.appendBlob(numb: state, idx: idx)
         }
     }
     
@@ -187,6 +234,7 @@ class MXSPuddleItem: MXSBaseView {
     }
     
     override func selfTaped() {
+        if self.state == 0 { return }
 //        self.control?.MXSFuncMapCmd.callFunction(byName: "mineViewTaped:", withPara: self)
         self.owner?.puddleItemTaped(args: self)
     }
