@@ -123,14 +123,15 @@ class MXSPVESoloController: MXSGroundController {
     }
     
     // MARK: - offensive
-    override func waitReplyOrReactive() {
+    override func waitingForReply() {
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(750)) { [self] in
             
             guard let responder = MXSJudge.cmd.findResponder() else {
-                MXSLog("find responder failed")
+                MXSLog("not find responder, leaderReactive")
+                MXSJudge.cmd.leaderReactive()
+                
                 if MXSJudge.cmd.leader!.isPlayer {
                     leadingView.state = .attackUnPick
-                    player.signStatus = .active
                 }
                 else {
                     turnToAIAttack()
@@ -202,7 +203,7 @@ class MXSPVESoloController: MXSGroundController {
             } next: { [self] in
                 MXSLog("step done")
                 MXSJudge.cmd.currentResponderDone()
-                waitReplyOrReactive()
+                waitingForReply()
             }
             
         }
@@ -237,7 +238,7 @@ class MXSPVESoloController: MXSGroundController {
                     }
                 }
             }, next: { [self] in
-                waitReplyOrReactive()
+                waitingForReply()
                 
             }) == false {
                 MXSLog(leader.name, "AI can't attack -")
@@ -266,14 +267,14 @@ class MXSPVESoloController: MXSGroundController {
                 graspPokerView.losePokerView(pokers) {
                     self.passedView.depositPoker(pokers, fromHero: responder!) {
                         MXSJudge.cmd.currentResponderDone()
-                        self.waitReplyOrReactive()
+                        self.waitingForReply()
                     }
                 }
             }
             else if pokerWay == .awayfrom {// = active give + responder gain
                 self.pokerHandover(pokers: pokers, from: responder!, to: target.first!) {
                     MXSJudge.cmd.currentResponderDone()
-                    self.waitReplyOrReactive()
+                    self.waitingForReply()
                 }
             }
         })
@@ -329,7 +330,7 @@ class MXSPVESoloController: MXSGroundController {
         }, next: { [self] in
             MXSLog("=== step done ===")
             MXSJudge.cmd.currentResponderDone()
-            waitReplyOrReactive()
+            waitingForReply()
         })
     }
     

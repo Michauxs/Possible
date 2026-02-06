@@ -37,12 +37,6 @@ class MXSJudge {
         }
     }
     
-    var leader:MXSHero? {
-        didSet {
-            leader?.holdAction = MXSOneAction(axle: leader!, fensive: .offensive)
-            leader?.signStatus = .active
-        }
-    }
     func dealcardForGameStart(ready:(_ heroArray: [MXSHero], _ pokersArray: [[MXSPoker]]) -> Void) {
         var pokers_array = [[MXSPoker]]()
         for hero in subject {
@@ -74,14 +68,14 @@ class MXSJudge {
         MXSLog("--------------------------")
         MXSLog(flowNote, "Did set flow note:")
         let hero = subject[flowNote]
-        hero.signStatus = .active
+        
         self.leader = hero
+        self.leaderReactive()
         
         let pokers = MXSPokerCmd.shared.push(leader!.collectNumb)
         leader!.getPokers(pokers)
         
         reBlock(leader!, pokers)
-        
     }
     
     func playerCanAttack() -> Bool {
@@ -129,7 +123,7 @@ class MXSJudge {
     }
         
     func leaderReactive() {
-        leader?.signStatus = .active
+        leader!.signStatus = .active
         leader!.holdAction = MXSOneAction(axle: leader!, fensive: .offensive)
     }
     
@@ -156,21 +150,16 @@ class MXSJudge {
         }
     }
     
+    var leader:MXSHero?
     var activer:MXSHero?
     var replyer:MXSHero?
-    /*------------ 触动链 --------------- 230719：可能不需要触动链，触动激活是临时的，只需记录当前正在对峙的双方
-     Activer <-note | aim-> Replyer <-note | next-> Next ...
-     */
+    /*------------ 触动链 ---------------*/
     
     func findResponder() -> MXSHero? {
         var hero:MXSHero?
         if MXSJudge.cmd.responder.count > 0 {
             hero = MXSJudge.cmd.responder.first!
             hero!.holdAction = MXSOneAction(axle: hero!, fensive: .defensive)
-        }
-        else {
-            // no one reply   /all reply done
-            MXSJudge.cmd.leaderReactive()
         }
         return hero
     }

@@ -184,18 +184,18 @@ class MXSGroundController: MXSViewController {
             if pokerWay == .passed {
                 graspPokerView.losePokerView(pokeres, complete: nil)
                 self.passedView.depositPoker(pokeres, fromHero: MXSJudge.cmd.leader!) {
-                    self.waitReplyOrReactive()
+                    self.waitingForReply()
                 }
             }
             else if pokerWay == .awayfrom {//= active give + responder gain
                 graspPokerView.losePokerView(pokeres, complete: nil)
                 self.pokerHandover(pokers: pokeres, from: player, to: target.first!) {
-                    self.waitReplyOrReactive()
+                    self.waitingForReply()
                 }
             }
         })
     }
-    public func waitReplyOrReactive() { //sub object
+    public func waitingForReply() { //sub object
         
     }
     
