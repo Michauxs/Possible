@@ -75,8 +75,8 @@
 		76DCAE7C2D9653E200E0037F /* MXSGameNameCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76DCAE7B2D9653E200E0037F /* MXSGameNameCell.swift */; };
 		76DEB05825303E5300D954FC /* XK.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 76DEB05725303E5300D954FC /* XK.ttf */; };
 		76E9D0EA26453EF400D6E5C4 /* MXSPVESoloController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76E9D0E926453EF400D6E5C4 /* MXSPVESoloController.swift */; };
-		76E9D0EF26463FF700D6E5C4 /* MXSPVPServiceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76E9D0EE26463FF700D6E5C4 /* MXSPVPServiceController.swift */; };
-		76E9D0F42646401400D6E5C4 /* MXSPVPCustomerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76E9D0F32646401400D6E5C4 /* MXSPVPCustomerController.swift */; };
+		76E9D0EF26463FF700D6E5C4 /* MXSPVPHostController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76E9D0EE26463FF700D6E5C4 /* MXSPVPHostController.swift */; };
+		76E9D0F42646401400D6E5C4 /* MXSPVPClientController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76E9D0F32646401400D6E5C4 /* MXSPVPClientController.swift */; };
 		76F92F4524F3D8860039478D /* MXSHeroCmd.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76F92F4424F3D8850039478D /* MXSHeroCmd.swift */; };
 		76F92F4724F3D8E80039478D /* MXSSkillCmd.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76F92F4624F3D8E80039478D /* MXSSkillCmd.swift */; };
 		76F92F4A24F4A5D20039478D /* MXSColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76F92F4924F4A5D20039478D /* MXSColor.swift */; };
@@ -175,8 +175,8 @@
 		76DCAE7B2D9653E200E0037F /* MXSGameNameCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSGameNameCell.swift; sourceTree = "<group>"; };
 		76DEB05725303E5300D954FC /* XK.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = XK.ttf; sourceTree = "<group>"; };
 		76E9D0E926453EF400D6E5C4 /* MXSPVESoloController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSPVESoloController.swift; sourceTree = "<group>"; };
-		76E9D0EE26463FF700D6E5C4 /* MXSPVPServiceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSPVPServiceController.swift; sourceTree = "<group>"; };
-		76E9D0F32646401400D6E5C4 /* MXSPVPCustomerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSPVPCustomerController.swift; sourceTree = "<group>"; };
+		76E9D0EE26463FF700D6E5C4 /* MXSPVPHostController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSPVPHostController.swift; sourceTree = "<group>"; };
+		76E9D0F32646401400D6E5C4 /* MXSPVPClientController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSPVPClientController.swift; sourceTree = "<group>"; };
 		76F92F4424F3D8850039478D /* MXSHeroCmd.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSHeroCmd.swift; sourceTree = "<group>"; };
 		76F92F4624F3D8E80039478D /* MXSSkillCmd.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSSkillCmd.swift; sourceTree = "<group>"; };
 		76F92F4924F4A5D20039478D /* MXSColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXSColor.swift; sourceTree = "<group>"; };
@@ -480,10 +480,10 @@
 		76AC2AF92514B3F5005884CF /* Ground */ = {
 			isa = PBXGroup;
 			children = (
+				76EDF983273376B9005B903A /* PVP */,
 				765C8BEF28091A5600A77293 /* View */,
 				76053DDB24E39C90001860E7 /* MXSGroundController.swift */,
 				76E9D0E926453EF400D6E5C4 /* MXSPVESoloController.swift */,
-				76EDF983273376B9005B903A /* PVP */,
 			);
 			path = Ground;
 			sourceTree = "<group>";
@@ -530,8 +530,8 @@
 			isa = PBXGroup;
 			children = (
 				76D036D826B3FBE000D312F9 /* MXSPVPController.swift */,
-				76E9D0EE26463FF700D6E5C4 /* MXSPVPServiceController.swift */,
-				76E9D0F32646401400D6E5C4 /* MXSPVPCustomerController.swift */,
+				76E9D0EE26463FF700D6E5C4 /* MXSPVPHostController.swift */,
+				76E9D0F32646401400D6E5C4 /* MXSPVPClientController.swift */,
 			);
 			path = PVP;
 			sourceTree = "<group>";
@@ -744,7 +744,7 @@
 			files = (
 				76053DDD24E39C90001860E7 /* MXSGroundController.swift in Sources */,
 				7654CDDA251C98D90053B4F3 /* MXSPickHeroView.swift in Sources */,
-				76E9D0EF26463FF700D6E5C4 /* MXSPVPServiceController.swift in Sources */,
+				76E9D0EF26463FF700D6E5C4 /* MXSPVPHostController.swift in Sources */,
 				765824D32509D64A00EB55E5 /* MXSCollectionDlg.swift in Sources */,
 				76963DC924FE3B5100007D9F /* MXSNetServCmd.swift in Sources */,
 				76F92F4724F3D8E80039478D /* MXSSkillCmd.swift in Sources */,
@@ -767,7 +767,7 @@
 				7697A5C624ECBC1E00FB93A6 /* MXSPokerView.swift in Sources */,
 				76053DDC24E39C90001860E7 /* MXSViewController.swift in Sources */,
 				76963DC524FC922200007D9F /* MXSLeadingView.swift in Sources */,
-				76E9D0F42646401400D6E5C4 /* MXSPVPCustomerController.swift in Sources */,
+				76E9D0F42646401400D6E5C4 /* MXSPVPClientController.swift in Sources */,
 				765824D02509D64A00EB55E5 /* MXSTableViewCell.swift in Sources */,
 				766C3F3B25245235002819E6 /* MXSOneAction.swift in Sources */,
 				765824D42509D64A00EB55E5 /* MXSCollectionViewLeftAlignLayout.swift in Sources */,

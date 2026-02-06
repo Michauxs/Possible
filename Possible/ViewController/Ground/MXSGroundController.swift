@@ -184,25 +184,26 @@ class MXSGroundController: MXSViewController {
             if pokerWay == .passed {
                 graspPokerView.losePokerView(pokeres, complete: nil)
                 self.passedView.depositPoker(pokeres, fromHero: MXSJudge.cmd.leader!) {
-                    self.checkResponderWaitReplyOrReactive()
+                    self.waitReplyOrReactive()
                 }
             }
             else if pokerWay == .awayfrom {//= active give + responder gain
                 graspPokerView.losePokerView(pokeres, complete: nil)
-                self.pokerHandover(pokers: pokeres, from: player, to: target!) {
-                    self.checkResponderWaitReplyOrReactive()
+                self.pokerHandover(pokers: pokeres, from: player, to: target.first!) {
+                    self.waitReplyOrReactive()
                 }
             }
         })
     }
-    public func checkResponderWaitReplyOrReactive() { //sub object
+    public func waitReplyOrReactive() { //sub object
         
     }
     
     public func offensiveCancel() {
         for poker in player.picked { poker.concreteView?.isUp = false }
         player.picked.removeAll()
-        MXSJudge.cmd.clearResponder()
+        player.holdAction?.aimClear()
+        
     }
     func offensiveCancelSubject() { //sub object
         
@@ -279,10 +280,10 @@ class MXSGroundController: MXSViewController {
         
         let hero = heroView.belong!
         if heroView.signStatus == .selected {
-            MXSJudge.cmd.removeResponder(hero)
+            player.holdAction?.aimRemove(hero)
         }
         else {
-            MXSJudge.cmd.appendResponder(hero)
+            player.holdAction?.aimAppend(hero)
         }
         
         checkCanCertainAction()

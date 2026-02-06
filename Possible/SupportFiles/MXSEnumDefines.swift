@@ -12,7 +12,7 @@ typealias DelayedBlock = (_ parry:ParryResultType) -> Void
 typealias DelayedBlockReturn = (_ parry:ParryResultType) -> MXSHero
 
 typealias CallbackBlock = () -> Void
-typealias ParryResultCallback = (_ parry:ParryResultType, _ pokers:[MXSPoker]?, _ pokerWay:PokerViewWay?, _ callback: @escaping CallbackBlock) -> Void
+typealias ReplyResultCallback = (_ parry:ParryResultType, _ pokers:[MXSPoker]?, _ pokerWay:PokerViewWay?, _ callback: @escaping CallbackBlock) -> Void
 
 typealias HeroParryResult = (_ parry:ParryResultType, _ pokers:[MXSPoker]?, _ pokerWay:PokerViewWay?) -> Void
 
@@ -112,7 +112,7 @@ enum PokerState : Int {
     case transferring
 }
 
-enum PokerAction : Int {
+enum PokerFunc : Int {
     case unknown = 0
     case attack = 1
     case dodge //闪避

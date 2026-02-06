@@ -18,6 +18,7 @@ enum ActionFensive {
 }
 enum ActionCategy {
     case unknown
+//    case dealcards
     case alive//common act
     case endLead//end note
 }
@@ -49,7 +50,7 @@ class MXSOneAction {
         var type:Int = 0//0:do  1:not do anything
         var numb:Int = 0
         var color:PokerColor = .unknown
-        var act:PokerAction = .unknown
+        var act:PokerFunc = .unknown
         var count:Int = 0//
         
         func reset() {
@@ -81,12 +82,20 @@ class MXSOneAction {
     var categy:ActionCategy = .alive
     var skill:MXSSkill?
     
+    class HeroDoneNote {
+        var hero:MXSHero?
+        var done:Bool = false
+        
+        init(hero: MXSHero? = nil) {
+            self.hero = hero
+        }
+    }
     var aimType:ActionAimType = .unknown
-    var aim:[MXSHero] = [MXSHero]()
+    var aim:[HeroDoneNote] = [HeroDoneNote]()
     
-    var action:PokerAction = .unknown {
+    var aFunc:PokerFunc = .unknown {
         didSet {
-            switch action {
+            switch aFunc {
             case .unknown, .dodge, .detect, .recover, .gain:
                 reply.reset()
                 consequence.reset()
@@ -137,23 +146,22 @@ class MXSOneAction {
     lazy var consequence:ActionConsequence = ActionConsequence()
     
     func aimAppend(_ hero:MXSHero) {
-        if aim.contains(where: { one in
-            one === hero
-        }) {
+        if aim.contains(where: { one in one.hero === hero }) {
             return
         }
         
-        aim.append(hero)
-        if action == .remedy {
+        hero.signStatus = .selected
+        aim.append(HeroDoneNote(hero: hero))
+        if aFunc == .remedy {
             aimType = .ptp
         }
     }
     func aimRemove(_ hero:MXSHero) {
-        if let index = aim.firstIndex(where: { one in
-            one === hero
-        }) {
-            aim.remove(at: index)
-            if action == .remedy {
+        if let index = aim.firstIndex(where: { one in one.hero === hero }) {
+            let note = aim.remove(at: index)
+            note.hero!.signStatus = .blank
+            
+            if aFunc == .remedy {
                 if aim.count == 0 {
                     aimType = .oneself
                 }
@@ -163,12 +171,18 @@ class MXSOneAction {
             }
         }
     }
+    func aimClear() {
+        for note in aim {
+            note.hero?.signStatus = .blank
+        }
+        aim.removeAll()
+    }
     
     func reset() {
         reply.reset()
         consequence.reset()
         effect.reset()
-        action = .unknown
+        aFunc = .unknown
         pokers.removeAll()
     }
     

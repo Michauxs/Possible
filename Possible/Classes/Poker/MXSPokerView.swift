@@ -14,7 +14,7 @@ class MXSPokerView: MXSBaseView {
             reverseView.isHidden = true
         }
     }
-    let actionTextTranslater: [PokerAction:String] = [.attack:"攻",
+    let actionTextTranslater: [PokerFunc:String] = [.attack:"攻",
                                                       .dodge:"闪",
                                                       .steal:"偷窃",
                                                       .destroy:"破坏",
@@ -34,8 +34,8 @@ class MXSPokerView: MXSBaseView {
     var contentView: UIView = UIView()
     var colorSign: UIImageView = UIImageView()
     var numberLabel: UILabel = UILabel.init(text: "0", fontSize: 614, textColor: .black, align: .center)
-    var actionLabel: UILabel = UILabel.init(text: "0", fontSize: 618, textColor: .black, align: .center)
-    var actionGuiseLabel: UILabel = UILabel.init(text: "0", fontSize: 313, textColor: .black, align: .center)
+    var funcNameLabel: UILabel = UILabel.init(text: "0", fontSize: 618, textColor: .black, align: .center)
+    var funcGuiseNameLabel: UILabel = UILabel.init(text: "0", fontSize: 313, textColor: .black, align: .center)
     
     var beAnimate: Bool = false
     var isUp: Bool = false {
@@ -51,7 +51,7 @@ class MXSPokerView: MXSBaseView {
             } else {
                 if org_y == 5.0 { return }
                 offset_y = 5.0
-                belong?.actionGuise = belong!.actionFate
+                belong?.funcGuise = belong!.funcFate
                 belong?.colorGuise = belong!.color
             }
             
@@ -69,7 +69,7 @@ class MXSPokerView: MXSBaseView {
             if font_size > 20 { font_size = 20 }
             else if font_size < 13 { font_size = 13 }
             //actionLabel.font = UIFont.systemFont(ofSize: font_size, weight: .bold)
-            actionLabel.font = UIFont.init(name: FontXingKai, size: font_size)
+            funcNameLabel.font = UIFont.init(name: FontXingKai, size: font_size)
             contentView.snp.updateConstraints({ (m) in
                 m.width.equalTo(showWidth)
             })
@@ -110,33 +110,33 @@ class MXSPokerView: MXSBaseView {
             case .heart:
                 colorSign.image = UIImage.init(named: "heart")
                 numberLabel.textColor = .red
-                actionLabel.textColor = .red
+                funcNameLabel.textColor = .red
             case .club:
                 colorSign.image = UIImage.init(named: "club")
                 numberLabel.textColor = .black
-                actionLabel.textColor = .black
+                funcNameLabel.textColor = .black
             case .spade:
                 colorSign.image = UIImage.init(named: "spade")
                 numberLabel.textColor = .black
-                actionLabel.textColor = .black
+                funcNameLabel.textColor = .black
             case .diamond:
                 colorSign.image = UIImage.init(named: "diamond")
                 numberLabel.textColor = .red
-                actionLabel.textColor = .red
+                funcNameLabel.textColor = .red
             default:
                 break
             }
         }
     }
-    var action: PokerAction? {
+    var action: PokerFunc? {
         didSet{
-            actionLabel.text = actionTextTranslater[action!]
-            actionGuiseLabel.text = actionTextTranslater[action!]
+            funcNameLabel.text = actionTextTranslater[action!]
+            funcGuiseNameLabel.text = actionTextTranslater[action!]
         }
     }
-    var actionGuise: PokerAction? {
+    var actionGuise: PokerFunc? {
         didSet{
-            actionGuiseLabel.text = actionTextTranslater[actionGuise!]
+            funcGuiseNameLabel.text = actionTextTranslater[actionGuise!]
         }
     }
     
@@ -177,23 +177,23 @@ class MXSPokerView: MXSBaseView {
             m.size.equalTo(CGSize.init(width: sign_width, height: sign_width))
         })
         
-        actionLabel.numberOfLines = 0
-        contentView.addSubview(actionLabel)
-        actionLabel.snp.makeConstraints({ (m) in
+        funcNameLabel.numberOfLines = 0
+        contentView.addSubview(funcNameLabel)
+        funcNameLabel.snp.makeConstraints({ (m) in
             m.top.equalTo(colorSign.snp_bottom).offset(5)
             m.centerX.equalTo(contentView)
             m.width.equalTo(contentView)
         })
         
-        actionGuiseLabel.backgroundColor = .alphaBlack
-        contentView.addSubview(actionGuiseLabel)
-        actionGuiseLabel.snp.makeConstraints({ (m) in
+        funcGuiseNameLabel.backgroundColor = .alphaBlack
+        contentView.addSubview(funcGuiseNameLabel)
+        funcGuiseNameLabel.snp.makeConstraints({ (m) in
             m.width.equalTo(contentView)
             m.bottom.equalTo(contentView)
             m.centerX.equalTo(contentView)
             m.height.equalTo(20)
         })
-        actionGuiseLabel.isHidden = true
+        funcGuiseNameLabel.isHidden = true
         
         reverseView.frame = self.bounds
         reverseView.image = UIImage(named: "poker_reverse")

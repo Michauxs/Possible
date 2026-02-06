@@ -8,7 +8,7 @@
 
 import UIKit
 
-class MXSPVPServiceController: MXSPVPController {
+class MXSPVPHostController: MXSPVPController {
 
     override func readyModelForView() {
         pickHeroView.heroData = MXSHeroCmd.shared.allHeroModel

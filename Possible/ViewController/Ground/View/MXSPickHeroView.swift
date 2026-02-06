@@ -164,17 +164,20 @@ class MXSPickHeroView: MXSBaseView {
     }
 
     @objc func didTapedSelf(taped:UITapGestureRecognizer) {
-        pickedCount += 1
-        if pickedCount > expectCount {
-            return
-        }
-        
         let view:MXSHeroShowView = taped.view as! MXSHeroShowView
         if view.isSelect { return }
         
+        if pickedCount+1 > expectCount {
+            return
+        }
+        
+        pickedCount += 1
         view.isSelect = true
+        let hero = heroData![view.tag]
+        hero.seq = pickedCount
+        
         if pickedCount == 1 {
-            self.belong?.pickedHero(heroData![view.tag], chairNumb: pickedCount)
+            self.belong?.pickedHero(hero, chairNumb: pickedCount)
             
             if pickType == .PVP {
                 autoHiddenSelfAfter(500)
@@ -185,7 +188,7 @@ class MXSPickHeroView: MXSBaseView {
             }
         }
         else {
-            self.belong?.pickedHero(heroData![view.tag], chairNumb: pickedCount)
+            self.belong?.pickedHero(hero, chairNumb: pickedCount)
             
             if pickedCount == expectCount {
                 autoHiddenSelfAfter(500)

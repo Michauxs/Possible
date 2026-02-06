@@ -123,13 +123,14 @@ class MXSPVESoloController: MXSGroundController {
     }
     
     // MARK: - offensive
-    override func checkResponderWaitReplyOrReactive() {
+    override func waitReplyOrReactive() {
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(750)) { [self] in
             
-            guard let responder = MXSJudge.cmd.trySomeoneAsResponderToReply() else {
+            guard let responder = MXSJudge.cmd.findResponder() else {
                 MXSLog("find responder failed")
                 if MXSJudge.cmd.leader!.isPlayer {
                     leadingView.state = .attackUnPick
+                    player.signStatus = .active
                 }
                 else {
                     turnToAIAttack()
@@ -137,9 +138,9 @@ class MXSPVESoloController: MXSGroundController {
                 return
             }
             
-            responder.parryAttack { parry, pokers, pokerWay, callback in
+            responder.replyAction { parry, pokers, pokerWay, callback in
                 if parry == .recover {
-                    MXSLog(responder.name, "hp +")
+                    MXSLog("hp +", responder.name)
                     let _ = responder.HPIncrease()
                     callback()
                     return
@@ -201,7 +202,7 @@ class MXSPVESoloController: MXSGroundController {
             } next: { [self] in
                 MXSLog("step done")
                 MXSJudge.cmd.currentResponderDone()
-                checkResponderWaitReplyOrReactive()
+                waitReplyOrReactive()
             }
             
         }
@@ -236,7 +237,7 @@ class MXSPVESoloController: MXSGroundController {
                     }
                 }
             }, next: { [self] in
-                checkResponderWaitReplyOrReactive()
+                waitReplyOrReactive()
                 
             }) == false {
                 MXSLog(leader.name, "AI can't attack -")
@@ -252,7 +253,7 @@ class MXSPVESoloController: MXSGroundController {
                     }
                 }
             }//if
-        }//after
+        } //after
     }
     
     //MARK: -- defensive
@@ -265,14 +266,14 @@ class MXSPVESoloController: MXSGroundController {
                 graspPokerView.losePokerView(pokers) {
                     self.passedView.depositPoker(pokers, fromHero: responder!) {
                         MXSJudge.cmd.currentResponderDone()
-                        self.checkResponderWaitReplyOrReactive()
+                        self.waitReplyOrReactive()
                     }
                 }
             }
             else if pokerWay == .awayfrom {// = active give + responder gain
-                self.pokerHandover(pokers: pokers, from: responder!, to: target!) {
+                self.pokerHandover(pokers: pokers, from: responder!, to: target.first!) {
                     MXSJudge.cmd.currentResponderDone()
-                    self.checkResponderWaitReplyOrReactive()
+                    self.waitReplyOrReactive()
                 }
             }
         })
@@ -328,7 +329,7 @@ class MXSPVESoloController: MXSGroundController {
         }, next: { [self] in
             MXSLog("=== step done ===")
             MXSJudge.cmd.currentResponderDone()
-            checkResponderWaitReplyOrReactive()
+            waitReplyOrReactive()
         })
     }
     

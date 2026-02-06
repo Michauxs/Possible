@@ -56,7 +56,7 @@ class MXSSkill {
     func disguisePoker(_ poker:MXSPoker) -> Bool {
         if self.power == .redToAttack {
             if poker.color == PokerColor.heart || poker.color == PokerColor.diamond {
-                poker.actionGuise = .attack
+                poker.funcGuise = .attack
                 return true
             }
         }

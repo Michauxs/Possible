@@ -15,11 +15,11 @@ class MXSPoker : NSObject {
     var number: Int = 0
     var color: PokerColor = .unknown
     var colorGuise: PokerColor = .unknown
-    var actionFate: PokerAction = .unknown
-    var actionGuise: PokerAction = .unknown {
+    var funcFate: PokerFunc = .unknown
+    var funcGuise: PokerFunc = .unknown {
         didSet {
-            self.concreteView?.actionGuiseLabel.isHidden = actionFate == actionGuise
-            self.concreteView?.actionGuise = actionGuise
+            self.concreteView?.funcGuiseNameLabel.isHidden = funcFate == funcGuise
+            self.concreteView?.actionGuise = funcGuise
         }
     }
     
@@ -35,9 +35,9 @@ class MXSPoker : NSObject {
         let c = attri[2] as! PokerColor
         color = c
         colorGuise = c
-        let a = attri[3] as! PokerAction
-        actionFate = a
-        actionGuise = a
+        let a = attri[3] as! PokerFunc
+        funcFate = a
+        funcGuise = a
         uid = c.rawValue * 100 + n as Int
     }
     
@@ -47,7 +47,7 @@ class MXSPoker : NSObject {
             
             concreteView?.numb = number
             concreteView?.color = color
-            concreteView?.action = actionFate
+            concreteView?.action = funcFate
         }
     }
     var isPicked: Bool = false {
@@ -63,13 +63,13 @@ class MXSPokerCmd {
     var pokers: Array<MXSPoker> = Array<MXSPoker>()
     var pokers_ready: Array<MXSPoker> = Array<MXSPoker>()
     
-    var priority: Array<PokerAction> = [.steal, .destroy, .warFire, .arrowes, .duel, .attack]
+    var priority: Array<PokerFunc> = [.steal, .destroy, .warFire, .arrowes, .duel, .attack]
     
     
     static let shared : MXSPokerCmd = {
         let single = MXSPokerCmd.init()
         let color:Array<PokerColor> = [.heart, .spade, .club, .diamond]
-        let action:Array<PokerAction> = [.duel, .remedy, .attack, .attack, .attack, .dodge, .dodge, .dodge, .steal, .steal, .destroy, .remedy, .detect,
+        let action:Array<PokerFunc> = [.duel, .remedy, .attack, .attack, .attack, .dodge, .dodge, .dodge, .steal, .steal, .destroy, .remedy, .detect,
                                          .duel, .warFire, .warFire, .arrowes, .arrowes, .attack, .attack, .dodge, .steal, .steal, .destroy, .remedy, .detect]
         
         for index in 0..<13*2 {

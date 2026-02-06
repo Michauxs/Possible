@@ -8,7 +8,7 @@
 
 import UIKit
 
-class MXSPVPCustomerController: MXSPVPController {
+class MXSPVPClientController: MXSPVPController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
