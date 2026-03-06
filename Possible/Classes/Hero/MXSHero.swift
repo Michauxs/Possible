@@ -94,6 +94,36 @@ class MXSHero {
         }
     }
     
+    // MARK: - Life Recyc
+    // re/Active多数设置重合
+    func active() {
+        MXSLog(self.name, "hero become leader:")
+        self.reActive()
+    }
+    
+    func reActive() {
+        MXSLog(self.name, "hero re_active:")
+        self.signStatus = .active
+        readyAllSkill()
+        holdAction = MXSOneAction(axle: self, fensive: .offensive)
+        lastActiveAction = holdAction
+        MXSJudge.cmd.diary.append(self.holdAction!)
+    }
+    
+    func endRound() {
+        stopAllSkill(.enable)
+        signStatus = .blank
+        lastActiveAction = nil
+        attackCount = 0
+        
+        self.holdAction!.categy = .endLead //note end lead
+    }
+    
+    func asRecver() {
+        self.signStatus = .focus
+        self.holdAction = MXSOneAction(axle: self, fensive: .defensive)
+        MXSJudge.cmd.diary.append(self.holdAction!)
+    }
     
     // MARK: - View
     init(_ attr:[String:Any]) { /**name photo hp skills desc*/
@@ -168,7 +198,6 @@ class MXSHero {
         if picked.count > 0 {
             let pok = picked.first!
             holdAction?.aFunc = pok.funcGuise
-            holdAction?.aimType = .oneself
         }
         else {
             holdAction?.reset()
@@ -228,10 +257,10 @@ class MXSHero {
             
             //note onestep active action
             lastActiveAction = holdAction
-            
+            //
             if holdAction!.aim.count > 0 {
                 if act == .give {
-                    reBlock(MXSJudge.cmd.responder, .awayfrom, pokers)
+                    reBlock([], .awayfrom, pokers)
                     return
                 }
                 else { //.duel .steal .destroy  .attack
@@ -242,7 +271,7 @@ class MXSHero {
             }
             
             //默认passed，其他way，要提前return
-            reBlock(MXSJudge.cmd.responder, .passed, pokers)
+            reBlock([], .passed, pokers)
         }
         
         /*------------------------------*/
@@ -255,13 +284,6 @@ class MXSHero {
         return ownPokers.remove(at: index)
     }
     
-    func endActiveByClearStatus () {
-        stopAllSkill(.enable)
-        signStatus = .blank
-        lastActiveAction = nil
-        attackCount = 0
-    }
-    
     // MARK: - hero action
     weak var aim:MXSHero?
     weak var aimedBySomeone:MXSHero?
@@ -272,23 +294,22 @@ class MXSHero {
     
     //(_ parry:ParryResultType, _ pokers:[MXSPoker]?, _ pokerWay:LosePokerWay?)
     public func replyAction(replyResult: ReplyResultCallback, next: @escaping CallbackBlock) {
-        let leader = MXSJudge.cmd.leader!
-        let pokers: [MXSPoker] = leader.holdAction!.pokers
+        let currentNote = MXSJudge.cmd.replyStack.last!
+        let leader = currentNote.from
         
-        let action_leader = leader.holdAction!.aFunc
-        let action_reply: PokerFunc = leader.holdAction!.reply.act
-        
-        MXSJudge.cmd.diary.append(self.holdAction!)
+        let pokers: [MXSPoker] = currentNote.action!.pokers
+        let func_active = currentNote.action!.aFunc
+        let func_reply: PokerFunc = currentNote.action!.reply.aFunc
         
         /**在调用方法中callback**/
         func callback() {
             next()
         }
         
-        if action_reply == .recover {
+        if func_reply == .recover {
             replyResult(.recover, nil, nil, callback)
         }
-        else if action_reply == .gain {
+        else if func_reply == .gain {
             replyResult(.receive, pokers, .comefrom, callback)
         }
         else {
@@ -297,27 +318,29 @@ class MXSHero {
                 replyResult(.operate, nil, nil, callback)
             }
             else {
-                if let index = self.ownPokers.firstIndex(where: { poker in poker.funcGuise == action_reply }) {
+                if let index = self.ownPokers.firstIndex(where: { poker in poker.funcGuise == func_reply }) {
                     let contain = self.ownPokers[index]
                     replyResult(.answered, [contain], .passed, callback)
                     
                     if leader.holdAction?.aimType == .aoe { MXSLog(self.name + "responder -->  reply group") }
                 }
                 else {
-                    if action_leader == .steal {
+                    if func_active == .steal {
                         let random = self.rollRandomPoker()
                         MXSLog(random, "The poker will awayfrom ")
                         replyResult(.beStolen, [random], .awayfrom, callback)
                     }
-                    else if action_leader == .destroy {
+                    else if func_active == .destroy {
                         let random = self.rollRandomPoker()
                         replyResult(.beDestroyed, [random], .passed, callback)
                     }
-                    else if action_leader == .attack || action_leader == .duel || action_leader == .arrowes || action_leader == .warFire {
+                    else if func_active == .attack || func_active == .duel || func_active == .arrowes || func_active == .warFire {
                         replyResult(.injured, nil, nil, callback)
                     }
                     
-                    if leader.holdAction?.aimType == .aoe { MXSLog(self.name + " responder --> can't reply group") }
+                    if leader.holdAction?.aimType == .aoe {
+                        MXSLog(self.name + " responder --> can't reply group")
+                    }
                 }
             }
             
@@ -326,7 +349,7 @@ class MXSHero {
     
     func sufferConsequence(reBlock:ReplyResultCallback, next: @escaping CallbackBlock) {
         //let conseq = leader?.holdAction?.consequence
-        let hero:MXSHero = MXSJudge.cmd.responder.first!
+        let hero:MXSHero = MXSJudge.cmd.currentRecver
         
         /**在调用方法中callback**/
         func callback() {
@@ -363,6 +386,11 @@ class MXSHero {
     }
     
     //MARK: - skill
+    func readyAllSkill() {
+        for skill in skillSet {
+            skill.state = .unable
+        }
+    }
     func stopAllSkill(_ state:SkillState) {
         for skill in skillSet.filter({$0.state == state}) {
             skill.state = .unable

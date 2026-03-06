@@ -306,7 +306,10 @@ class MXSMinerController: MXSViewController {
     }
     
     @objc func didSignBtnClick() {
+        MXSLog("didSignBtnClick")
         guard mineHolder != nil else { return }
+        
+        if mineHolder?.state == .check { return }
         
         if mineHolder?.state == .mark { //undo
             mineHolder?.setupState(.unknown)

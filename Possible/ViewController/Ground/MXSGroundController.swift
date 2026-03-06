@@ -209,29 +209,29 @@ class MXSGroundController: MXSViewController {
         
     }
         
-    public func offensiveEndActive() {
+    public func offensiveEndRound() {
         leadingView.hide()
         
         passedView.fadeout()
-        offensiveEndActiveSubject()
+        offensiveEndRoundImp()
     }
-    func offensiveEndActiveSubject() { //sub object
+    func offensiveEndRoundImp() { //sub object
         
     }
     
     public func defensiveCertain() {
         leadingView.hide()
-        defensiveCertainSubject()
+        defensiveCertainImp()
     }
-    func defensiveCertainSubject() { //sub object
+    func defensiveCertainImp() { //sub object
         
     }
         
     public func defensiveCancel() {
         leadingView.hide()
-        defensiveCancelSubject()
+        defensiveCancelImp()
     }
-    func defensiveCancelSubject() { //sub object
+    func defensiveCancelImp() { //sub object
         
     }
         
@@ -291,7 +291,7 @@ class MXSGroundController: MXSViewController {
     
     //MARK: - check every one step action
     func checkCanCertainAction() {
-        if player.signStatus == .selected {
+        if player.signStatus == .focus {
             if MXSJudge.cmd.canDefence() {
                 leadingView.state = .defenseReadyOn
             }

@@ -129,7 +129,8 @@ class MXSPVESoloController: MXSGroundController {
             guard let responder = MXSJudge.cmd.findResponder() else {
                 MXSLog("not find responder, leaderReactive")
                 MXSJudge.cmd.leaderReactive()
-                
+                //AI主动 -waiting -player被动
+                //who is wiater?
                 if MXSJudge.cmd.leader!.isPlayer {
                     leadingView.state = .attackUnPick
                 }
@@ -166,7 +167,7 @@ class MXSPVESoloController: MXSGroundController {
                 }
                 else if parry == .operate {
                     leadingView.state = .defenseUnPick
-                    MXSLog("player operate")
+                    MXSLog("player operate... ")
                     return
                 }
                 MXSLog(responder.name + " parryResult'block not return")
@@ -210,7 +211,7 @@ class MXSPVESoloController: MXSGroundController {
     }
     
     
-    override func offensiveEndActiveSubject() {
+    override func offensiveEndRoundImp() {
         MXSJudge.cmd.turnLeaderAndDealcard { leader, pokers in
             leader.holdHisPokersView(pokers!) {
                 if leader.isPlayer { //no any possible
@@ -226,7 +227,7 @@ class MXSPVESoloController: MXSGroundController {
     func turnToAIAttack() {
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(750)) { [self] in
             let leader = MXSJudge.cmd.leader!
-            if leader.canAttack(attackResult: { target, action, pokers, pokerWay, callback in
+            let can = leader.canAttack(attackResult: { target, action, pokers, pokerWay, callback in
                 if pokerWay == .passed {
                     passedView.depositPoker(pokers!, fromHero: leader) {
                         callback()
@@ -238,9 +239,12 @@ class MXSPVESoloController: MXSGroundController {
                     }
                 }
             }, next: { [self] in
+                //动画结束后调用逃逸闭包 callback触发next
                 waitingForReply()
+            })
                 
-            }) == false {
+            if can == false {
+                //if
                 MXSLog(leader.name, "AI can't attack -")
                 passedView.fadeout()
                 MXSJudge.cmd.turnLeaderAndDealcard { leader, pokers in
@@ -258,21 +262,20 @@ class MXSPVESoloController: MXSGroundController {
     }
     
     //MARK: -- defensive
-    override func defensiveCertainSubject() {
-            
-        let responder = MXSJudge.cmd.responder.first
-        responder?.discardPoker(reBlock: { target, pokerWay, pokers in
+    override func defensiveCertainImp() {
+        let responder = MXSJudge.cmd.currentRecver
+        responder.discardPoker(reBlock: { target, pokerWay, pokers in
             if pokerWay == .passed {
                 MXSLog(pokers, "player discard poker")
                 graspPokerView.losePokerView(pokers) {
-                    self.passedView.depositPoker(pokers, fromHero: responder!) {
+                    self.passedView.depositPoker(pokers, fromHero: responder) {
                         MXSJudge.cmd.currentResponderDone()
                         self.waitingForReply()
                     }
                 }
             }
             else if pokerWay == .awayfrom {// = active give + responder gain
-                self.pokerHandover(pokers: pokers, from: responder!, to: target.first!) {
+                self.pokerHandover(pokers: pokers, from: responder, to: target.first!) {
                     MXSJudge.cmd.currentResponderDone()
                     self.waitingForReply()
                 }
@@ -280,8 +283,8 @@ class MXSPVESoloController: MXSGroundController {
         })
     }
     
-    override func defensiveCancelSubject() {
-        let responder = MXSJudge.cmd.responder.first!
+    override func defensiveCancelImp() {
+        let responder = MXSJudge.cmd.currentRecver
         responder.sufferConsequence(reBlock: { parry, pokers, pokerWay, callback in
             if parry == .beDestroyed {
                 responder.losePokers(pokers!)
@@ -292,7 +295,7 @@ class MXSPVESoloController: MXSGroundController {
             }
             else if parry == .injured {
                 responder.HPDecrease()
-                MXSLog(responder.name, "HP mins")
+                MXSLog(responder.name, "HP mins: ")
                 if responder.HPCurrent <= 0 {
                     MXSLog("player faied")
                     return

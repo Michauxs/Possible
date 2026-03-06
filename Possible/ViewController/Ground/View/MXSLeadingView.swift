@@ -106,7 +106,7 @@ class MXSLeadingView: MXSBaseView {
     @objc func didCancelBtnClick (btn:UIButton) {
         if self.state == .attackUnPick {
             MXSLog("====== end Active ======", "LeadingView")
-            self.controller?.offensiveEndActive()
+            self.controller?.offensiveEndRound()
         }
         else if self.state == .attackPicked || self.state == .attackReadyOn {
             MXSLog("====== cancel Pickes ======", "LeadingView")

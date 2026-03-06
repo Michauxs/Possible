@@ -17,9 +17,9 @@ typealias ReplyResultCallback = (_ parry:ParryResultType, _ pokers:[MXSPoker]?, 
 typealias HeroParryResult = (_ parry:ParryResultType, _ pokers:[MXSPoker]?, _ pokerWay:PokerViewWay?) -> Void
 
 
-func MXSLog(_ args:Any, _ sign:String = "MXSSwift") {
+func MXSLog(_ args:Any, _ sign:String = "") {
     #if DEBUG
-        print(Date.init(), sign, ":", args)
+        print(Date.init(), "MXSSwift :", sign, args)
 //    withUnsafePointer(to: args) { ptr in
 //        print(Date.init(), sign, ":", args, "  =>P:\(ptr)")
 //        print(Date.init(), sign, ":", args, "  =>P:\(ptr.pointee)")
@@ -75,7 +75,7 @@ enum HeroSignStatus {
     case blank
     case active
     case selected
-    case focus
+    case focus //聚焦
 }
 
 //招架+战利类型+

@@ -98,7 +98,7 @@ class MXSPVPController: MXSGroundController {
         
     }
     
-    public override func offensiveEndActive() {
+    public override func offensiveEndRound() {
         leadingView.hide()
         leadingView.state = .defenseUnPick
         passedView.fadeout()

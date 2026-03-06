@@ -176,9 +176,9 @@ class MXSPickHeroView: MXSBaseView {
         let hero = heroData![view.tag]
         hero.seq = pickedCount
         
-        if pickedCount == 1 {
-            self.belong?.pickedHero(hero, chairNumb: pickedCount)
+        self.belong?.pickedHero(hero, chairNumb: pickedCount)
             
+        if pickedCount == 1 {
             if pickType == .PVP {
                 autoHiddenSelfAfter(500)
                 return
@@ -188,8 +188,6 @@ class MXSPickHeroView: MXSBaseView {
             }
         }
         else {
-            self.belong?.pickedHero(hero, chairNumb: pickedCount)
-            
             if pickedCount == expectCount {
                 autoHiddenSelfAfter(500)
                 tipsLabel.text = "即将开始。"

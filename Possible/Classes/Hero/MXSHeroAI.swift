@@ -70,8 +70,9 @@ extension MXSHero {
     
     
     //MARK: - AI leader
-    typealias AttackResultCallback = (_ target: MXSHero?, _ action: PokerFunc, _ pokers: [MXSPoker]?, _ pokerWay: PokerViewWay?, _ callback: @escaping CallbackBlock) -> Void
-    public func canAttack(attackResult: AttackResultCallback, next:@escaping CallbackBlock) -> Bool {
+    typealias AttackResultBlock = (_ target: MXSHero?, _ action: PokerFunc, _ pokers: [MXSPoker]?, _ pokerWay: PokerViewWay?, _ callback: @escaping CallbackBlock) -> Void
+    
+    public func canAttack(attackResult: AttackResultBlock, next:@escaping CallbackBlock) -> Bool {
         if self.ownPokers.count == 0 {
             return false
         }
@@ -94,6 +95,7 @@ extension MXSHero {
         if target == nil {
             return false
         }
+        self.holdAction?.aimAppend(target!)
         
         var action_note: PokerFunc?
         var pokers = [MXSPoker]()
@@ -101,6 +103,11 @@ extension MXSHero {
         
         //[.steal, .destroy, .warFire, .arrowes, .duel, .attack]
         for action in MXSPokerCmd.shared.priority {
+            if pokers.count > 0 {
+                MXSLog(pokers, "find pokers:")
+                break
+            }
+            
             if let index = self.ownPokers.firstIndex(where: { (item) -> Bool in item.funcGuise == action }) {
                 let poker = self.ownPokers[index]
                 action_note = action
@@ -134,10 +141,10 @@ extension MXSHero {
         }//for
         
         if pokers.count > 0 {
+            self.pickPokers(pokers)
             
             MXSJudge.cmd.correctHoldAction(action: self.holdAction!)
                 
-            self.pickPokers(pokers)
             self.losePokers(self.picked)
             
             attackResult(target, action_note!, pokers, pokWay!, callback)

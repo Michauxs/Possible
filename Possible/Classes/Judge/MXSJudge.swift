@@ -7,14 +7,28 @@
 //
 
 import UIKit
+import Foundation
+
+class HeroDoneNote {
+    var from:MXSHero = MXSHeroCmd.shared.getNewBlankHero()
+    var recver:MXSHero = MXSHeroCmd.shared.getNewBlankHero()
+    weak var action:MXSOneAction?
+    
+    init() {
+        
+    }
+    init(from: MXSHero, recver: MXSHero, action: MXSOneAction) {
+        self.from = from
+        self.recver = recver
+        self.action = action
+    }
+}
 
 class MXSJudge {
-    /**
-     * |      --------cycle------>       |
-     * |
-     * | leader <- _active -> _responder |
-     * |
-     * |      <-------cycle-------       |
+    /**  ==> leader ==>
+     * | -------------> |
+     * |    压栈/出栈    |
+     * |<-------------- |
      */
     
     static let cmd : MXSJudge = {
@@ -44,9 +58,9 @@ class MXSJudge {
             hero.getPokers(pokers)
             pokers_array.append(pokers)
         }
-        
         ready(subject, pokers_array)
     }
+        
     func gameOver() {
         leader = nil
         flowNote = -1
@@ -58,10 +72,8 @@ class MXSJudge {
     func turnLeaderAndDealcard(reBlock:(_ leader: MXSHero, _ pokers: [MXSPoker]?) -> Void) {
         
         if leader != nil {
-            leader!.endActiveByClearStatus()
+            leader!.endRound()
             
-            leader!.holdAction!.categy = .endLead //note end lead
-            diary.append(leader!.holdAction!)
         }
         
         self.flowNote += 1
@@ -70,7 +82,7 @@ class MXSJudge {
         let hero = subject[flowNote]
         
         self.leader = hero
-        self.leaderReactive()
+        self.leader?.active()
         
         let pokers = MXSPokerCmd.shared.push(leader!.collectNumb)
         leader!.getPokers(pokers)
@@ -78,6 +90,7 @@ class MXSJudge {
         reBlock(leader!, pokers)
     }
     
+    // TODO: leader被回转指定 1.待响应栈有/无
     func playerCanAttack() -> Bool {
         guard leader != nil else {
             return false
@@ -93,21 +106,22 @@ class MXSJudge {
         
         if (action == .warFire || action == .arrowes) { return true }
         
-        if responder.count == 0 { //no aim
+        if leader?.holdAction?.aim.count == 0 { //no aim
             if action == .remedy && leader!.HPCurrent < leader!.HPSum { return true }
             
         }
         else {
+            let aim_first = leader?.holdAction?.aim.first
             if action == .attack {
                 return leader!.attackCount < leader!.attackLimit
             }
             if action == .duel {
                 return true
             }
-            if (action == .steal || action == .destroy) && responder.first!.ownPokers.count > 0 {
+            if (action == .steal || action == .destroy) && aim_first!.ownPokers.count > 0 {
                 return true
             }
-            if action == .remedy && responder.first!.HPCurrent < responder.first!.HPSum  {
+            if action == .remedy && aim_first!.HPCurrent < aim_first!.HPSum  {
                 return true
             }
         }
@@ -123,83 +137,67 @@ class MXSJudge {
     }
         
     func leaderReactive() {
-        leader!.signStatus = .active
-        leader!.holdAction = MXSOneAction(axle: leader!, fensive: .offensive)
+        leader!.reActive()
     }
     
     
     //MARK: - responder
-    var reqHeroStack:[MXSHero] = []
-    
     func currentResponderDone() {
-        guard let hero = reqHeroStack.popLast() else { return }
-        hero.signStatus = .blank
+        guard let act = replyStack.popLast() else { return }
+        act.recver.signStatus = .blank
         
         MXSLog("one opponter done -> goon")
     }
     
-    var responder:[MXSHero] {
-        get {
-            let undone = leader?.holdAction?.aim.filter({$0.done == false})
-            var tmp = [MXSHero]()
-            for undo in undone! {
-                tmp.append(undo.hero!)
-            }
-            MXSLog(tmp, "JudgeCmd.get responder: ")
-            return tmp
-        }
-    }
     
     var leader:MXSHero?
-    var activer:MXSHero?
-    var replyer:MXSHero?
-    /*------------ 触动链 ---------------*/
     
     func findResponder() -> MXSHero? {
         var hero:MXSHero?
-        if MXSJudge.cmd.responder.count > 0 {
-            hero = MXSJudge.cmd.responder.first!
-            hero!.holdAction = MXSOneAction(axle: hero!, fensive: .defensive)
+        if MXSJudge.cmd.replyStack.count > 0 {
+            let act = MXSJudge.cmd.replyStack.last!
+            hero = act.recver
+            hero?.asRecver()
         }
         return hero
     }
     
     func aimHavingPoker() -> Bool {
-        let hero = responder.first!
-        return hero.ownPokers.count > 0
+        return self.currentRecver.ownPokers.count > 0
     }
-    
-    //MARK: - group = taketurns
-//    func findOneByOneResponder() -> MXSHero? {
-//        return responder.first
-//    }
-//    func takeTurnsReply() {
-//        if let someone = findOneByOneResponder() {
-//
-//        }
-//    }
     
     
     func responderGainPoker(_ pokers:[MXSPoker]) -> Void {
-        let responder_one = responder.first!
+        let responder_one = self.currentRecver
         responder_one.getPokers(pokers)
         responder_one.holdHisPokersView(pokers) {
             
         }
     }
     
+    var replyStack:[HeroDoneNote] = [HeroDoneNote]()
+    var currentRecver:MXSHero {
+        get {
+            replyStack.last?.recver ?? MXSHeroCmd.shared.getNewBlankHero()
+        }
+    }
+    var currentActiver:MXSHero {
+        get {
+            replyStack.last?.from ?? MXSHeroCmd.shared.getNewBlankHero()
+        }
+    }
     //MARK: - 检查/修正一些 操作上不需要，规则上需要自动添加的信息
+    //ps:仅主动操作时使用
+    //TODO: - 被动
     func correctHoldAction(action:MXSOneAction) {
         /**需要补充的**/
         if action.aimType == .aoe || action.aimType == .all {
-            
             action.aimClear()
-            
+            //清除重新按序号加入全体（是否包含leader）
             var byone = action.aimType == .all ? 0 : 1
             while byone < subject.count {
                 let next_index = (flowNote + byone)%subject.count
                 let hero = subject[next_index]
-                
                 action.aimAppend(hero)
                 
                 byone+=1
@@ -213,20 +211,18 @@ class MXSJudge {
             action.aimAppend(leader!)
         }
         
-        self.diary.append(action)
-        
         //压栈
-        var tmp = [MXSHero]()
+        var tmp = [HeroDoneNote]()
         for item in action.aim {
-            tmp.append(item.hero!)
+            tmp.append(HeroDoneNote(from: action.belong!, recver: item, action: action))
         }
-        reqHeroStack.append(contentsOf: tmp.reversed())
+        replyStack.append(contentsOf: tmp.reversed())
     }
     
     //MARK: - judge
     func canDefence() -> Bool {
-        let action_reply: PokerFunc = self.leader!.holdAction!.reply.act
-        let responder_one = responder.first!
+        let action_reply: PokerFunc = self.currentActiver.holdAction!.reply.aFunc
+        let responder_one = self.currentRecver
         MXSLog(action_reply, "attack's reply action")
         MXSLog(responder_one.holdAction?.aFunc as Any, "defence action")
         return responder_one.holdAction?.aFunc == action_reply
