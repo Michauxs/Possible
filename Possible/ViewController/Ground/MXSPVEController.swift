@@ -8,7 +8,7 @@
 
 import UIKit
 
-class MXSPVESoloController: MXSGroundController {
+class MXSPVEController: MXSGroundController {
 
     override func initionalSubViewes() {
         super.initionalSubViewes()
@@ -51,14 +51,7 @@ class MXSPVESoloController: MXSGroundController {
     }
     
     override func pickedHero(_ hero: MXSHero, chairNumb: Int = 0) {
-        if chairNumb > self.heroConcreteView.count {
-            return
-        }
-        
-        hero.joingame()
-        
-        let concreteView = self.heroConcreteView[chairNumb-1]
-        hero.concreteView = concreteView
+        super.pickedHero(hero, chairNumb: chairNumb)
         
         if chairNumb == 1 {
             player = hero
@@ -184,7 +177,7 @@ class MXSPVESoloController: MXSGroundController {
                     }
                 }
                 else if pokerWay == .comefrom {
-                    self.pokerHandover(pokers: pokers!, from: MXSJudge.cmd.leader!, to: responder) {
+                    self.pokerHandover(pokers: pokers!, from: MXSJudge.cmd.leader!, to: [responder]) {
                         MXSLog("poker handvoer:come finished")
                         responder.holdHisPokersView(pokers!) {
                             callback()
@@ -192,9 +185,12 @@ class MXSPVESoloController: MXSGroundController {
                     }
                 }
                 else if pokerWay == .awayfrom {
-                    self.pokerHandover(pokers: pokers!, from: responder, to: MXSJudge.cmd.leader!) {
+                    let activer = MXSJudge.cmd.currentActiver
+                    self.pokerHandover(pokers: pokers!, from: responder, to: [activer]) {
                         MXSLog("poker handvoer:away finished")
-                        callback()
+                        activer.holdHisPokersView(pokers!) {
+                            callback()
+                        }
                     }
                 }
                 else {
@@ -234,7 +230,7 @@ class MXSPVESoloController: MXSGroundController {
                     }
                 }
                 else if pokerWay == .awayfrom {
-                    self.pokerHandover(pokers: pokers!, from: leader, to: target!) {
+                    self.pokerHandover(pokers: pokers!, from: leader, to: [target!]) {
                         callback()
                     }
                 }
@@ -263,19 +259,23 @@ class MXSPVESoloController: MXSGroundController {
     
     //MARK: -- defensive
     override func defensiveCertainImp() {
-        let responder = MXSJudge.cmd.currentRecver
-        responder.discardPoker(reBlock: { target, pokerWay, pokers in
+        
+        player.discardPoker(reBlock: { target, pokerWay, pokers in
+            for hero in target {
+                oneAimAnother(from: player, to: hero)
+            }
+            
             if pokerWay == .passed {
                 MXSLog(pokers, "player discard poker")
                 graspPokerView.losePokerView(pokers) {
-                    self.passedView.depositPoker(pokers, fromHero: responder) {
+                    self.passedView.depositPoker(pokers, fromHero: self.player) {
                         MXSJudge.cmd.currentResponderDone()
                         self.waitingForReply()
                     }
                 }
             }
             else if pokerWay == .awayfrom {// = active give + responder gain
-                self.pokerHandover(pokers: pokers, from: responder, to: target.first!) {
+                self.pokerHandover(pokers: pokers, from: player, to: target) {
                     MXSJudge.cmd.currentResponderDone()
                     self.waitingForReply()
                 }
@@ -284,7 +284,7 @@ class MXSPVESoloController: MXSGroundController {
     }
     
     override func defensiveCancelImp() {
-        let responder = MXSJudge.cmd.currentRecver
+        let responder = MXSJudge.cmd.currentRecver!
         responder.sufferConsequence(reBlock: { parry, pokers, pokerWay, callback in
             if parry == .beDestroyed {
                 responder.losePokers(pokers!)
@@ -314,14 +314,11 @@ class MXSPVESoloController: MXSGroundController {
                     callback()
                 }
             }
-            else if pokerWay == .handle {
-                MXSLog("poker handvoer finished: handle...")
-                responder.holdHisPokersView(pokers!) {
-                    callback()
-                }
-            }
             else if pokerWay == .awayfrom {
-                self.pokerHandover(pokers: pokers!, from: responder, to: MXSJudge.cmd.leader!) {
+                responder.arrangeGrasp {
+                    
+                }
+                self.pokerHandover(pokers: pokers!, from: responder, to: [MXSJudge.cmd.leader!]) {
                     MXSLog("poker handvoer: away finished")
                     callback()
                 }
@@ -331,7 +328,7 @@ class MXSPVESoloController: MXSGroundController {
             }
             
         }, next: { [self] in
-            MXSLog("=== step done ===")
+            MXSLog("======================== Leader Done ========================")
             MXSJudge.cmd.currentResponderDone()
             waitingForReply()
         })

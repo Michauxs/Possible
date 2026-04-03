@@ -14,15 +14,9 @@ class MXSPokerView: MXSBaseView {
             reverseView.isHidden = true
         }
     }
-    let actionTextTranslater: [PokerFunc:String] = [.attack:"攻",
-                                                      .dodge:"闪",
-                                                      .steal:"偷窃",
-                                                      .destroy:"破坏",
-                                                      .warFire:"战火",
-                                                      .arrowes:"箭雨",
-                                                      .duel:"暗器",
-                                                      .remedy:"恢复",
-                                                      .detect:"侦察"]
+    let actionTextTranslater: [PokerFunc:String] = [.attack:"攻", .dodge:"闪", .steal:"偷窃", .destroy:"破坏",
+                                                    .warFire:"战火", .arrowes:"箭雨", .duel:"暗器", .detect:"侦察",
+                                                    .remedy:"恢复", .JieDao:"借刀"]
     
     var reverseView: UIImageView = UIImageView()
     var reverse: Bool = false {

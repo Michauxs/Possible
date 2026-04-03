@@ -166,7 +166,7 @@ class MXSLobbyController: MXSViewController, NetServiceBrowserDelegate {
     
     //MARK: - actions
     @objc func didPVEBtnClick() {
-        let vc = MXSPVESoloController()
+        let vc = MXSPVEController()
         self.navigationController?.pushViewController(vc, animated: false)
     }
     @objc func assemBtnClick() {

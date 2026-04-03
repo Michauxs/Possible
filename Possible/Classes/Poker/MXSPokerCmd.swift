@@ -69,13 +69,15 @@ class MXSPokerCmd {
     static let shared : MXSPokerCmd = {
         let single = MXSPokerCmd.init()
         let color:Array<PokerColor> = [.heart, .spade, .club, .diamond]
-        let action:Array<PokerFunc> = [.duel, .remedy, .attack, .attack, .attack, .dodge, .dodge, .dodge, .steal, .steal, .destroy, .remedy, .detect,
-                                         .duel, .warFire, .warFire, .arrowes, .arrowes, .attack, .attack, .dodge, .steal, .steal, .destroy, .remedy, .detect]
+//        let action:Array<PokerFunc> = [.duel, .remedy, .attack, .attack, .attack, .dodge, .dodge, .dodge, .steal, .JieDao, .destroy, .remedy, .detect,
+//                                       .duel, .warFire, .warFire, .arrowes, .arrowes, .attack, .attack, .dodge, .steal, .JieDao, .destroy, .remedy, .detect]
+        let action:Array<PokerFunc> = [.steal, .steal, .steal, .steal, .attack, .dodge, .dodge, .dodge, .steal, .steal, .destroy, .steal, .steal,
+                                       .steal, .steal, .steal, .steal, .arrowes, .attack, .steal, .dodge, .steal, .steal, .destroy, .steal, .steal]
         
         for index in 0..<13*2 {
-            let index_trans = index%13
+            let poker_numb = (index%13) + 1
             for type in color {
-                let pok = MXSPoker.init([PokerState.pass, index_trans+1, type, action[index]])
+                let pok = MXSPoker.init([PokerState.pass, poker_numb, type, action[index]])
                 single.pokers.append(pok)
             }
         }

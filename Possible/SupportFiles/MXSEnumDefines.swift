@@ -19,7 +19,7 @@ typealias HeroParryResult = (_ parry:ParryResultType, _ pokers:[MXSPoker]?, _ po
 
 func MXSLog(_ args:Any, _ sign:String = "") {
     #if DEBUG
-        print(Date.init(), "MXSSwift :", sign, args)
+        print(Date.init(), "MXSSwift :", args, sign)
 //    withUnsafePointer(to: args) { ptr in
 //        print(Date.init(), sign, ":", args, "  =>P:\(ptr)")
 //        print(Date.init(), sign, ":", args, "  =>P:\(ptr.pointee)")
@@ -122,10 +122,9 @@ enum PokerFunc : Int {
     case steal
     case destroy
     case detect
-    case remedy//active
-    case recover//pissive
-    case give
-    case gain
+    case remedy
+    case JieDao
+    case give//PokerFunc里没有这个枚举，actionFunc和pokerFunc高度重合，为了方便不再起一个类型写在一起
 }
 
 enum PokerViewWay : Int {
@@ -135,8 +134,6 @@ enum PokerViewWay : Int {
     case salvage
     case comefrom
     case awayfrom
-    
-    case handle
 }
 enum PokerFromSource : Int {
     case deck = 0
@@ -152,9 +149,9 @@ enum SkillPower : Int {
     case redToAttack = 10
     case attackTwoTwiceMaybe = 11
     case WolfSt = 12
-    case drink
+    case drink = 13
     case allIsMy = 14
-    case attackOrDefense
+    case attackOrDefense = 15
     case control = 16
     case exchange = 17
     case againPrev = 18

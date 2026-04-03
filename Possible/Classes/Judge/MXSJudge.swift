@@ -92,6 +92,12 @@ class MXSJudge {
     
     // TODO: leader被回转指定 1.待响应栈有/无
     func playerCanAttack() -> Bool {
+        let can_a = checkPickedAndAim()
+        
+        return can_a
+    }
+    
+    func checkPickedAndAim() -> Bool {
         guard leader != nil else {
             return false
         }
@@ -101,37 +107,34 @@ class MXSJudge {
             return false
         }
         
-        let action:PokerFunc = leader!.holdAction!.aFunc
-        if action == .unknown { return false }
+        let a_func:PokerFunc = leader!.holdAction!.aFunc
+        if a_func == .unknown { return false }
         
-        if (action == .warFire || action == .arrowes) { return true }
+        if (a_func == .warFire || a_func == .arrowes) { return true }
         
         if leader?.holdAction?.aim.count == 0 { //no aim
-            if action == .remedy && leader!.HPCurrent < leader!.HPSum { return true }
-            
+            if a_func == .remedy && leader!.HPCurrent < leader!.HPSum { return true }
         }
         else {
             let aim_first = leader?.holdAction?.aim.first
-            if action == .attack {
+            if a_func == .attack {
                 return leader!.attackCount < leader!.attackLimit
             }
-            if action == .duel {
+            if a_func == .duel {
                 return true
             }
-            if (action == .steal || action == .destroy) && aim_first!.ownPokers.count > 0 {
+            if (a_func == .steal || a_func == .destroy) && aim_first!.ownPokers.count > 0 {
                 return true
             }
-            if action == .remedy && aim_first!.HPCurrent < aim_first!.HPSum  {
+            if a_func == .remedy && aim_first!.HPCurrent < aim_first!.HPSum  {
                 return true
             }
         }
-        
         return false
     }
     
-    
     func record(pokers:[MXSPoker], toAction holdAction:MXSOneAction) {
-        leader?.holdAction?.pokers.append(contentsOf: leader!.picked)
+        leader?.holdAction?.pokers.append(contentsOf: pokers)
         
         MXSLog(leader?.holdAction?.pokers as Any, "action note pokers")
     }
@@ -149,8 +152,24 @@ class MXSJudge {
         MXSLog("one opponter done -> goon")
     }
     
-    
+    //TODO: leader.alive <-> recver.alive
+    /**leader和activer(recver)**/
     var leader:MXSHero?
+    /**还是以压栈的方式方便控制顺序流程**/
+//    var activer:MXSHero?
+//    var recever:MXSHero?
+    var replyStack:[HeroDoneNote] = [HeroDoneNote]()
+    
+    var currentRecver:MXSHero? {
+        get {
+            replyStack.last?.recver
+        }
+    }
+    var currentActiver:MXSHero {
+        get {
+            replyStack.last?.from ?? leader!
+        }
+    }
     
     func findResponder() -> MXSHero? {
         var hero:MXSHero?
@@ -163,29 +182,19 @@ class MXSJudge {
     }
     
     func aimHavingPoker() -> Bool {
-        return self.currentRecver.ownPokers.count > 0
+        return self.currentRecver!.ownPokers.count > 0
     }
     
     
     func responderGainPoker(_ pokers:[MXSPoker]) -> Void {
-        let responder_one = self.currentRecver
+        guard let responder_one = self.currentRecver else { return }
+        
         responder_one.getPokers(pokers)
         responder_one.holdHisPokersView(pokers) {
             
         }
     }
     
-    var replyStack:[HeroDoneNote] = [HeroDoneNote]()
-    var currentRecver:MXSHero {
-        get {
-            replyStack.last?.recver ?? MXSHeroCmd.shared.getNewBlankHero()
-        }
-    }
-    var currentActiver:MXSHero {
-        get {
-            replyStack.last?.from ?? MXSHeroCmd.shared.getNewBlankHero()
-        }
-    }
     //MARK: - 检查/修正一些 操作上不需要，规则上需要自动添加的信息
     //ps:仅主动操作时使用
     //TODO: - 被动
@@ -222,7 +231,7 @@ class MXSJudge {
     //MARK: - judge
     func canDefence() -> Bool {
         let action_reply: PokerFunc = self.currentActiver.holdAction!.reply.aFunc
-        let responder_one = self.currentRecver
+        let responder_one = self.currentRecver!
         MXSLog(action_reply, "attack's reply action")
         MXSLog(responder_one.holdAction?.aFunc as Any, "defence action")
         return responder_one.holdAction?.aFunc == action_reply

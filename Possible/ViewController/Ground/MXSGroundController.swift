@@ -151,8 +151,64 @@ class MXSGroundController: MXSViewController {
         self.navigationController?.popViewController(animated: true)
     }
     
+    var aimSignDict:[String:CAShapeLayer] = [:]
+    func oneAimAnother(from:MXSHero, to:MXSHero) {
+        let layer = aimSignDict[from.name+to.name]
+        
+        let animation = CABasicAnimation(keyPath: "strokeEnd")
+        animation.duration = 0.35
+        animation.fromValue = 0.0
+        animation.toValue = 1.0
+//        animation.fillMode = CAMediaTimingFillMode.backwards
+        animation.isRemovedOnCompletion = true
+        layer?.add(animation, forKey: nil)
+        
+    }
     //MARK: - Pick hero
     public func pickedHero(_ hero:MXSHero, chairNumb:Int = 0) {
+        
+        if chairNumb > self.heroConcreteView.count {
+            return
+        }
+        
+        let concreteView = self.heroConcreteView[chairNumb-1]
+        hero.concreteView = concreteView
+        
+        let p_self = CGPoint(x: CGRectGetMinX(hero.concreteView!.frame) + CGRectGetWidth(hero.concreteView!.frame)*0.5,
+                             y: CGRectGetMinY(hero.concreteView!.frame) + CGRectGetHeight(hero.concreteView!.frame)*0.5)
+        for obj in MXSJudge.cmd.subject {
+            let p_obj = CGPoint(x: CGRectGetMinX(obj.concreteView!.frame) + CGRectGetWidth(obj.concreteView!.frame)*0.5,
+                                 y: CGRectGetMinY(obj.concreteView!.frame) + CGRectGetHeight(obj.concreteView!.frame)*0.5)
+            
+            let path_to = UIBezierPath.init()
+            path_to.move(to: p_self)
+            path_to.addLine(to: p_obj)
+            let layer_to = CAShapeLayer.init()
+            layer_to.path = path_to.cgPath
+            layer_to.lineWidth = 4.0
+            layer_to.fillColor = UIColor.black.cgColor
+            layer_to.strokeColor = UIColor.red.cgColor
+//            layer_to.lineCap = .round
+            layer_to.strokeEnd = 0.0
+            self.view.layer.addSublayer(layer_to)
+            aimSignDict[hero.name+obj.name] = layer_to
+            
+            let path_come = UIBezierPath.init()
+            path_come.move(to: p_obj)
+            path_come.addLine(to: p_self)
+            let layer_come = CAShapeLayer.init()
+            layer_come.path = path_come.cgPath
+            layer_come.lineWidth = 4.0
+            layer_come.fillColor = UIColor.black.cgColor
+            layer_come.strokeColor = UIColor.red.cgColor
+//            layer_come.lineCap = .round
+            layer_come.strokeEnd = 0.0
+            self.view.layer.addSublayer(layer_come)
+            aimSignDict[obj.name+hero.name] = layer_come
+        }
+        /**1.逐步拉线，分摊性能
+         * 2.先拉线再加入，区分未拉线的点**/
+        hero.joingame()
         
     }
     
@@ -180,16 +236,20 @@ class MXSGroundController: MXSViewController {
     public func offensiveCertain() {
         leadingView.hide()
         
-        MXSJudge.cmd.leader?.discardPoker(reBlock: { target, pokerWay, pokeres in
+        player.discardPoker(reBlock: { target, pokerWay, pokeres in
+            for hero in target {
+                oneAimAnother(from: MXSJudge.cmd.currentActiver, to: hero)
+            }
+            
             if pokerWay == .passed {
                 graspPokerView.losePokerView(pokeres, complete: nil)
-                self.passedView.depositPoker(pokeres, fromHero: MXSJudge.cmd.leader!) {
+                self.passedView.depositPoker(pokeres, fromHero: player) {
                     self.waitingForReply()
                 }
             }
             else if pokerWay == .awayfrom {//= active give + responder gain
                 graspPokerView.losePokerView(pokeres, complete: nil)
-                self.pokerHandover(pokers: pokeres, from: player, to: target.first!) {
+                self.pokerHandover(pokers: pokeres, from: player, to: target) {
                     self.waitingForReply()
                 }
             }
@@ -325,19 +385,35 @@ class MXSGroundController: MXSViewController {
     }
     
     // MARK: - animate
-    func pokerHandover(pokers:[MXSPoker], from: MXSHero, to: MXSHero, completion: @escaping ()->Void) {
-        let tmpView = MXSPokerView()
-        let fromFrame = from.concreteView!.frame
-//        tmpView.frame = CGRect(x: fromFrame.minX + (MXSSize.Hw - MXSSize.Pw) * 0.5, y: fromFrame.minY + (MXSSize.Hh - MXSSize.Ph) * 0.5, width: MXSSize.Pw, height: MXSSize.Ph)
-        tmpView.center = from.concreteView!.center
-        view.addSubview(tmpView)
-        UIView.animate(withDuration: 1.0) {
-            tmpView.center = to.concreteView!.center
-        } completion: { success in
-            tmpView.isHidden = true
+    func pokerHandover(pokers:[MXSPoker], from: MXSHero, to: [MXSHero], completion: @escaping ()->Void) {
+        
+        guard let poker = pokers.first else {
             completion()
+            return }
+        
+        var tmpView = poker.concreteView
+        if tmpView == nil {
+            tmpView = MXSPokerView.init(control: self)
+            poker.concreteView = tmpView
         }
-
+        //反面
+        tmpView?.reverse = true
+        
+        //tmpView.frame = CGRect(x: fromFrame.minX + (MXSSize.Hw - MXSSize.Pw) * 0.5, y: fromFrame.minY + (MXSSize.Hh - MXSSize.Ph) * 0.5, width: MXSSize.Pw, height: MXSSize.Ph)
+        tmpView!.center = from.concreteView!.center
+        
+        for to_hero in to {
+            if from.isPlayer || to_hero.isPlayer {
+                tmpView?.reverse = false
+            }
+            view.addSubview(tmpView!)
+            UIView.animate(withDuration: 1.0) {
+                tmpView!.center = to_hero.concreteView!.center
+            } completion: { success in
+                tmpView!.removeFromSuperview()
+                completion()
+            }
+        }
     }
     
     
